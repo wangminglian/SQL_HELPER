@@ -1,0 +1,20 @@
+SELECT
+  id,
+  merchant_sn,
+  merchant_name,
+  type,
+  event_msg,
+  event_context,
+  status,
+  affect_sub_task_count,
+  affect_status_success_task_count,
+  result,
+  create_at,
+  update_at,
+  version,
+  priority,
+  complete_at,
+  rule_group_id,
+  pt
+ FROM wosai_main.ods_trans_contract_task
+ WHERE pt = '20220529'
