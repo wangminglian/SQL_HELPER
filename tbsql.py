@@ -199,26 +199,47 @@ class ColumnSelector(QListWidget):
             self.parent_widget.setFocus()
 
     def on_item_clicked(self, item):
-        if hasattr(self, 'parent_widget'):
-            # 获取当前搜索框的文本
-            current_text = self.parent_widget.text()
-            # 找到最后一个@的位置
-            last_at = current_text.rfind('@')
-            if last_at != -1:
-                # 保留@符号，并添加选中的列名
-                new_text = current_text[:last_at] + '@' + item.text()
-                self.parent_widget.setText(new_text)
+        """列表项被点击时触发"""
+        if hasattr(self, 'on_item_clicked'):
+            self.on_item_clicked(item)
+        # 确保隐藏窗口
         self.hide()
 
     def keyPressEvent(self, event):
-        """处理键盘事件"""
-        if event.key() in (Qt.Key_Return, Qt.Key_Enter):
-            # 获取当前选中的项
+        """键盘事件处理"""
+        key = event.key()
+        if key == Qt.Key.Key_Escape:
+            # ESC键隐藏窗口
+            self.hide()
+        elif key == Qt.Key.Key_Return or key == Qt.Key.Key_Enter:
+            # 回车键选择当前项
             current_item = self.currentItem()
             if current_item and not current_item.isHidden():
-                self.on_item_clicked(current_item)
-            event.accept()
+                # 保存项目文本，因为回调后项目可能被删除
+                item_text = current_item.text()
+                # 创建一个新的项目对象传递给回调
+                new_item = QListWidgetItem(item_text)
+                self.on_item_clicked(new_item)
+        elif key == Qt.Key.Key_Up:
+            # 上键选择上一项
+            current_row = self.currentRow()
+            if current_row > 0:
+                # 查找上一个可见项
+                for row in range(current_row - 1, -1, -1):
+                    if not self.item(row).isHidden():
+                        self.setCurrentRow(row)
+                        break
+        elif key == Qt.Key.Key_Down:
+            # 下键选择下一项
+            current_row = self.currentRow()
+            if current_row < self.count() - 1:
+                # 查找下一个可见项
+                for row in range(current_row + 1, self.count()):
+                    if not self.item(row).isHidden():
+                        self.setCurrentRow(row)
+                        break
         else:
+            # 其他键传递给父类
             super().keyPressEvent(event)
 
 
@@ -395,153 +416,333 @@ class TBSQLWindow(QWidget):
         self.table_manager.register_function('average_range', average_range)
 
     def init_ui(self):
-        # ====== 按钮组件 ======
-        # 导入文档按钮
-        self.pb_input_excel: QPushButton = self.ui.pb_input_excel
-        # 保存数据按钮
-        self.pb_save: QPushButton = self.ui.pb_save
-        # 新建表格按钮
-        self.pb_add_tab: QPushButton = self.ui.pb_add_tab
-        # 创建函数按钮
-        self.pb_create_func: QPushButton = self.ui.pb_create_func
-        # 删除表格按钮
-        self.pb_del_excel: QPushButton = self.ui.pb_del_excel
-        # 删除函数按钮
-        self.pb_del_func: QPushButton = self.ui.pb_del_func
-        # 数据导入按钮
-        self.pb_tab1_data_in: QPushButton = self.ui.pb_tab1_data_in
-        # 新增列按钮
-        self.pb_tab1_add_col: QPushButton = self.ui.pb_tab1_add_col
-        # 删除列按钮
-        self.pb_tab1_del_col: QPushButton = self.ui.pb_tab1_del_col
-        # 新增行按钮
-        self.pb_tab1_add_row: QPushButton = self.ui.pb_tab1_add_row
-        # 删除行按钮
-        self.pb_tab1_del_row: QPushButton = self.ui.pb_tab1_del_row
-        # 存为模板按钮
-        self.pb_save_mb: QPushButton = self.ui.pb_save_mb
-        # 历史记录按钮
-        self.pb_history: QPushButton = self.ui.pb_history
-        # 生成按钮
-        self.pb_run: QPushButton = self.ui.pb_run
+        """初始化用户界面"""
+        try:
+            # ====== 按钮组件 ======
+            # 导入文档按钮
+            self.pb_input_excel: QPushButton = self.ui.pb_input_excel
+            # 保存数据按钮
+            self.pb_save: QPushButton = self.ui.pb_save
+            # 新建表格按钮
+            self.pb_add_tab: QPushButton = self.ui.pb_add_tab
+            # 创建函数按钮
+            self.pb_create_func: QPushButton = self.ui.pb_create_func
+            # 删除表格按钮
+            self.pb_del_excel: QPushButton = self.ui.pb_del_excel
+            # 删除函数按钮
+            self.pb_del_func: QPushButton = self.ui.pb_del_func
+            # 数据导入按钮
+            self.pb_tab1_data_in: QPushButton = self.ui.pb_tab1_data_in
+            # 新增列按钮
+            self.pb_tab1_add_col: QPushButton = self.ui.pb_tab1_add_col
+            # 删除列按钮
+            self.pb_tab1_del_col: QPushButton = self.ui.pb_tab1_del_col
+            # 新增行按钮
+            self.pb_tab1_add_row: QPushButton = self.ui.pb_tab1_add_row
+            # 删除行按钮
+            self.pb_tab1_del_row: QPushButton = self.ui.pb_tab1_del_row
+            # 存为模板按钮
+            self.pb_save_mb: QPushButton = self.ui.pb_save_mb
+            # 历史记录按钮
+            self.pb_history: QPushButton = self.ui.pb_history
+            # 生成按钮
+            self.pb_run: QPushButton = self.ui.pb_run
 
-        # ====== 输入框组件 ======
-        # 表格搜索输入框
-        self.li_tb_search: QLineEdit = self.ui.li_tb_search
-        # 字段筛选输入框
-        self.li_tab1_search: QLineEdit = self.ui.li_tab1_search
-        # 命令输入框
-        self.li_com: QLineEdit = self.ui.li_com
-        # 表格名称输入框
-        self.li_tb: QLineEdit = self.ui.li_tb
-        # 列名输入框
-        self.li_col: QLineEdit = self.ui.li_col
-        # 变量搜索输入框
-        self.li_search_arg: QLineEdit = self.ui.li_search_arg
-        # 模板搜索输入框
-        self.li_mb_search: QLineEdit = self.ui.li_mb_search
+            # ====== 输入框组件 ======
+            # 表格搜索输入框
+            self.li_tb_search: QLineEdit = self.ui.li_tb_search
+            # 字段筛选输入框
+            self.li_tab1_search: QLineEdit = self.ui.li_tab1_search
+            # 命令输入框
+            self.li_com: QLineEdit = self.ui.li_com
+            # 表格名称输入框
+            self.li_tb: QLineEdit = self.ui.li_tb
+            # 列名输入框
+            self.li_col: QLineEdit = self.ui.li_col
+            # 变量搜索输入框
+            self.li_search_arg: QLineEdit = self.ui.li_search_arg
+            # 模板搜索输入框
+            self.li_mb_search: QLineEdit = self.ui.li_mb_search
 
-        # ====== 下拉框组件 ======
-        # 表格选择下拉框
-        self.com_table: QComboBox = self.ui.com_table
+            # ====== 下拉框组件 ======
+            # 表格选择下拉框
+            self.com_table: QComboBox = self.ui.com_table
 
-        # ====== 单选按钮 ======
-        # 是否置顶单选框
-        self.ra_zhiding: QRadioButton = self.ui.ra_zhiding
+            # ====== 单选按钮 ======
+            # 是否置顶单选框
+            self.ra_zhiding: QRadioButton = self.ui.ra_zhiding
 
-        # ====== 表格组件 ======
-        # 主数据表格
-        self.tb_data: QTableView = self.ui.tb_data
-        # 参数列表表格
-        self.tb_arg_list: QTableView = self.ui.tb_arg_list
+            # ====== 表格组件 ======
+            # 主数据表格
+            self.tb_data: QTableView = self.ui.tb_data
+            # 参数列表表格
+            self.tb_arg_list: QTableView = self.ui.tb_arg_list
 
-        # ====== 文本框组件 ======
-        # 所有命令文本框
-        self.tx_all_com: QTextEdit = self.ui.tx_all_com
-        # 输出文本框
-        self.tx_out: QTextEdit = self.ui.tx_out
+            # ====== 文本框组件 ======
+            # 所有命令文本框
+            self.tx_all_com: QTextEdit = self.ui.tx_all_com
+            # 输出文本框
+            self.tx_out: QTextEdit = self.ui.tx_out
 
-        # ====== 初始化数据 ======
-        self.data_dict = INNT_DATA
-        
-        # ====== 绑定事件 ======
-        self.pb_input_excel.clicked.connect(self.import_json)
-        # 绑定下拉框选择事件
-        self.com_table.currentTextChanged.connect(self.on_table_changed)
-        
-        # 设置表格编辑触发方式
-        self.tb_data.setEditTriggers(QTableView.DoubleClicked | 
-                                   QTableView.EditKeyPressed | 
-                                   QTableView.AnyKeyPressed)
-        
-        # 允许多选
-        self.tb_data.setSelectionMode(QTableView.ExtendedSelection)
-        # 设置表格调整模式
-        self.tb_data.horizontalHeader().setStretchLastSection(True)
-        self.tb_data.horizontalHeader().setSectionsMovable(True)
-        
-        # 启用表格单元格的自定义颜色显示
-        self.tb_data.setAlternatingRowColors(False)  # 禁用交替行颜色，以便更好地显示公式单元格颜色
-        
-        # 设置表格双击事件
-        self.tb_data.doubleClicked.connect(self.on_tb_data_double_clicked)
-        # 新增列按钮
-        self.pb_tab1_add_col.clicked.connect(self.add_column)
-        # 绑定新增行按钮事件
-        self.pb_tab1_add_row.clicked.connect(self.add_row)
-        # 绑定删除行按钮事件
-        self.pb_tab1_del_row.clicked.connect(self.delete_row)
-        # 绑定删除列按钮事件
-        self.pb_tab1_del_col.clicked.connect(self.delete_column)
-        # 绑定表格搜索按钮事件
-        self.li_tb_search.textChanged.connect(self.search_table)
-        # 绑定数据搜索按钮事件
-        self.li_tab1_search.textChanged.connect(self.search_data_by_rule)
-        # 绑定命令输入框事件
-        self.li_com.textChanged.connect(self.handle_command_input)
-        # 绑定执行按钮事件
-        self.pb_run.clicked.connect(self.execute_command)
-        
-        # 记录上一个search_rule 
-        self.last_search_rule = ""
-        # 记录上一个command_input
-        self.last_command_input = ""
+            # ====== 初始化数据 ======
+            self.data_dict = INNT_DATA
+            
+            # ====== 绑定事件 ======
+            self.pb_input_excel.clicked.connect(self.import_json)
+            # 绑定下拉框选择事件
+            self.com_table.currentTextChanged.connect(self.on_table_changed)
+            # 绑定表格名称输入框的文本变化信号
+            self.li_tb.textChanged.connect(self.handle_table_input)
+            # 绑定列名输入框的文本变化信号
+            self.li_col.textChanged.connect(self.handle_column_input)
+            
+            # 设置表格编辑触发方式
+            self.tb_data.setEditTriggers(QTableView.DoubleClicked | 
+                                       QTableView.EditKeyPressed | 
+                                       QTableView.AnyKeyPressed)
+            
+            # 允许多选
+            self.tb_data.setSelectionMode(QTableView.ExtendedSelection)
+            # 设置表格调整模式
+            self.tb_data.horizontalHeader().setStretchLastSection(True)
+            self.tb_data.horizontalHeader().setSectionsMovable(True)
+            
+            # 启用表格单元格的自定义颜色显示
+            self.tb_data.setAlternatingRowColors(False)  # 禁用交替行颜色，以便更好地显示公式单元格颜色
+            
+            # 设置表格双击事件
+            self.tb_data.doubleClicked.connect(self.on_tb_data_double_clicked)
+            # 新增列按钮
+            self.pb_tab1_add_col.clicked.connect(self.add_column)
+            # 绑定新增行按钮事件
+            self.pb_tab1_add_row.clicked.connect(self.add_row)
+            # 绑定删除行按钮事件
+            self.pb_tab1_del_row.clicked.connect(self.delete_row)
+            # 绑定删除列按钮事件
+            self.pb_tab1_del_col.clicked.connect(self.delete_column)
+            # 绑定表格搜索按钮事件
+            self.li_tb_search.textChanged.connect(self.search_table)
+            # 绑定数据搜索按钮事件
+            self.li_tab1_search.textChanged.connect(self.search_data_by_rule)
+            # 绑定命令输入框事件
+            self.li_com.textChanged.connect(self.handle_command_input)
+            # 绑定执行按钮事件
+            self.pb_run.clicked.connect(self.execute_command)
+            
+            # 记录上一个search_rule 
+            self.last_search_rule = ""
+            # 记录上一个command_input
+            self.last_command_input = ""
 
-        # 添加公式单元格图例标签
-        self.formula_legend = QLabel(self)
-        self.formula_legend.setText("绿色文字表示公式单元格")
-        self.formula_legend.setStyleSheet("""
-            background-color: rgb(230, 245, 255); 
-            color: rgb(0, 128, 0);
-            padding: 3px;
-            border-radius: 3px;
-            font-size: 12px;
-            border: 1px solid rgb(200, 225, 255);
-        """)
-        self.formula_legend.setFixedHeight(20)
-        self.formula_legend.setAlignment(Qt.AlignCenter)
-        
-        # 将图例放在表格上方
-        legend_container = QWidget(self)
-        legend_layout = QHBoxLayout(legend_container)
-        legend_layout.setContentsMargins(0, 0, 0, 0)
-        legend_layout.addStretch()
-        legend_layout.addWidget(self.formula_legend)
-        
-        # 将图例容器添加到表格上方
-        # 在水平布局3（包含表格的布局）前插入图例
-        self.ui.verticalLayout_3.insertWidget(3, legend_container)
+            # 添加公式单元格图例标签
+            self.formula_legend = QLabel(self)
+            self.formula_legend.setText("绿色文字表示公式单元格")
+            self.formula_legend.setStyleSheet("""
+                background-color: rgb(230, 245, 255); 
+                color: rgb(0, 128, 0);
+                padding: 3px;
+                border-radius: 3px;
+                font-size: 12px;
+                border: 1px solid rgb(200, 225, 255);
+            """)
+            self.formula_legend.setFixedHeight(20)
+            self.formula_legend.setAlignment(Qt.AlignCenter)
+            
+            # 将图例放在表格上方
+            legend_container = QWidget(self)
+            legend_layout = QHBoxLayout(legend_container)
+            legend_layout.setContentsMargins(0, 0, 0, 0)
+            legend_layout.addStretch()
+            legend_layout.addWidget(self.formula_legend)
+            
+            # 将图例容器添加到表格上方
+            # 在水平布局3（包含表格的布局）前插入图例
+            self.ui.verticalLayout_3.insertWidget(3, legend_container)
 
-        # 初始化上一次输入的表格名
-        self.last_table_input = ""
-        
-        # 连接表格名称输入框的文本变化信号
-        self.li_tb.textChanged.connect(self.handle_table_input)
+            # 初始化上一次输入的表格名
+            self.last_table_input = ""
+            
+            # 初始化上一次输入的列名
+            self.last_column_input = ""
+            
+        except Exception as e:
+            logging.error(f"初始化UI时出错: {str(e)}")
 
-    # 实现li_tb功能，
-    # 当用户在li_tb中输入@时，像li_com一样弹出选择器，选择器中包含所有表格名称
-    # 选择器支持键盘上下键切换，回车选择
-    
+    def handle_column_input(self):
+        """处理列名输入框的输入"""
+        try:
+            # 获取当前输入的文本
+            column_name = self.li_col.text()
+            
+            # 检查是否刚刚输入了@符号
+            if '@' in column_name and '@' not in self.last_column_input:
+                # 获取当前li_tb中的表名
+                table_text = self.li_tb.text().strip()
+                table_name = None
+                
+                # 检查 li_tb 是否为空
+                if not table_text:
+                    QMessageBox.warning(self, "提示", "请先在表格名称输入框中选择表名")
+                    # 清除 @ 符号
+                    self.li_col.setText(self.last_column_input)
+                    # 设置焦点到表格名称输入框
+                    self.li_tb.setFocus()
+                    return
+                
+                if '@' in table_text:
+                    # 提取@后面的表名
+                    at_pos = table_text.rfind('@')
+                    table_name = table_text[at_pos + 1:].strip()
+                else:
+                    # 使用下拉框中选择的表名
+                    table_name = self.com_table.currentText()
+                
+                # 检查表名是否存在
+                if not table_name or table_name not in self.data_dict.get("表格列表", {}):
+                    QMessageBox.warning(self, "提示", f"表 '{table_name}' 不存在，请先选择有效的表名")
+                    # 清除 @ 符号
+                    self.li_col.setText(self.last_column_input)
+                    # 设置焦点到表格名称输入框
+                    self.li_tb.setFocus()
+                    return
+                
+                # 清空输入框，只保留@符号
+                self.li_col.setText('@')
+                self.li_col.setCursorPosition(1)  # 将光标移动到@后面
+                # 更新上一次输入
+                self.last_column_input = '@'
+                
+                # 显示列名选择器
+                self.show_column_selector_for_col(table_name, "")
+                return
+            
+            # 如果输入比上一次短，说明是删除操作，隐藏选择器
+            if len(column_name) < len(self.last_column_input):
+                if hasattr(self, 'column_selector_for_col'):
+                    self.column_selector_for_col.hide()
+                self.last_column_input = column_name
+                return
+            
+            # 更新上一次输入
+            self.last_column_input = column_name
+            
+            # 检查是否输入了@符号，弹出列名选择器
+            if '@' in column_name:
+                last_at_pos = column_name.rfind('@')
+                after_at = column_name[last_at_pos + 1:].strip()
+                
+                # 如果@后面有空格或其他分隔符，则不显示选择框
+                if '=' in after_at or ' ' in after_at or ',' in after_at or '.' in after_at:
+                    if hasattr(self, 'column_selector_for_col'):
+                        self.column_selector_for_col.hide()
+                else:
+                    # 获取当前li_tb中的表名（如果有@，需要剔除）
+                    table_text = self.li_tb.text()
+                    table_name = None
+                    
+                    if '@' in table_text:
+                        # 提取@后面的表名
+                        at_pos = table_text.rfind('@')
+                        table_name = table_text[at_pos + 1:].strip()
+                    else:
+                        # 使用下拉框中选择的表名
+                        table_name = self.com_table.currentText()
+                    
+                    # 检查表名是否存在
+                    if not table_name or table_name not in self.data_dict.get("表格列表", {}):
+                        if hasattr(self, 'column_selector_for_col'):
+                            self.column_selector_for_col.hide()
+                        return
+                    
+                    # 显示列名选择器
+                    self.show_column_selector_for_col(table_name, after_at)
+                return
+                
+            # 如果没有特殊字符，隐藏所有选择器
+            if hasattr(self, 'column_selector_for_col'):
+                self.column_selector_for_col.hide()
+                
+        except Exception as e:
+            logging.error(f"处理列名输入时出错: {str(e)}")
+            
+    def show_column_selector_for_col(self, table_name, filter_text=""):
+        """显示列名选择器（用于列名输入框）"""
+        try:
+            # 获取表的列名
+            if table_name in self.data_dict.get("表格列表", {}):
+                columns = self.data_dict["表格列表"][table_name]["表格字段"]
+            else:
+                logging.warning(f"表 {table_name} 不存在")
+                return
+                
+            if not columns:
+                logging.warning(f"表 {table_name} 没有列信息")
+                return
+                
+            # 初始化列选择器
+            if not hasattr(self, 'column_selector_for_col'):
+                self.column_selector_for_col = ColumnSelector(self)
+                
+                # 定义选择回调函数
+                def on_column_selected(item):
+                    try:
+                        # 获取当前文本和@符号位置
+                        current_text = self.li_col.text()
+                        last_at_pos = current_text.rfind('@')
+                        
+                        # 获取项目文本（安全方式）
+                        column_name = item.text() if hasattr(item, 'text') else str(item)
+                        
+                        # 替换@后面的内容
+                        new_text = current_text[:last_at_pos+1] + column_name
+                        if last_at_pos + len(column_name) + 1 < len(current_text):
+                            # 如果有后续内容，保留
+                            after_content = current_text[last_at_pos+1:]
+                            # 找到第一个分隔符
+                            separator_pos = -1
+                            for separator in [' ', ',', '=']:
+                                pos = after_content.find(separator)
+                                if pos != -1 and (separator_pos == -1 or pos < separator_pos):
+                                    separator_pos = pos
+                            
+                            if separator_pos != -1:
+                                # 有分隔符，保留分隔符及之后的内容
+                                new_text = current_text[:last_at_pos+1] + column_name + after_content[separator_pos:]
+                        
+                        self.li_col.setText(new_text)
+                        # 将光标移动到插入文本后
+                        new_cursor_pos = last_at_pos + 1 + len(column_name)
+                        self.li_col.setCursorPosition(new_cursor_pos)
+                        
+                        # 让列名输入框获得焦点
+                        self.li_col.setFocus()
+                        
+                        # 隐藏选择框
+                        self.column_selector_for_col.hide()
+                    except Exception as e:
+                        logging.error(f"选择列名时出错: {str(e)}")
+                
+                self.column_selector_for_col.on_item_clicked = on_column_selected
+            
+            # 清空并设置列名列表
+            self.column_selector_for_col.clear()
+            for col in columns:
+                self.column_selector_for_col.addItem(col)
+            
+            # 根据过滤文本筛选
+            if filter_text:
+                self.column_selector_for_col.filter_items(filter_text)
+            
+            # 计算弹出位置
+            pos = self.li_col.mapToGlobal(QPoint(0, self.li_col.height()))
+            self.column_selector_for_col.move(pos)
+            self.column_selector_for_col.setFixedWidth(self.li_col.width())
+            
+            # 显示选择器
+            self.column_selector_for_col.show()
+            
+        except Exception as e:
+            logging.error(f"显示列名选择器时出错: {str(e)}")
 
     # 处理命令输入框的输入
     def handle_command_input(self):
