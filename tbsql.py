@@ -532,6 +532,16 @@ class TBSQLWindow(QWidget):
         # 在水平布局3（包含表格的布局）前插入图例
         self.ui.verticalLayout_3.insertWidget(3, legend_container)
 
+        # 初始化上一次输入的表格名
+        self.last_table_input = ""
+        
+        # 连接表格名称输入框的文本变化信号
+        self.li_tb.textChanged.connect(self.handle_table_input)
+
+    # 实现li_tb功能，
+    # 当用户在li_tb中输入@时，像li_com一样弹出选择器，选择器中包含所有表格名称
+    # 选择器支持键盘上下键切换，回车选择
+    
 
     # 处理命令输入框的输入
     def handle_command_input(self):
@@ -569,7 +579,7 @@ class TBSQLWindow(QWidget):
                     if hasattr(self, 'table_selector'):
                         self.table_selector.hide()
                 else:
-                    self.show_table_selector(after_at)
+                    self.show_table_selector(after_at, self.li_com)
                 return
                 
             # 检查是否输入了点号，弹出列名选择器
@@ -636,13 +646,24 @@ class TBSQLWindow(QWidget):
         except Exception as e:
             logging.error(f"显示公式选择器时出错: {str(e)}")
     
-    def show_table_selector(self, filter_text=""):
-        """显示表名选择器"""
+    def show_table_selector(self, filter_text="", parent_widget=None):
+        """显示表名选择器
+        
+        Args:
+            filter_text: 过滤文本
+            parent_widget: 父组件，默认为 li_com
+        """
         try:
+            # 如果没有指定父组件，默认使用 li_com
+            if parent_widget is None:
+                parent_widget = self.li_com
+            
             # 确保表名选择器已创建
             if not hasattr(self, 'table_selector'):
                 self.table_selector = ColumnSelector(self)
-                self.table_selector.parent_widget = self.li_com
+            
+            # 设置父组件
+            self.table_selector.parent_widget = parent_widget
             
             # 获取所有表名
             tables = list(self.data_dict.get("表格列表", {}).keys())
@@ -653,29 +674,39 @@ class TBSQLWindow(QWidget):
                 self.table_selector.addItem(table)
             
             # 设置位置和大小
-            pos = self.li_com.mapToGlobal(QPoint(0, self.li_com.height()))
+            pos = parent_widget.mapToGlobal(QPoint(0, parent_widget.height()))
             self.table_selector.move(pos)
-            self.table_selector.setFixedWidth(self.li_com.width())
+            self.table_selector.setFixedWidth(parent_widget.width())
             
             # 根据输入过滤列表项
             self.table_selector.filter_items(filter_text)
             
             # 设置选择器的点击事件处理
             def on_table_selected(item):
-                current_text = self.li_com.text()
+                current_text = parent_widget.text()
                 # 找到最后一个@符号的位置
                 last_at_pos = current_text.rfind('@')
-                # 替换@后面的内容为选中的表名加点号
-                new_text = current_text[:last_at_pos + 1] + item.text() + "."
-                self.li_com.setText(new_text)
-                # 将光标移动到点号后
-                self.li_com.setCursorPosition(len(new_text))
+                # 替换@后面的内容为选中的表名
+                new_text = current_text[:last_at_pos + 1] + item.text()
+                
+                # 如果父组件是 li_com，则在表名后添加点号
+                if parent_widget == self.li_com:
+                    new_text += "."
+                
+                parent_widget.setText(new_text)
+                # 将光标移动到末尾
+                parent_widget.setCursorPosition(len(new_text))
                 self.table_selector.hide()
-                # 自动触发列名选择器
-                self.show_column_selector_for_command(item.text(), "")
+                
+                # 如果父组件是 li_com，自动触发列名选择器
+                if parent_widget == self.li_com:
+                    self.show_column_selector_for_command(item.text(), "")
             
             # 绑定选择事件
             self.table_selector.on_item_clicked = on_table_selected
+            
+            # 显示选择器
+            self.table_selector.show()
             
         except Exception as e:
             logging.error(f"显示表名选择器时出错: {str(e)}")
@@ -838,6 +869,43 @@ class TBSQLWindow(QWidget):
             # 检查焦点是否在表格上
             if self.tb_data.hasFocus():
                 self.copy_selected_cells()
+                event.accept()
+                return
+        
+        # 处理表格选择器的键盘事件
+        if hasattr(self, 'table_selector') and self.table_selector.isVisible():
+            if event.key() == Qt.Key_Up:
+                # 向上选择
+                current_row = self.table_selector.currentRow()
+                if current_row > 0:
+                    # 找到上一个可见项
+                    for i in range(current_row - 1, -1, -1):
+                        if not self.table_selector.item(i).isHidden():
+                            self.table_selector.setCurrentRow(i)
+                            break
+                event.accept()
+                return
+            elif event.key() == Qt.Key_Down:
+                # 向下选择
+                current_row = self.table_selector.currentRow()
+                if current_row < self.table_selector.count() - 1:
+                    # 找到下一个可见项
+                    for i in range(current_row + 1, self.table_selector.count()):
+                        if not self.table_selector.item(i).isHidden():
+                            self.table_selector.setCurrentRow(i)
+                            break
+                event.accept()
+                return
+            elif event.key() == Qt.Key_Return or event.key() == Qt.Key_Enter:
+                # 确认选择
+                current_item = self.table_selector.currentItem()
+                if current_item and not current_item.isHidden():
+                    self.table_selector.on_item_clicked(current_item)
+                event.accept()
+                return
+            elif event.key() == Qt.Key_Escape:
+                # 关闭选择器
+                self.table_selector.hide()
                 event.accept()
                 return
                 
@@ -1275,6 +1343,70 @@ class TBSQLWindow(QWidget):
         except Exception as e:
             logging.error(f"执行命令时出错: {str(e)}")
             self.tx_all_com.append(f"执行错误: {str(e)}")
+
+    def handle_table_input(self):
+        """处理表格名称输入框的输入"""
+        try:
+            # 获取当前输入的文本
+            table_name = self.li_tb.text().strip()
+            
+            # 如果输入比上一次短，说明是删除操作，隐藏选择器
+            if len(table_name) < len(self.last_table_input):
+                if hasattr(self, 'table_selector'):
+                    self.table_selector.hide()
+                self.last_table_input = table_name
+                return
+            
+            # 更新上一次输入
+            self.last_table_input = table_name
+            
+            # 检查是否输入了@符号，弹出表名选择器
+            if '@' in table_name:
+                last_at_pos = table_name.rfind('@')
+                after_at = table_name[last_at_pos + 1:].strip()
+                
+                # 如果@后面有空格或其他分隔符，则不显示选择框
+                if '=' in after_at or ' ' in after_at or ',' in after_at or '.' in after_at:
+                    if hasattr(self, 'table_selector'):
+                        self.table_selector.hide()
+                else:
+                    self.show_table_selector(after_at, self.li_tb)
+                return
+                
+            # 检查是否输入了点号，弹出列名选择器
+            if '.' in table_name:
+                last_dot_pos = table_name.rfind('.')
+                # 获取点号前的表名
+                dot_context = table_name[:last_dot_pos]
+                table_name = None
+                
+                # 尝试从@符号后提取表名
+                if '@' in dot_context:
+                    at_pos = dot_context.rfind('@')
+                    potential_table = dot_context[at_pos + 1:].strip()
+                    # 检查表名是否存在
+                    if potential_table in self.data_dict.get("表格列表", {}):
+                        table_name = potential_table
+                
+                # 如果找到了表名，显示该表的列名选择器
+                if table_name:
+                    after_dot = table_name[last_dot_pos + 1:].strip()
+                    # 如果点号后面有空格或其他分隔符，则不显示选择框
+                    if '=' in after_dot or ' ' in after_dot or ',' in after_dot:
+                        if hasattr(self, 'column_selector_for_command'):
+                            self.column_selector_for_command.hide()
+                    else:
+                        self.show_column_selector_for_command(table_name, after_dot)
+                return
+                
+            # 如果没有特殊字符，隐藏所有选择器
+            if hasattr(self, 'table_selector'):
+                self.table_selector.hide()
+            if hasattr(self, 'column_selector_for_command'):
+                self.column_selector_for_command.hide()
+                
+        except Exception as e:
+            logging.error(f"处理表格名称输入时出错: {str(e)}")
 
 
 def main():
