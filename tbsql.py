@@ -1348,7 +1348,44 @@ class TBSQLWindow(QWidget):
         """处理表格名称输入框的输入"""
         try:
             # 获取当前输入的文本
-            table_name = self.li_tb.text().strip()
+            table_name = self.li_tb.text()
+            
+            # 检查是否输入了@符号
+            if '@' in table_name:
+                # 如果输入了新的@符号，清空之前的所有内容，只保留新的@
+                current_cursor_pos = self.li_tb.cursorPosition()
+                # 检查光标前一个字符是否为@
+                if current_cursor_pos > 0 and table_name[current_cursor_pos-1] == '@':
+                    # 清空输入框，只保留@符号
+                    self.li_tb.setText('@')
+                    self.li_tb.setCursorPosition(1)  # 将光标移动到@后面
+                    # 更新上一次输入
+                    self.last_table_input = '@'
+                    # 显示表格选择器
+                    self.show_table_selector("", self.li_tb)
+                    return
+                
+                # 处理其他情况下的@符号
+                last_at_pos = table_name.rfind('@')
+                after_at = table_name[last_at_pos + 1:].strip()
+                
+                # 如果@后面有空格或其他分隔符，则不显示选择框
+                if '=' in after_at or ' ' in after_at or ',' in after_at or '.' in after_at:
+                    if hasattr(self, 'table_selector'):
+                        self.table_selector.hide()
+                else:
+                    self.show_table_selector(after_at, self.li_tb)
+                    
+                # 确保输入框中只有一个@表名引用
+                if table_name.count('@') > 1:
+                    # 保留最后一个@及其后面的内容
+                    new_text = '@' + after_at
+                    self.li_tb.setText(new_text)
+                    # 将光标放在文本末尾
+                    self.li_tb.setCursorPosition(len(new_text))
+                    # 更新上一次输入
+                    self.last_table_input = new_text
+                return
             
             # 如果输入比上一次短，说明是删除操作，隐藏选择器
             if len(table_name) < len(self.last_table_input):
@@ -1359,19 +1396,6 @@ class TBSQLWindow(QWidget):
             
             # 更新上一次输入
             self.last_table_input = table_name
-            
-            # 检查是否输入了@符号，弹出表名选择器
-            if '@' in table_name:
-                last_at_pos = table_name.rfind('@')
-                after_at = table_name[last_at_pos + 1:].strip()
-                
-                # 如果@后面有空格或其他分隔符，则不显示选择框
-                if '=' in after_at or ' ' in after_at or ',' in after_at or '.' in after_at:
-                    if hasattr(self, 'table_selector'):
-                        self.table_selector.hide()
-                else:
-                    self.show_table_selector(after_at, self.li_tb)
-                return
                 
             # 检查是否输入了点号，弹出列名选择器
             if '.' in table_name:
