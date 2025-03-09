@@ -1,27 +1,18 @@
-import ctypes
-import logging
 import os
 import re
-from asyncio import sleep
-from concurrent.futures import ThreadPoolExecutor
-
-import win32con
-from apscheduler.schedulers.background import BackgroundScheduler
 
 from clinet.main_ui import Ui_MainWindow
 from clinet.gy_ui import Ui_SQL_HELPER
 import pyperclip
-from PySide2 import QtWidgets, QtCore
-from PySide2.QtCore import QTime, QDateTime, QRect, QTimer, QCoreApplication
-from PySide2.QtGui import Qt, QIcon, QKeySequence
-from PySide2.QtWidgets import QTextEdit, QApplication, QMessageBox, QDateTimeEdit, QLineEdit, QPushButton, QTextBrowser, \
+
+from PySide6.QtCore import QTime, QDateTime, QRect, QTimer, QCoreApplication
+from PySide6.QtGui import Qt, QIcon, QKeySequence, QShortcut, QAction
+from PySide6.QtWidgets import QTextEdit, QApplication, QMessageBox, QDateTimeEdit, QLineEdit, QPushButton, QTextBrowser, \
     QFormLayout, QHBoxLayout, QComboBox, QInputDialog, QMainWindow, QFileDialog, QTableWidget, QTableWidgetItem, \
-    QHeaderView, QAbstractItemView, QDesktopWidget, QAction, QShortcut, QWidget, QToolBar, QMenu, QVBoxLayout, \
+    QHeaderView, QAbstractItemView,  QWidget, QToolBar, QMenu, QVBoxLayout, \
     QRadioButton, QLabel
-from PySide2.QtUiTools import QUiLoader
-from PySide2.QtGui import QStandardItem
-from peewee import SqliteDatabase
-from playhouse.shortcuts import model_to_dict
+
+from peewee import SqliteDatabase, fn
 from collections import namedtuple
 from model.model import Project_detail, SQL_arg, History, dp, create_tables, ARG_model,db
 from sql_helper.helper_restruct import Reader_Factory, Genner_Com
@@ -29,7 +20,6 @@ from collections import deque
 from xuqiu import XUQIU_UI
 from yuanshuju import YSJGL_UI, RWXY_UI, ZDGL_UI, BGL_UI
 from conf import MOBAN_PATH,DB_PATH,DB_NAME,TXHS,TXYD,TXSJ
-from apscheduler.schedulers.blocking import BlockingScheduler
 
 HELP_TEXT = """
                                     帮助文档
@@ -191,10 +181,7 @@ class MainWindow(QMainWindow):
         self.init_com_arg()
         self.init_com_moban()
 
-        # center_pointer = QDesktopWidget().availableGeometry().center()
-        # x = center_pointer.x()
-        # y = center_pointer.y()
-        # self.arg_ui.move()
+
 
         self.te_input:QTextEdit = self.ui.te_input
         self.te_view:QTextBrowser = self.ui.te_view
@@ -203,6 +190,10 @@ class MainWindow(QMainWindow):
         self.a_gy.triggered.connect(self.f_gy)
         self.a_xqgl:QAction = self.ui.a_xqgl
         self.a_xqgl.triggered.connect(self.f_xqgl)
+
+        # 工具栏中添加菜单
+
+
         self.a_ysjgl:QAction=self.ui.a_kjgl
         self.a_ysjgl.triggered.connect(self.f_a_ysjgl)
 
@@ -234,9 +225,9 @@ class MainWindow(QMainWindow):
         # 设置快捷键
         shortcut = QShortcut(QKeySequence("Ctrl+`"), self)
         shortcut.activated.connect(self.switch_focus)
-        shortcut2 = QShortcut(QKeySequence(Qt.CTRL + Qt.Key_Return), self)
+        shortcut2 = QShortcut(QKeySequence(Qt.CTRL | Qt.Key_Return), self)
         shortcut2.activated.connect(self.gener_sql)
-        shortcut3 = QShortcut(QKeySequence(Qt.ALT + Qt.Key_Return), self)
+        shortcut3 = QShortcut(QKeySequence(Qt.ALT | Qt.Key_Return), self)
         shortcut3.activated.connect(self.view_and_copy)
 
         # self.com_history.hide()
@@ -289,7 +280,7 @@ class MainWindow(QMainWindow):
         self.gy_ui.showNormal()
 
     def f_xqgl(self):
-        self.xqgl=XUQIU_UI()
+        self.xqgl=XUQIU_UI(self)
         self.xqgl.show()
 
 
@@ -310,21 +301,26 @@ class MainWindow(QMainWindow):
         for item in items:
             if text.upper() in item.upper():
                 ret.append(item)
-
         self.com_arg.addItems(ret)
         self.repaint()
     def update_comHistory(self,text):
     # 模糊查询历史变量
         self.com_history.clear()
         project_name = self.com_project_name.currentText()
-        itmes = History.select().where(History.project_name==project_name)
 
-        gjz = text.strip().upper()
-        items = itmes.select().where((History.genner_str ** f'%{gjz}%')).order_by(-History.ctime)
+        my_gjz = text.strip().upper()
+        my_gjz_list = my_gjz.split('&')
+    #构造筛选条件语句
+        gjz = ' and '.join(map(lambda x: f"genner_str like '%{x}%'",my_gjz_list))
+        print(gjz)
+        query = f"select genner_str AS genner_str from(select  genner_str,max(ctime) as ctime from history where  {gjz} group by genner_str ) ORDER BY ctime desc "
+
+        print(query)
+        result = db.execute_sql(query)
         tmp = []
-        for i in items:
-            tmp.append(i.__str__())
-            self.mycach[i.__str__()] = i.ret
+
+        for i in result:
+            tmp.append(i[0])
         self.com_history.addItems(tmp)
         self.repaint()
 
@@ -405,11 +401,12 @@ class MainWindow(QMainWindow):
 
     def init_com_history(self):
         self.com_history.clear()
-        itmes = History.select().order_by(-History.mtime).limit(10).execute()
+        itmes = History.select().order_by(-History.mtime).limit(50).execute()
         tmp = []
         for i in itmes:
-            tmp.append(i.__str__())
-            self.mycach[i.__str__()] = i.ret
+            tmp.append(i.genner_str)
+            # tmp.append(i.__str__())
+            # self.mycach[i.__str__()] = i.ret
         self.com_history.addItems(tmp)
         self.repaint()
 
@@ -543,6 +540,9 @@ class MainWindow(QMainWindow):
 
 
     def remove_arg_model(self):
+        result = QMessageBox.question(self, "提醒", "是否删除内容", QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+        if result == QMessageBox.No:
+            return
         try:
             current_row = self.ta_model_list.currentRow()
             pk = int(self.ta_model_list.item(current_row,3).text())
@@ -578,12 +578,12 @@ class MainWindow(QMainWindow):
     def relaod_history(self):
         '''加载历史数据'''
         key = self.com_history.currentText()
-        if key == '' :return
-        values = eval(self.mycach[key])
-        self.te_printer.clear()
-        for item in values:
-            self.te_printer.append(item)
-        self.li_complex.setText(key.split('->')[2])
+        # if key == '' :return
+        # values = eval(self.mycach[key])
+        # self.te_printer.clear()
+        # for item in values:
+        #     self.te_printer.append(item)
+        self.li_complex.setText(key)
         self.repaint()
 
     def help(self):
@@ -664,6 +664,9 @@ class MainWindow(QMainWindow):
 
 
     def remove_arg(self):
+        result = QMessageBox.question(self, "提醒", "是否删除内容", QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+        if result == QMessageBox.No:
+            return
         name = self.com_arg.currentText()
         p_name = self.com_project_name.currentText()
         if (p_name.strip()=='' or p_name == None):
@@ -795,6 +798,9 @@ class MainWindow(QMainWindow):
 
     def remove_project(self):
         '''删除工程'''
+        result = QMessageBox.question(self, "提醒", "是否删除内容", QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+        if result == QMessageBox.No:
+            return
         name = self.com_project_name.currentText()
         tmp = Project_detail.delete().where(Project_detail.project_name == name).execute()
         self.init_com_project_name()
@@ -820,16 +826,17 @@ class MainWindow(QMainWindow):
             print(e.__str__())
 
 
+from qt_material import apply_stylesheet
 
 
 try:
     app = QApplication([])
     stats = MainWindow()
+    # apply_stylesheet(app, theme='light_lightgreen.xml')
 
     stats.show()
 
-    app.exec_()
+    app.exec()
 finally:
-
     pass
 

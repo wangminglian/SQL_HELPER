@@ -1,0 +1,280 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>TBSQL_UI</class>
+ <widget class="QWidget" name="TBSQL_UI">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>917</width>
+    <height>778</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout_5">
+   <item>
+    <layout class="QVBoxLayout" name="verticalLayout_3" stretch="1,0,0,5,5,5,1,5">
+     <item>
+      <layout class="QVBoxLayout" name="verticalLayout_2" stretch="1">
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout">
+         <item>
+          <widget class="QPushButton" name="pb_input_excel">
+           <property name="text">
+            <string>导入文档</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="pb_save">
+           <property name="text">
+            <string>保存数据</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="pb_add_tab">
+           <property name="text">
+            <string>新建表格</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="pb_create_func">
+           <property name="text">
+            <string>创建函数</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="pb_del_excel">
+           <property name="text">
+            <string>删除表格</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="pb_del_func">
+           <property name="text">
+            <string>删除函数</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QRadioButton" name="ra_zhiding">
+           <property name="text">
+            <string>是否置顶</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <widget class="Line" name="line">
+       <property name="orientation">
+        <enum>Qt::Orientation::Horizontal</enum>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <layout class="QVBoxLayout" name="verticalLayout">
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_7" stretch="1,10,20">
+         <item>
+          <widget class="QLabel" name="label">
+           <property name="text">
+            <string>表格搜索:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="li_tb_search"/>
+         </item>
+         <item>
+          <widget class="QComboBox" name="com_table"/>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_2">
+         <item>
+          <widget class="QLabel" name="label_5">
+           <property name="text">
+            <string>字段筛选:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="li_tab1_search"/>
+         </item>
+         <item>
+          <widget class="QPushButton" name="pb_tab1_data_in">
+           <property name="text">
+            <string>数据导入</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="pb_tab1_add_col">
+           <property name="text">
+            <string>新增列</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="pb_tab1_add_row">
+           <property name="text">
+            <string>新增行</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="pb_tab1_del_col">
+           <property name="text">
+            <string>删除列</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="pb_tab1_del_row">
+           <property name="text">
+            <string>删除行</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_3">
+         <item>
+          <widget class="QTableView" name="tb_data"/>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_8" stretch="9,1,2,2,1">
+         <item>
+          <widget class="QLineEdit" name="li_com"/>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_6">
+           <property name="text">
+            <string>-&gt;写入列:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="li_tb"/>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="li_col"/>
+         </item>
+         <item>
+          <widget class="QPushButton" name="pb_run_arg">
+           <property name="text">
+            <string>执行</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <widget class="Line" name="line_2">
+       <property name="orientation">
+        <enum>Qt::Orientation::Horizontal</enum>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_5">
+       <item>
+        <widget class="QTextEdit" name="tx_all_com"/>
+       </item>
+       <item>
+        <layout class="QVBoxLayout" name="verticalLayout_4">
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_6">
+           <item>
+            <widget class="QLabel" name="label_4">
+             <property name="text">
+              <string>变量搜索</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLineEdit" name="li_search_arg"/>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <widget class="QTableView" name="tb_arg_list"/>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <widget class="Line" name="line_3">
+       <property name="orientation">
+        <enum>Qt::Orientation::Horizontal</enum>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_4">
+       <item>
+        <widget class="QLabel" name="label_3">
+         <property name="text">
+          <string>选择模板:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="li_mb_search"/>
+       </item>
+       <item>
+        <widget class="Line" name="line_4">
+         <property name="orientation">
+          <enum>Qt::Orientation::Vertical</enum>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="pb_save_mb">
+         <property name="text">
+          <string>存为模板</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="pb_history">
+         <property name="text">
+          <string>历史记录</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="pb_run">
+         <property name="text">
+          <string>生成</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <widget class="QTextEdit" name="tx_out"/>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

@@ -4,11 +4,12 @@ conf_path:
   GONGZUOQU_PATH: 学习笔记\\数仓任务\\ #工作区代码路径
   DATA_PATH: SQL_HELPER目录\\数据\\ # 数据区代码路径
   HSZ_PATH : SQL_HELPER目录\\回收站\\ # 数据区代码路径
-  VS_PATH: D:\\Users\\86158\\AppData\\Local\\Programs\\Microsoft VS Code\\Code.exe #打开代码的工具，建议使用VSCODE
+  VS_PATH: D:\\Program Files\\Microsoft VS Code\\Code.exe #打开代码的工具，建议使用VSCODE
   WPS_PATH: D:\\Users\\86158\\AppData\\Local\\Kingsoft\\WPS Office\\ksolaunch.exe #WPS目录
   TXT_PATH: D:\\Program Files\\Notepad++\\notepad++.exe
   EDGE_PATH: C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe #浏览器目录
   VSDX_PATH: C:\\Program Files\\Microsoft Office\\root\\Office16\\VISIO.EXE # visio 地址
+  ZIP_PATH: D:\\Program Files (x86)\\360\\360zip\\360zip.exe
   DB_PATH: SQL_HELPER目录\\ # 数据库存储路径
   MOBAN_PATH: SQL_HELPER目录\\模板目录\\ #代码模版路径
   DB_NAME: SQL_Helper.db
@@ -19,4 +20,4 @@ conf_path:
   TXSJ : 5 # 提醒周期，每几分钟提醒一次
   TXHS: 3 #喝水提醒（每几个周期提醒一次）
   TXYD: 6 # 运动提醒（每几个周期提醒一次）
-  ZDXQ: 图书馆|口径 #需要置顶的需求
+  ZDXQ: 图书馆|周报|口径 #需要置顶的需求

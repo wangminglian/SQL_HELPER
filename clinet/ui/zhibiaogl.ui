@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>ZHIBIAOGL</class>
+ <widget class="QWidget" name="ZHIBIAOGL">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1187</width>
+    <height>832</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>指标管理</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout_2">
+   <item>
+    <layout class="QVBoxLayout" name="verticalLayout">
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_2">
+       <item>
+        <widget class="QLabel" name="label">
+         <property name="text">
+          <string>主体/业务过程搜索</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="li_zb_ss"/>
+       </item>
+       <item>
+        <widget class="QLabel" name="label_3">
+         <property name="text">
+          <string>类型筛选</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QComboBox" name="com_zb_sx"/>
+       </item>
+       <item>
+        <spacer name="horizontalSpacer">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="QRadioButton" name="is_zd">
+         <property name="text">
+          <string>是否置顶</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="bt_zb_xj">
+         <property name="text">
+          <string>新建</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="bt_zb_sc">
+         <property name="text">
+          <string>删除</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="bt_zb_xg">
+         <property name="text">
+          <string>修改</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <widget class="Line" name="line">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="label_2">
+       <property name="text">
+        <string>主体/业务过程</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QTableView" name="tb_zb"/>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout">
+       <item>
+        <widget class="QLabel" name="label_4">
+         <property name="text">
+          <string>类型筛选</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QComboBox" name="com_zb_dtl_sx"/>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="li_zb_dtl_ss"/>
+       </item>
+       <item>
+        <spacer name="horizontalSpacer_2">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="QPushButton" name="bt_zb_dtl_tj">
+         <property name="text">
+          <string>添加</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="bt_zb_dtl_sc">
+         <property name="text">
+          <string>删除</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="bt_zb_dtl_xg">
+         <property name="text">
+          <string>修改</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <widget class="Line" name="line_2">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="label_5">
+       <property name="text">
+        <string>属性/指标/条件</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QTableView" name="tb_zb_dtl"/>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

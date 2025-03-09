@@ -63,7 +63,17 @@ class Reader_SQL:
                 gjz_list.add((tb_name))
         return (file_name, list(gjz_list))
 
-
+    def read_sql_to_rtl_table_v2(self,text):
+        _,out_tb = self.read_sql_str_to_out_table(text)
+        out_tbs = out_tb.keys()
+        # 获取输入表
+        text = self.get_real_sql(text)
+        gjz_list = set()
+        for line in text.split('\n'):
+            tb_name = self.get_tbname(line)
+            if tb_name and not tb_name in out_tbs:
+                gjz_list.add((tb_name))
+        return list(gjz_list)
 
 
     def get_real_sql(self,text):
@@ -84,6 +94,18 @@ class Reader_SQL:
         ret_dict = {}
         comment_dict={}
         self.sql_eng.set_sql_by_file(file_name)
+        tbs = self.sql_eng.get_creat_tables()
+        for i in tbs:
+            ret_dict[i.table_name] =i.cloums
+            comment_dict[i.table_name] = i.comment
+
+        return ret_dict, comment_dict
+
+    def read_sql_str_to_out_table(self, sql_str):
+    # 解析输出表
+        ret_dict = {}
+        comment_dict={}
+        self.sql_eng.set_sql(sql_str)
         tbs = self.sql_eng.get_creat_tables()
         for i in tbs:
             ret_dict[i.table_name] =i.cloums

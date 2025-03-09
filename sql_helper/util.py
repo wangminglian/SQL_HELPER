@@ -29,7 +29,7 @@ class MyConf2:
         datas = self.value.get('conf_path')
         ret = datas.get(name,None)
         if ret == None:
-            raise KeyError(f"配置文件配置不正确，请配置，文件路径：{self.ps}")
+            raise KeyError(f"配置文件配置不正确，请配置，文件路径：{self.ps},配置名称{name}")
         return datas.get(name,None)
 
 

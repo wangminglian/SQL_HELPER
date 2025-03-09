@@ -9,29 +9,27 @@ from concurrent.futures import ThreadPoolExecutor
 from clinet.xuqiu_ui import Ui_Form
 from clinet.create_xq_ui import Ui_create_xq
 import pyperclip
-from PySide2 import QtWidgets, QtCore
-from PySide2.QtCore import QTime, QDateTime, QDir, QAbstractTableModel, QModelIndex
-from PySide2.QtGui import Qt, QIcon, QKeySequence, QStandardItemModel, QColor
-from PySide2.QtWidgets import QTextEdit, QApplication, QMessageBox, QDateTimeEdit, QLineEdit, QPushButton, QTextBrowser, \
+from PySide6 import QtWidgets, QtCore
+from PySide6.QtCore import QTime, QDateTime, QDir, QAbstractTableModel, QModelIndex
+from PySide6.QtGui import Qt, QIcon, QKeySequence, QStandardItemModel, QColor, QAction, QShortcut
+from PySide6.QtWidgets import QTextEdit, QApplication, QMessageBox, QDateTimeEdit, QLineEdit, QPushButton, QTextBrowser, \
     QFormLayout, QHBoxLayout, QComboBox, QInputDialog, QMainWindow, QFileDialog, QTableWidget, QTableWidgetItem, \
-    QHeaderView, QAbstractItemView, QDesktopWidget, QAction, QShortcut, QWidget, QTableView, QDialog, QVBoxLayout, \
+    QHeaderView, QAbstractItemView,  QWidget, QTableView, QDialog, QVBoxLayout, \
     QDialogButtonBox, QLabel, QToolTip, QRadioButton, QMenu
-from PySide2.QtUiTools import QUiLoader
-from PySide2.QtGui import QStandardItem
-from peewee import SqliteDatabase, fn
-from playhouse.shortcuts import model_to_dict
-from collections import namedtuple
+from PySide6.QtUiTools import QUiLoader
+from PySide6.QtGui import QStandardItem
 from model.model import Project_detail, SQL_arg, History, dp, create_tables, ARG_model, db, XQ_INFO, JB_INFO, YSJ_KJ, \
     XQ_TABLE_INFO, TABLE_INFO, TABLE_COLUM_INFO
 from sql_helper.helper_restruct import Reader_Factory, Genner_Com
 from collections import deque
 import shutil
 import subprocess
-from conf import XUQIU_MOBAN_PATH,VSDX_PATH, GONGZUOQU_PATH, DATA_PATH, HSZ_PATH, VS_PATH, WPS_PATH, EDGE_PATH, LSJS_PATH, XQLX, \
-    TXT_PATH,ZDXQ
+from conf import XUQIU_MOBAN_PATH, VSDX_PATH, GONGZUOQU_PATH, DATA_PATH, HSZ_PATH, VS_PATH, WPS_PATH, EDGE_PATH, \
+    LSJS_PATH, XQLX, \
+    TXT_PATH, ZDXQ, ZIP_PATH
 from sql_helper.read_sql_file import Reader_SQL
 from tijiaobanben import Submit_banben_UI
-from yuanshuju import CJJS_UI
+from yuanshuju import CJJS_UI, BGL_UI
 
 XUQIU_MOBAN_PATH = XUQIU_MOBAN_PATH
 GONGZUOQU_PATH=GONGZUOQU_PATH
@@ -65,6 +63,36 @@ class Create_XUQIU_UI(QWidget):
         super().__init__()
         self.ui = Ui_create_xq()
         self.ui.setupUi(self)
+        self.setStyleSheet("""
+            QWidget {
+                background-color: #e0f7fa;
+                color: #333;
+            }
+            QPushButton {
+                background-color: #0288d1;
+                color: white;
+                border: none;
+                padding: 5px 10px;
+                text-align: center;
+                font-size: 16px;
+                margin: 4px 2px;
+            }
+            QPushButton:hover {
+                background-color: white;
+                color: black;
+                border: 2px solid #0288d1;
+            }
+            QLabel {
+                font-size: 14px;
+                color: #333;
+            }
+            QLineEdit, QComboBox {
+                background-color: white;
+                color: #333;
+                border: 1px solid #ccc;
+                padding: 5px;
+            }
+        """)
         self.tl_xqmc:QLineEdit = self.ui.lineEdit
         self.com_xqlx:QComboBox = self.ui.comboBox
         self.tl_tcr:QLineEdit = self.ui.lineEdit_2
@@ -105,9 +133,15 @@ class Create_XUQIU_UI(QWidget):
         scpt=os.path.join(XUQIU_MOBAN_PATH,scmb)
         schz = scmb.split('.')[-1]
         if os.path.exists(pt):
-            raise ValueError('需求已存在，请勿重复创建')
+            raise ValueError('目录已存在，请勿重复创建')
+        inint_path_str =['数据','文档']
+        inint_path =[]
+        for i in inint_path_str:
+            inint_path.append(os.path.join(pt,i))
         else:
             os.mkdir(pt)
+            for i in inint_path:
+                os.mkdir(i)
             os.mkdir(os.path.join(pt,'代码'))
             shutil.copy(srpt,os.path.join(pt,f'输入-{name}.{srhz}'))
             shutil.copy(scpt,os.path.join(pt, f'输出-{name}.{schz}'))
@@ -134,13 +168,14 @@ class Create_XUQIU_UI(QWidget):
 
 
 
-xuqiu_header = ['id','需求名称','需求类型','需求状态','需求提出人','需求存储位置']
+xuqiu_header = ['id','需求名称','需求类型','需求状态','需求提出人','需求存储位置','创建日期']
 xuqiu_header_id =0
 xuqiu_header_xqmc =1
 xuqiu_header_xqlx =2
 xuqiu_header_xqzt =3
 xuqiu_header_xqtcr =4
 xuqiu_header_xqccwz =5
+xuqiu_header_cjrq =6
 
 
 xuqiu_dtl_header = ['id','类型','文件名','版本','备注','创建日期','更新日期','路径']
@@ -186,11 +221,12 @@ class MyTableView(QTableView):
 
 
 class XUQIU_UI(QWidget):
-    def __init__(self):
+    def __init__(self,main_pk):
         super().__init__()
         self.ui = Ui_Form()
         self.ui.setupUi(self)
         self.tb_xuqiu:QTableView=self.ui.tb_xuqiu
+        self.main_pk = main_pk
 
         self.tb_xuqiu.setSelectionBehavior(QAbstractItemView.SelectItems)
         self.bt_rename:QPushButton = self.ui.bt_rename
@@ -201,17 +237,28 @@ class XUQIU_UI(QWidget):
         self.bt_remove:QPushButton=self.ui.bt_remove
         self.bt_remove.clicked.connect(self.remove_xuqiu)
         self.li_search:QLineEdit=self.ui.lineEdit
+
         model = QStandardItemModel()
+
+
+
         self.li_search.textChanged.connect(self.search_xuqiu)
+        self.li_search.selectionChanged.connect(self.select_xuqiu)
+
+
         self.com_type:QComboBox = self.ui.com_type
         self.com_type.addItems(['','文档','脚本','文件夹'])
         self.com_type.currentTextChanged.connect(self.f_com_type)
         self.tb_xuqiudtl:QTableView =self.ui.tb_xuqiudtl
-
+        self.tb_xuqiudtl.setSortingEnabled(True)
+        self.tb_xuqiudtl.resizeColumnsToContents()
+        self.tb_xuqiu.setSortingEnabled(True)
+        self.tb_xuqiu.resizeColumnsToContents()
 
 
         self.com_sear_type:QComboBox=self.ui.com_sear_type
         self.com_sear_type.currentTextChanged.connect(self.init_tb_xuqiu)
+
 
         self.tb_xuqiudtl.setSelectionBehavior(QAbstractItemView.SelectItems)
         self.tb_xuqiudtl.setWordWrap(True)
@@ -257,7 +304,40 @@ class XUQIU_UI(QWidget):
         self.is_zd: QRadioButton = self.ui.is_zd
         self.is_zd.toggled.connect(self.f_is_zd)
         # self.is_zd.setChecked(True)
-        
+        shortcut2 = QShortcut(QKeySequence(Qt.CTRL | Qt.Key_B), self)
+        shortcut2.activated.connect(self.f_bgl)
+
+        shortcut3 = QShortcut(QKeySequence(Qt.CTRL | Qt.Key_Z), self)
+        shortcut3.activated.connect(self.f_tz_parent)
+        self.bgl_ui=None
+        self.dict_search_tmp={}
+
+
+        self.tb_xuqiu.hideColumn(5)
+
+        # self.li_search.setText('|')
+        # self.search_xuqiu()
+
+    def f_tz_parent(self):
+        if self.main_pk is None:
+            QMessageBox.warning(self, '提醒', '没有上一级')
+        else:
+            self.main_pk.is_zd.setChecked(True)
+            self.main_pk.is_zd.setChecked(self.is_zd.isChecked())
+            self.main_pk.showNormal()
+
+
+
+    def f_bgl(self):
+        if self.bgl_ui is None:
+            self.bgl_ui = BGL_UI()
+
+        self.bgl_ui.is_zd.setChecked(True)
+        self.bgl_ui.is_zd.setChecked(self.is_zd.isChecked())
+        self.bgl_ui.hide()
+        self.bgl_ui.show()
+
+    # 超级检索
     def f_cjjs(self):
         select_idxs = self.tb_xuqiu.selectedIndexes()
         xqids = []
@@ -445,7 +525,7 @@ class XUQIU_UI(QWidget):
         try:
             idx = self.tb_xuqiu.currentIndex()
             d_datas = self.get_row_content(idx)
-            dpth = d_datas[-1]
+            dpth = d_datas[xuqiu_header_xqccwz]
             # 导入文件
             initial_dir = QDir(LSJS_PATH)
             file_dialog = QFileDialog()
@@ -477,12 +557,19 @@ class XUQIU_UI(QWidget):
             elif datas[-1].endswith('.txt') or datas[-1].endswith('.vsdx'):
                 subprocess.Popen(f'{VSDX_PATH} "{datas[-1]}"')
                 # VSDX_PATH
+            elif datas[-1].endswith('.zip'):
+                subprocess.Popen(f'{ZIP_PATH} "{datas[-1]}"')
+                # 打开zip文件
+            elif datas[-1].startswith('http'):
+                subprocess.Popen(F'{EDGE_PATH} "{datas[-1]}"')
+                pass
             else:
                 subprocess.Popen(F'{WPS_PATH} "{datas[-1]}"')
         elif datas[1]=='文件夹':
             path = datas[-1]
             os.startfile(path)
         else:
+            print( F'{VS_PATH}  "{datas[-1]}"')
             subprocess.Popen(F'{VS_PATH}  "{datas[-1]}"')
 
     def set_file_permissions(self,file_path): #设置为可读可写
@@ -500,6 +587,10 @@ class XUQIU_UI(QWidget):
             print(f"设置文件权限失败：{e}")
     def rm_jb(self):
         #删除脚本
+        result = QMessageBox.question(self, "提醒", "是否删除内容", QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+        if result == QMessageBox.No:
+            return
+
         idx = self.tb_xuqiudtl.currentIndex()
         dts = self.get_row_content(idx)
         id = int(dts[0])
@@ -642,9 +733,20 @@ class XUQIU_UI(QWidget):
             return {}
 
 
+    def select_xuqiu(self):
+        selected_text = self.li_search.selectedText().strip()
+        if selected_text!='':
+            self.init_tb_xuqiu(selected_text)
     def search_xuqiu(self):
-        search_str = self.li_search.text()
-        self.init_tb_xuqiu(search_str)
+        search_str = self.li_search.text().strip().strip()
+        if search_str!='':
+            self.init_tb_xuqiu(search_str)
+        else:
+            self.init_tb_xuqiu()
+
+
+
+
 
 
     def remove_xuqiu(self):
@@ -654,9 +756,13 @@ class XUQIU_UI(QWidget):
             data = self.get_row_content(cur_index)
             id = int(data[0])
             pt = data[-1]
-            shutil.move(pt,HSZ_PATH)
-            XQ_INFO.delete_by_id(id)
-            self.init_tb_xuqiu()
+
+            result = QMessageBox.question(self, "提醒", "是否删除内容", QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+            if result == QMessageBox.Yes:
+                shutil.move(pt,HSZ_PATH)
+                XQ_INFO.delete_by_id(id)
+                self.init_tb_xuqiu()
+
             
         except Exception as e:
             QMessageBox.warning(self,'',e.__str__())
@@ -674,6 +780,10 @@ class XUQIU_UI(QWidget):
             model.setHorizontalHeaderItem(column, header_item)
         ct = self.com_type.currentText()
         datas = []
+
+        search_str = self.dict_search_tmp.get(xq_item.id,'')
+        self.li_search_wd.setText(search_str)
+
         search_str = self.li_search_wd.text()
 
         ex_file = [item.name for item in items]
@@ -698,8 +808,24 @@ class XUQIU_UI(QWidget):
                     print(lines)
                 for line in lines:
                     line = line.strip()
-                    if os.path.exists(line):
-                        files.append(line)
+                    if ';' in line:
+                        file_path = line.split(';')[0]
+                        desc = line.split(';')[1]
+                    else:
+                        file_path = line
+                        desc = ''
+                    id = '-888'
+                    type = '文档'
+                    version = '0'
+                    name = file_path.split('\\')[-1]
+                    if os.path.exists(file_path):
+                        ctime = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(os.path.getctime(file_path)))
+                        mtime = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(os.path.getmtime(file_path)))
+                        datas.append([id,type, f'@@@{name}', version, desc,ctime,mtime, file_path])
+                    if 'http' in file_path:
+                        ctime = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
+                        mtime = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
+                        datas.append([id,type, f'@@@{file_path}', version, desc,ctime,mtime, file_path])
         files.reverse()
         if ct == '' or ct == '文档':
             for file in files :
@@ -712,6 +838,7 @@ class XUQIU_UI(QWidget):
                 desc = ''
                 type = '文档'
                 version='0'
+                print(f'@@@@@@@@@@@@@file:{name}')
                 if os.path.exists(file):
                     tmp = file.split("\\")
                     name = f'@@@@-{tmp[-1]}'
@@ -727,40 +854,66 @@ class XUQIU_UI(QWidget):
 
         if ct == '' or ct == '脚本':
             for item in items:
+
                 id =str(item.id)
                 name = item.name
                 desc = item.desc
                 type = item.type
                 ctime = item.ctime.strftime("%Y-%m-%d %H:%M:%S")
                 path = item.path
-                mtime = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime( os.path.getmtime(path)))
+                print(path)
+                if not os.path.exists(path):
+                    mtime ='文件不存在'
+                else:
+                    mtime = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime( os.path.getmtime(path)))
                 version = str(item.version)
                 datas.append([id, type, name, version, desc,ctime, mtime,path])
 
         for item in datas:
             if item[2].startswith('~$'):
                 continue
-            if search_str.upper() in item[2].upper() or search_str.strip()=='' or search_str.upper() in item[4].upper():
+            pdyj = [item[2],item[4].upper()]
+            if self.xuqiu_dtl_is_display(search_str,pdyj):
+            # if search_str.upper() in item[2].upper() or search_str.strip()=='' or search_str.upper() in item[4].upper():
                 row_items = [QStandardItem(i) for i in item]
                 model.appendRow(row_items)
-
 
         self.tb_xuqiudtl.setModel(model)
         self.tb_xuqiudtl.setStyleSheet(mhsheet)
 
-
         # self.tb_xuqiudtl.resizeRowsToContents()
         self.repaint()
+    # 需求明细是否展示
+    def xuqiu_dtl_is_display(self,search,pdyj):
+        #search 为关键字，支持& | 运算，|优先级大
+        search = search.upper()
+        pdyj = u'\u033F'.join(pdyj)
+        search_list = search.split('|')
+        for item in  search_list:
+            flag = True
+            search_and_list = item.split('&')
+            for and_yj in search_and_list:
+                if and_yj not in pdyj.upper():
+                    flag = False
+            if flag :
+                return True
+        return  False
     def init_tb_xuqiu(self,search=None):
         # 显示需求表格
         rwlx =''
+        print('init_tb_xuqiu@@@search',search)
         com_status = self.com_sear_type.currentText()
-        gjz_str_ss = self.li_search.text()
+        if search:
+            gjz_str_ss = search
+        else:
+            gjz_str_ss = self.li_search.text()
         model = QStandardItemModel()
         gjz_str_l =[]
+        # print(ZDXQ)
         zd_list = ZDXQ.split('|')
         gjz_str_l += zd_list
-        gjz_str_l += gjz_str_ss.split('|')
+        if gjz_str_ss!='':
+            gjz_str_l += gjz_str_ss.split('|')
         xs_ids = []
         for gjz_str in gjz_str_l:
             gjz_list = gjz_str.split('&')
@@ -782,7 +935,8 @@ class XUQIU_UI(QWidget):
                 xuqiu_type = item.xuqiu_type
                 status = item.status
                 tcr = item.tcr
-                row_items = [QStandardItem(i) for i in [id,name,xuqiu_type,status,tcr,path]]
+                ctime = item.ctime.strftime("%Y-%m-%d %H:%M:%S")
+                row_items = [QStandardItem(i) for i in [id,name,xuqiu_type,status,tcr,path,ctime]]
                 model.appendRow(row_items)
         self.tb_xuqiu.setModel(model)
 
@@ -802,7 +956,7 @@ class XUQIU_UI(QWidget):
 
     def ddj_xuqiu(self,index):
         datas = self.get_row_content(index)
-        path = datas[-1]
+        path = datas[xuqiu_header_xqccwz]
         os.startfile(path)
     def dj_xuqiu(self,index):
         #刷新需求内容
@@ -813,6 +967,9 @@ class XUQIU_UI(QWidget):
 
     def f_com_type(self):
         row = self.tb_xuqiu.currentIndex()
+        datas = self.get_row_content(row)
+        id = int(datas[0])
+        self.dict_search_tmp[id]=self.li_search_wd.text()
         self.tb_xuqiu.setFocus()
         self.dj_xuqiu(row)
         self.li_search_wd.setFocus()

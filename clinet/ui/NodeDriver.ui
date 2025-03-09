@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>NodeDriver</class>
+ <widget class="QWidget" name="NodeDriver">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>959</width>
+    <height>811</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout_2" stretch="1,7">
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QPushButton" name="pb_create_func">
+       <property name="text">
+        <string>创建函数</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pb_create_node">
+       <property name="text">
+        <string>创建节点</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pb_open_file">
+       <property name="text">
+        <string>打开</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pb_save">
+       <property name="text">
+        <string>保存</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QVBoxLayout" name="verticalLayout">
+     <item>
+      <widget class="QWidget" name="wi_node_display" native="true"/>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

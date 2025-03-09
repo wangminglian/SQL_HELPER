@@ -1,39 +1,22 @@
-import logging
 import os
-import re
-from asyncio import sleep
-from concurrent.futures import ThreadPoolExecutor
+
 from clinet.tijiaobanben_ui import Ui_submit_banben
-from clinet.create_xq_ui import Ui_create_xq
-import pyperclip
-from PySide2 import QtWidgets
-from PySide2.QtCore import QTime, QDateTime
-from PySide2.QtGui import Qt, QIcon, QKeySequence, QStandardItemModel
-from PySide2.QtWidgets import QTextEdit, QApplication, QMessageBox, QDateTimeEdit, QLineEdit, QPushButton, QTextBrowser, \
+
+from PySide6.QtGui import Qt, QIcon, QKeySequence, QStandardItemModel
+from PySide6.QtWidgets import QTextEdit, QApplication, QMessageBox, QDateTimeEdit, QLineEdit, QPushButton, QTextBrowser, \
     QFormLayout, QHBoxLayout, QComboBox, QInputDialog, QMainWindow, QFileDialog, QTableWidget, QTableWidgetItem, \
-    QHeaderView, QAbstractItemView, QDesktopWidget, QAction, QShortcut, QWidget, QTableView, QDialog, QVBoxLayout, \
-    QDialogButtonBox, QLabel, QToolTip, QColumnView
-from PySide2.QtUiTools import QUiLoader
-from PySide2.QtGui import QStandardItem
+    QHeaderView, QAbstractItemView, QWidget, QTableView, QDialog, QVBoxLayout
+from PySide6.QtGui import QStandardItem
 from peewee import SqliteDatabase, fn
-from playhouse.shortcuts import model_to_dict
 from collections import namedtuple
 from model.model import Project_detail, SQL_arg, History, dp, create_tables, ARG_model, db, XQ_INFO, JB_INFO, YSJ_KJ, \
     XQ_TABLE_INFO, TABLE_COLUM_INFO, TABLE_INFO
-from sql_helper.helper_restruct import Reader_Factory, Genner_Com
-from collections import deque
 import shutil
-import subprocess
 
 from sql_helper.read_sql_file import Reader_SQL
 from conf import DATA_PATH, GONGZUOQU_PATH, mhsheet
 
-# id = AutoField(verbose_name='主键', primary_key=True)
-# xq_id = ForeignKeyField(XQ_INFO)
-# jb_id =ForeignKeyField(JB_INFO)
-# table_name = CharField(verbose_name='表名称')
-# table_type = CharField(verbose_name='类型:输入or输出')
-# version = IntegerField(verbose_name='版本')
+
 
 INPUT_TABLE_HEADER = ['id','输入表名', '类型']
 INPUT_TABLE_HEADER_ID=0
@@ -81,8 +64,10 @@ class Submit_banben_UI(QWidget):
 
         self.bt_yulan:QPushButton=self.ui.bt_yulan
         self.bt_yulan.clicked.connect(self.init_tx_sqldll)
+
         self.bt_close:QPushButton=self.ui.bt_close
         self.bt_close.clicked.connect(self.f_bt_close)
+
         self.li_bz:QLineEdit=self.ui.li_bz
         self.closeEvent=self.f_close
 
@@ -184,7 +169,8 @@ class Submit_banben_UI(QWidget):
         jb_info = JB_INFO.get_by_id(idx)
         xq_id = jb_info.xq_id
         name = jb_info.name
-        sql = JB_INFO.select(fn.Max(JB_INFO.version)).where(JB_INFO.xq_id==xq_id and JB_INFO.name==name).group_by(JB_INFO.xq_id,JB_INFO.name)
+        sql = JB_INFO.select(fn.Max(JB_INFO.version)).where((JB_INFO.xq_id==xq_id) & (JB_INFO.name==name)).group_by(JB_INFO.xq_id,JB_INFO.name)
+        print(sql)
         max_version=sql.scalar()
         type ='脚本'
         version = int(max_version)+1

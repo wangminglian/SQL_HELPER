@@ -8,9 +8,9 @@
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
 
-from PySide2.QtCore import *
-from PySide2.QtGui import *
-from PySide2.QtWidgets import *
+from PySide6.QtCore import *
+from PySide6.QtGui import *
+from PySide6.QtWidgets import *
 
 
 class Ui_MainWindow(object):
@@ -398,6 +398,42 @@ class Ui_MainWindow(object):
         self.toolBar.addAction(self.a_bgl)
         self.toolBar.addAction(self.a_zdgl)
         self.toolBar.addAction(self.a_rwxy)
+
+        MainWindow.setStyleSheet("""
+            QWidget {
+                background-color: #e0f7fa;
+                color: #333;
+            }
+            QPushButton {
+                background-color: #0288d1;
+                color: white;
+                border: none;
+                padding: 5px 10px;
+                text-align: center;
+                font-size: 16px;
+                margin: 4px 2px;
+            }
+            QPushButton:hover {
+                background-color: white;
+                color: black;
+                border: 2px solid #0288d1;
+            }
+            QLabel {
+                font-size: 14px;
+                color: #333;
+            }
+            QLineEdit, QComboBox {
+                background-color: white;
+                color: #333;
+                border: 1px solid #ccc;
+                padding: 5px;
+            }
+            QTextEdit, QTextBrowser {
+                background-color: white;
+                color: #333;
+                border: 1px solid #ccc;
+            }
+        """)
 
         self.retranslateUi(MainWindow)
 

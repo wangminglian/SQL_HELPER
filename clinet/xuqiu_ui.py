@@ -8,9 +8,9 @@
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
 
-from PySide2.QtCore import *
-from PySide2.QtGui import *
-from PySide2.QtWidgets import *
+from PySide6.QtCore import *
+from PySide6.QtGui import *
+from PySide6.QtWidgets import *
 
 
 class Ui_Form(object):
@@ -122,6 +122,8 @@ class Ui_Form(object):
 
         self.horizontalLayout_2.addWidget(self.com_type)
 
+
+
         self.bt_daoru = QPushButton(Form)
         self.bt_daoru.setObjectName(u"bt_daoru")
 
@@ -170,6 +172,87 @@ class Ui_Form(object):
 
         self.verticalLayout_2.addLayout(self.verticalLayout)
 
+        # 设置背景颜色
+        Form.setStyleSheet("""
+            QWidget {
+                background-color: #e0f7fa;
+                color: #333;
+            }
+            QPushButton {
+                background-color: #0288d1;
+                color: white;
+                border: none;
+                padding: 5px 10px;
+                text-align: center;
+                font-size: 16px;
+                margin: 4px 2px;
+            }
+            QPushButton:hover {
+                background-color: white;
+                color: black;
+                border: 2px solid #0288d1;
+            }
+            QLabel {
+                font-size: 14px;
+                color: #333;
+            }
+            QLineEdit, QComboBox {
+                background-color: white;
+                color: #333;
+                border: 1px solid #ccc;
+                padding: 5px;
+            }
+            QTextEdit, QTextBrowser {
+                background-color: white;
+                color: #333;
+                border: 1px solid #ccc;
+            }
+        """)
+
+        # 设置字体颜色和按钮样式
+        self.lineEdit.setStyleSheet("color: #01579B;")
+        self.label_4.setStyleSheet("color: #01579B;")
+        self.com_sear_type.setStyleSheet("color: #01579B;")
+        self.is_zd.setStyleSheet("color: #01579B;")
+        self.bt_cjjs.setStyleSheet("background-color: #0288D1; color: white; border-radius: 5px; padding: 5px;")
+        self.bt_rename.setStyleSheet("background-color: #0288D1; color: white; border-radius: 5px; padding: 5px;")
+        self.bt_create.setStyleSheet("background-color: #0288D1; color: white; border-radius: 5px; padding: 5px;")
+        self.bt_remove.setStyleSheet("background-color: #0288D1; color: white; border-radius: 5px; padding: 5px;")
+        self.label.setStyleSheet("color: #01579B;")
+        self.tb_xuqiu.setStyleSheet("gridline-color: #B3E5FC; selection-background-color: #0288D1; alternate-background-color: #E1F5FE;")
+        self.tb_xuqiu.horizontalHeader().setStyleSheet("background-color: #0288D1; color: white;")
+        self.tb_xuqiu.verticalHeader().setStyleSheet("background-color: #0288D1; color: white;")
+        self.tb_xuqiu.setAlternatingRowColors(True)
+        self.ra_banben.setStyleSheet("color: #01579B;")
+        self.li_search_wd.setStyleSheet("color: #01579B;")
+        self.label_3.setStyleSheet("color: #01579B;")
+        self.com_type.setStyleSheet("color: #01579B;")
+        self.bt_daoru.setStyleSheet("background-color: #0288D1; color: white; border-radius: 5px; padding: 5px;")
+        self.bt_xqzt.setStyleSheet("background-color: #0288D1; color: white; border-radius: 5px; padding: 5px;")
+        self.submit_jiaoben.setStyleSheet("background-color: #0288D1; color: white; border-radius: 5px; padding: 5px;")
+        self.new_jiaoben.setStyleSheet("background-color: #0288D1; color: white; border-radius: 5px; padding: 5px;")
+        self.bt_rm_jb.setStyleSheet("background-color: #0288D1; color: white; border-radius: 5px; padding: 5px;")
+        self.label_2.setStyleSheet("color: #01579B;")
+        self.tb_xuqiudtl.setStyleSheet("gridline-color: #B3E5FC; selection-background-color: #0288D1; alternate-background-color: #E1F5FE;")
+        self.tb_xuqiudtl.horizontalHeader().setStyleSheet("background-color: #0288D1; color: white;")
+        self.tb_xuqiudtl.verticalHeader().setStyleSheet("background-color: #0288D1; color: white;")
+        self.tb_xuqiudtl.setAlternatingRowColors(True)
+
+        # 修改自定义委托以应用于所有列
+        class CustomDelegate(QStyledItemDelegate):
+            def paint(self, painter, option, index):
+                # 获取第二列的值
+                second_column_value = index.sibling(index.row(), 1).data()
+                if second_column_value == "文件夹":
+                    option.palette.setColor(QPalette.Text, QColor("#FF5722"))  # 橙色
+                elif second_column_value == "文档":
+                    option.palette.setColor(QPalette.Text, QColor("#4CAF50"))  # 绿色
+                elif second_column_value == "脚本":
+                    option.palette.setColor(QPalette.Text, QColor("#2196F3"))  # 蓝色
+                super().paint(painter, option, index)
+
+        # 应用委托到整个表格
+        self.tb_xuqiudtl.setItemDelegate(CustomDelegate(self.tb_xuqiudtl))
 
         self.retranslateUi(Form)
 

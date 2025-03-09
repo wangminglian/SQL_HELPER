@@ -8,9 +8,9 @@
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
 
-from PySide2.QtCore import *
-from PySide2.QtGui import *
-from PySide2.QtWidgets import *
+from PySide6.QtCore import *
+from PySide6.QtGui import *
+from PySide6.QtWidgets import *
 
 
 class Ui_submit_banben(object):
@@ -45,6 +45,11 @@ class Ui_submit_banben(object):
 
         self.tb_input = QTableView(submit_banben)
         self.tb_input.setObjectName(u"tb_input")
+        self.tb_input.setAlternatingRowColors(True)
+        self.tb_input.setStyleSheet("gridline-color: #ccc;")
+        self.tb_input.horizontalHeader().setStretchLastSection(True)
+        self.tb_input.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        self.tb_input.verticalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
 
         self.verticalLayout.addWidget(self.tb_input)
 
@@ -59,6 +64,11 @@ class Ui_submit_banben(object):
 
         self.tb_output = QTableView(submit_banben)
         self.tb_output.setObjectName(u"tb_output")
+        self.tb_output.setAlternatingRowColors(True)
+        self.tb_output.setStyleSheet("gridline-color: #ccc;")
+        self.tb_output.horizontalHeader().setStretchLastSection(True)
+        self.tb_output.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        self.tb_output.verticalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
 
         self.verticalLayout_3.addWidget(self.tb_output)
 
@@ -81,6 +91,11 @@ class Ui_submit_banben(object):
 
         self.tb_koujing = QTableView(submit_banben)
         self.tb_koujing.setObjectName(u"tb_koujing")
+        self.tb_koujing.setAlternatingRowColors(True)
+        self.tb_koujing.setStyleSheet("gridline-color: #ccc;")
+        self.tb_koujing.horizontalHeader().setStretchLastSection(True)
+        self.tb_koujing.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        self.tb_koujing.verticalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
 
         self.verticalLayout_4.addWidget(self.tb_koujing)
 
@@ -142,6 +157,41 @@ class Ui_submit_banben(object):
 
         self.verticalLayout_2.addLayout(self.verticalLayout)
 
+        submit_banben.setStyleSheet("""
+            QWidget {
+                background-color: #e0f7fa;
+                color: #333;
+            }
+            QPushButton {
+                background-color: #0288d1;
+                color: white;
+                border: none;
+                padding: 5px 10px;
+                text-align: center;
+                font-size: 16px;
+                margin: 4px 2px;
+            }
+            QPushButton:hover {
+                background-color: white;
+                color: black;
+                border: 2px solid #0288d1;
+            }
+            QLabel {
+                font-size: 14px;
+                color: #333;
+            }
+            QLineEdit, QComboBox {
+                background-color: white;
+                color: #333;
+                border: 1px solid #ccc;
+                padding: 5px;
+            }
+            QTextEdit, QTextBrowser {
+                background-color: white;
+                color: #333;
+                border: 1px solid #ccc;
+            }
+        """)
 
         self.retranslateUi(submit_banben)
 

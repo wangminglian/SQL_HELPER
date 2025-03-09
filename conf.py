@@ -1,3 +1,5 @@
+import shutil
+
 from sql_helper.util import MyConf2
 import  os
 
@@ -27,13 +29,20 @@ TXHS = my_conf.get_path('TXHS')
 TXYD = my_conf.get_path('TXYD')
 TXSJ = my_conf.get_path('TXSJ')
 ZDXQ = my_conf.get_path('ZDXQ')
+ZIP_PATH =my_conf.get_path('ZIP_PATH')
+INIT_FILE = './初始化文件'
+import logging
+logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
-for i in [XUQIU_MOBAN_PATH,GONGZUOQU_PATH,DATA_PATH,HSZ_PATH,MOBAN_PATH,DB_PATH,SJTC_MOBAN_PATH,LSJS_PATH]:
+
+for i in [GEN_PATH,XUQIU_MOBAN_PATH,GONGZUOQU_PATH,DATA_PATH,HSZ_PATH,MOBAN_PATH,DB_PATH,SJTC_MOBAN_PATH,LSJS_PATH]:
     if os.path.exists(i):
         print(f'{i}》》文件路径存在，不新建')
     else:
         print(f'{i}》》不存在，新建文件夹!!!!!!!!!!!!!!!!')
         os.makedirs(i)
+        if i ==GEN_PATH:
+            shutil.copytree(INIT_FILE,os.path.join(GEN_PATH,'SQL_HELPER目录'))
 
 mhsheet = """
         QTableView {

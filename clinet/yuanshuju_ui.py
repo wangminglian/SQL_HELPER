@@ -8,9 +8,9 @@
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
 
-from PySide2.QtCore import *
-from PySide2.QtGui import *
-from PySide2.QtWidgets import *
+from PySide6.QtCore import *
+from PySide6.QtGui import *
+from PySide6.QtWidgets import *
 
 
 class Ui_Form(object):
@@ -56,6 +56,81 @@ class Ui_Form(object):
 
 
         self.verticalLayout_2.addLayout(self.verticalLayout)
+
+        # 设置与main_ui.py一致的样式表
+        Form.setStyleSheet("""
+            QWidget {
+                background-color: #e0f7fa;
+                color: #333;
+            }
+            QPushButton {
+                background-color: #0288d1;
+                color: white;
+                border: none;
+                padding: 5px 10px;
+                text-align: center;
+                font-size: 16px;
+                margin: 4px 2px;
+            }
+            QPushButton:hover {
+                background-color: white;
+                color: black;
+                border: 2px solid #0288d1;
+            }
+            QLabel {
+                font-size: 14px;
+                color: #333;
+            }
+            QLineEdit, QComboBox {
+                background-color: white;
+                color: #333;
+                border: 1px solid #ccc;
+                padding: 5px;
+            }
+            QTextEdit, QTextBrowser {
+                background-color: white;
+                color: #333;
+                border: 1px solid #ccc;
+            }
+        """)
+
+        # 调整布局间距
+        self.verticalLayout.setContentsMargins(10, 10, 10, 10)
+        self.verticalLayout.setSpacing(10)
+        self.horizontalLayout.setSpacing(10)
+
+        # 优化QTableView显示效果
+        self.tb_ysj.setAlternatingRowColors(True)
+        self.tb_ysj.setStyleSheet(u""
+            "QTableView {"
+            "    gridline-color: #d3d3d3;"
+            "    selection-background-color: #b0e0e6;"
+            "    alternate-background-color: #f0f8ff;"
+            "}"
+            "QHeaderView::section {"
+            "    background-color: #e0f7fa;"
+            "    padding: 4px;"
+            "    border: 1px solid #ccc;"
+            "    font-size: 14px;"
+            "    font-weight: bold;"
+            "}"
+        )
+        self.tb_ysj.horizontalHeader().setStretchLastSection(True)
+        self.tb_ysj.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        self.tb_ysj.verticalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
+        self.tb_ysj.setHorizontalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+        self.tb_ysj.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+
+        # 进一步优化QTableView横向显示效果
+        self.tb_ysj.horizontalHeader().setSectionResizeMode(QHeaderView.Interactive)
+        self.tb_ysj.horizontalHeader().setStretchLastSection(False)
+        self.tb_ysj.setShowGrid(True)
+        self.tb_ysj.setWordWrap(False)
+        self.tb_ysj.setHorizontalScrollMode(QAbstractItemView.ScrollPerPixel)
+        self.tb_ysj.setVerticalScrollMode(QAbstractItemView.ScrollPerPixel)
+        self.tb_ysj.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
+        self.tb_ysj.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
+        self.tb_ysj.setCornerButtonEnabled(False)
 
         self.retranslateUi(Form,name)
 

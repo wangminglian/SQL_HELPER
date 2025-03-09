@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>TB_FILE_INPUT</class>
+ <widget class="QWidget" name="TB_FILE_INPUT">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>600</width>
+    <height>522</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>文本导入</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout_2">
+   <item>
+    <layout class="QVBoxLayout" name="verticalLayout">
+     <item>
+      <widget class="QLabel" name="label_2">
+       <property name="text">
+        <string>输入数据</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QTextEdit" name="tx_input"/>
+     </item>
+     <item>
+      <widget class="Line" name="line_2">
+       <property name="orientation">
+        <enum>Qt::Orientation::Horizontal</enum>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="label_3">
+       <property name="text">
+        <string>数据预览</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QTableView" name="tb_yulan"/>
+     </item>
+     <item>
+      <widget class="Line" name="line">
+       <property name="orientation">
+        <enum>Qt::Orientation::Horizontal</enum>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,5,5,1,0">
+       <item>
+        <widget class="QLabel" name="label">
+         <property name="text">
+          <string>ETL函数</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="li_search_func"/>
+       </item>
+       <item>
+        <widget class="QComboBox" name="com_func"/>
+       </item>
+       <item>
+        <widget class="QPushButton" name="tb_run">
+         <property name="text">
+          <string>执行</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="rb_save">
+         <property name="text">
+          <string>确定</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

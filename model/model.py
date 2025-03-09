@@ -160,8 +160,8 @@ create_tables = [Project_detail,SQL_arg,History]
 if __name__ == '__main__':
     print(os.path.join(os.getcwd().split('SQL_Helper')[0],'SQL_Helper/clinet/data.json/SQL_Helper.db'))
     db.connect()
-    db.drop_tables([MY_CONFIG])
-    db.create_tables([MY_CONFIG])
+    # db.drop_tables([MY_CONFIG])
+    # db.create_tables([MY_CONFIG])
     print(db.get_tables())
     # db.create_tables([History,])
     # com = db.get_tables()

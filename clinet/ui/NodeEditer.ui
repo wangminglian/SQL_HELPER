@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>NodeEditer</class>
+ <widget class="QWidget" name="NodeEditer">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1426</width>
+    <height>951</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>节点编辑器</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QWidget" name="wi_p0" native="true">
+     <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,0,0,0,5">
+      <item>
+       <widget class="QWidget" name="wi_p1" native="true">
+        <layout class="QVBoxLayout" name="verticalLayout_2" stretch="0,0,0,0,0,0,0,0,0,0,0,0,0">
+         <item>
+          <widget class="QLabel" name="label_2">
+           <property name="text">
+            <string>节点配置</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_2">
+           <item>
+            <widget class="QPushButton" name="pb_add_node">
+             <property name="text">
+              <string>新建</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="pb_remove_node">
+             <property name="text">
+              <string>删除</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="pb_modify_node">
+             <property name="text">
+              <string>变更</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="li_search_node"/>
+         </item>
+         <item>
+          <widget class="QTableView" name="tb_n1"/>
+         </item>
+         <item>
+          <widget class="Line" name="line">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_3">
+           <property name="text">
+            <string>引脚配置</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_3">
+           <item>
+            <widget class="QPushButton" name="pb_add_port">
+             <property name="text">
+              <string>新建</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="pb_remove_port">
+             <property name="text">
+              <string>删除</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="pb_modify_port">
+             <property name="text">
+              <string>变更</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="li_search_func"/>
+         </item>
+         <item>
+          <widget class="QTableView" name="tb_n2"/>
+         </item>
+         <item>
+          <widget class="Line" name="line_3">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_4">
+           <property name="text">
+            <string>执行函数</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QWidget" name="wi_func" native="true">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>90</height>
+            </size>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_4">
+           <item>
+            <widget class="QPushButton" name="pb_init_func">
+             <property name="text">
+              <string>生成函数头</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="pb_run">
+             <property name="text">
+              <string>运行</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="pb_save">
+             <property name="text">
+              <string>保存</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="pb_release">
+             <property name="text">
+              <string>发布</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item>
+       <widget class="Line" name="line_2">
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QWidget" name="wi_p2" native="true">
+        <layout class="QVBoxLayout" name="verticalLayout_4">
+         <item>
+          <widget class="QLabel" name="label_5">
+           <property name="text">
+            <string>节点选择</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="li_search_gnode"/>
+         </item>
+         <item>
+          <widget class="QTreeWidget" name="tr_nodes">
+           <column>
+            <property name="text">
+             <string notr="true">1</string>
+            </property>
+           </column>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item>
+       <widget class="Line" name="line_4">
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QWidget" name="wi_p3" native="true">
+        <layout class="QVBoxLayout" name="verticalLayout_3" stretch="1,99">
+         <item>
+          <widget class="QLabel" name="label">
+           <property name="text">
+            <string>节点编辑器</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QWidget" name="wi_display" native="true"/>
+         </item>
+        </layout>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

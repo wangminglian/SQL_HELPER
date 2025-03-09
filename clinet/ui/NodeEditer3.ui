@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>NodeEditer</class>
+ <widget class="QWidget" name="NodeEditer">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>958</width>
+    <height>854</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>节点编辑器</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout_2" stretch="0,0,0,0,0,1,0,2,2,2,0,1">
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_4">
+     <item>
+      <widget class="QLineEdit" name="li_search_node"/>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pb_add_node">
+       <property name="text">
+        <string>新建节点</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pb_remove_node">
+       <property name="text">
+        <string>删除节点</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pb_modify_node">
+       <property name="text">
+        <string>变更节点</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QLabel" name="label_3">
+     <property name="text">
+      <string>节点/函数</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QTableWidget" name="tb_node"/>
+   </item>
+   <item>
+    <widget class="Line" name="line_6">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_3">
+     <item>
+      <widget class="QPushButton" name="pb_add_port">
+       <property name="text">
+        <string>添加引脚</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pb_modify_port">
+       <property name="text">
+        <string>删除引脚</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pb_delete_port">
+       <property name="text">
+        <string>变更引脚</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <layout class="QVBoxLayout" name="verticalLayout">
+       <item>
+        <widget class="QLabel" name="label">
+         <property name="text">
+          <string>输入引脚</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QTableWidget" name="tb_port_input"/>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <widget class="Line" name="line">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <layout class="QVBoxLayout" name="verticalLayout_3">
+       <item>
+        <widget class="QLabel" name="label_2">
+         <property name="text">
+          <string>输出引脚</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QTableWidget" name="tb_port_output"/>
+       </item>
+      </layout>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="Line" name="line_4">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QWidget" name="wi_daima" native="true"/>
+   </item>
+   <item>
+    <widget class="Line" name="line_2">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QWidget" name="wi_node_display" native="true"/>
+   </item>
+   <item>
+    <widget class="Line" name="line_5">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <item>
+      <widget class="QPushButton" name="pb_run_test">
+       <property name="text">
+        <string>测试</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pb_save">
+       <property name="text">
+        <string>保存</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
