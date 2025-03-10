@@ -11,6 +11,7 @@ import logging
 from PySide6.QtWidgets import QInputDialog
 from PySide6.QtGui import QKeySequence, QFocusEvent, QCursor
 import re
+from PySide6.QtCore import QEvent
 
 
 # 设置loging 打印到控制台
@@ -183,72 +184,180 @@ class ColumnSelector(QListWidget):
         # 获取点击的项
         item = self.itemAt(event.position().toPoint())
         if item:
-            self.on_item_clicked(item)
+            # 调用注册的回调函数或直接处理点击事件
+            if hasattr(self, 'item_clicked_callback') and callable(self.item_clicked_callback):
+                self.item_clicked_callback(item)
+            # 隐藏窗口
+            self.hide()
 
     def showEvent(self, event):
         """处理显示事件"""
         super().showEvent(event)
-        # 确保选择框在显示时获得焦点
+        
+        # 使用定时器确保在对话框完全显示后设置焦点
+        QTimer.singleShot(10, self._ensureFocus)
+    
+    def _ensureFocus(self):
+        """确保列表获得焦点"""
+        # ColumnSelector类是QListWidget，不需要设置input_field
         self.setFocus()
+        
+        # 选中第一个可见项（如果有）
+        for i in range(self.count()):
+            if not self.item(i).isHidden():
+                self.setCurrentRow(i)
+                break
 
-    def hideEvent(self, event):
-        """处理隐藏事件"""
-        super().hideEvent(event)
-        # 如果有父窗口的搜索框，将焦点返回给它
-        if hasattr(self, 'parent_widget'):
-            self.parent_widget.setFocus()
+    def focusInEvent(self, event):
+        """处理获得焦点事件"""
+        super().focusInEvent(event)
+        # ColumnSelector是QListWidget，它自己处理焦点
 
+    def event(self, event):
+        """处理所有事件"""
+        # ColumnSelector是QListWidget，默认的事件处理足够了
+        return super().event(event)
+        
     def on_item_clicked(self, item):
         """列表项被点击时触发"""
-        if hasattr(self, 'on_item_clicked'):
-            self.on_item_clicked(item)
+        if hasattr(self, 'item_clicked_callback') and callable(self.item_clicked_callback):
+            self.item_clicked_callback(item)
         # 确保隐藏窗口
         self.hide()
 
     def keyPressEvent(self, event):
-        """键盘事件处理"""
+        """处理键盘事件"""
         key = event.key()
-        if key == Qt.Key.Key_Escape:
-            # ESC键隐藏窗口
-            self.hide()
-        elif key == Qt.Key.Key_Return or key == Qt.Key.Key_Enter:
-            # 回车键选择当前项
-            current_item = self.currentItem()
-            if current_item and not current_item.isHidden():
-                # 保存项目文本，因为回调后项目可能被删除
-                item_text = current_item.text()
-                # 创建一个新的项目对象传递给回调
-                new_item = QListWidgetItem(item_text)
-                self.on_item_clicked(new_item)
-        elif key == Qt.Key.Key_Up:
-            # 上键选择上一项
-            current_row = self.currentRow()
-            if current_row > 0:
-                # 查找上一个可见项
-                for row in range(current_row - 1, -1, -1):
-                    if not self.item(row).isHidden():
-                        self.setCurrentRow(row)
+        
+        # 处理上下键，直接在列表中导航
+        if key == Qt.Key_Up:
+            # 获取当前选定行
+            current_row = self.item_list.currentRow()
+            
+            # 如果没有选定行，从最后一行开始向上查找可见项
+            if current_row == -1:
+                for row in range(self.item_list.count()-1, -1, -1):
+                    if not self.item_list.item(row).isHidden():
+                        self.item_list.setCurrentRow(row)
+                        self.item_list.setFocus()
+                        return
+            
+            # 如果已有选定行，则选择上一个可见项
+            found = False
+            for row in range(current_row-1, -1, -1):
+                if not self.item_list.item(row).isHidden():
+                    self.item_list.setCurrentRow(row)
+                    self.item_list.setFocus()
+                    found = True
+                    break
+                    
+            # 如果没找到上一个可见项，尝试选择最后一个可见项（循环选择）
+            if not found:
+                for row in range(self.item_list.count()-1, current_row, -1):
+                    if not self.item_list.item(row).isHidden():
+                        self.item_list.setCurrentRow(row)
+                        self.item_list.setFocus()
                         break
-        elif key == Qt.Key.Key_Down:
-            # 下键选择下一项
-            current_row = self.currentRow()
-            if current_row < self.count() - 1:
-                # 查找下一个可见项
-                for row in range(current_row + 1, self.count()):
-                    if not self.item(row).isHidden():
-                        self.setCurrentRow(row)
+                
+        elif key == Qt.Key_Down:
+            # 获取当前选定行
+            current_row = self.item_list.currentRow()
+            
+            # 如果没有选定行，则选择第一个可见项
+            if current_row == -1:
+                for row in range(self.item_list.count()):
+                    if not self.item_list.item(row).isHidden():
+                        self.item_list.setCurrentRow(row)
+                        self.item_list.setFocus()
+                        return
+            
+            # 如果已有选定行，则选择下一个可见项
+            found = False
+            for row in range(current_row+1, self.item_list.count()):
+                if not self.item_list.item(row).isHidden():
+                    self.item_list.setCurrentRow(row)
+                    self.item_list.setFocus()
+                    found = True
+                    break
+                    
+            # 如果没找到下一个可见项，尝试选择第一个可见项（循环选择）
+            if not found:
+                for row in range(0, current_row):
+                    if not self.item_list.item(row).isHidden():
+                        self.item_list.setCurrentRow(row)
+                        self.item_list.setFocus()
                         break
+        
+        elif key == Qt.Key_Tab:
+            # Tab键在输入框和列表之间切换焦点
+            if self.input_field.hasFocus():
+                self.item_list.setFocus()
+            else:
+                self.input_field.setFocus()
+            
+        elif key == Qt.Key_Return or key == Qt.Key_Enter:
+            # 处理回车/确认键
+            if self.item_list.hasFocus() and self.item_list.currentItem():
+                # 如果列表有焦点且有选中项，直接选择
+                self.on_item_selected(self.item_list.currentItem())
+                event.accept()
+                return
+                
+            # 其他情况下，查找可见项
+            current_item = self.item_list.currentItem()
+            
+            # 计算可见项数量
+            visible_count = 0
+            for i in range(self.item_list.count()):
+                if not self.item_list.item(i).isHidden():
+                    visible_count += 1
+            
+            # 如果只有一个可见项或者有已选中的非隐藏项，则选择它
+            if (visible_count == 1) or (current_item and not current_item.isHidden()):
+                self.on_item_selected(current_item if current_item and not current_item.isHidden() else None)
+            event.accept()
+            
+        elif key == Qt.Key_Escape:
+            self.reject()
+            
         else:
-            # 其他键传递给父类
+            # 其他键继续传递给默认处理
             super().keyPressEvent(event)
 
 
-class FormulaInputDialog(QDialog):
-    def __init__(self, parent=None, functions=None):
-        super().__init__(parent, Qt.Popup | Qt.FramelessWindowHint)
+class ItemSelectorDialog(QDialog):
+    """通用的项目选择对话框，可用于选择函数、表格、列名等"""
+    def __init__(self, parent=None, items=None, title="选择项目", placeholder="输入关键字搜索...", 
+                 target_input=None, selection_prefix="", selection_suffix="", selection_mode="replace",
+                 auto_confirm=False):
+        """
+        初始化通用选择对话框
+        
+        参数:
+        parent -- 父窗口
+        items -- 可选项目的列表
+        title -- 对话框标题
+        placeholder -- 搜索框的提示文本
+        target_input -- 目标输入框，选择结果将被插入到此输入框
+        selection_prefix -- 选择项目前缀（如函数名前可加等号）
+        selection_suffix -- 选择项目后缀（如函数名后可加括号）
+        selection_mode -- 选择模式：'replace' - 替换全部文本，'insert' - 在当前位置插入，'append' - 追加到末尾
+        auto_confirm -- 是否在只有一个匹配项时自动确认选择
+        """
+        # 使用Dialog模式而不是Popup，以获得更好的输入法支持
+        super().__init__(parent, Qt.Dialog | Qt.FramelessWindowHint)
         self.parent = parent
-        self.functions = functions or []
-        self.selected_function = None
+        self.items = items or []
+        self.title = title
+        self.target_input = target_input
+        self.selected_item = None
+        self.selection_prefix = selection_prefix
+        self.selection_suffix = selection_suffix
+        self.selection_mode = selection_mode
+        self.auto_confirm = auto_confirm
+        
+        # 为对话框启用输入法支持
+        self.setAttribute(Qt.WA_InputMethodEnabled, True)
         
         # 设置布局
         layout = QVBoxLayout(self)
@@ -257,19 +366,24 @@ class FormulaInputDialog(QDialog):
         
         # 创建输入框
         self.input_field = QLineEdit(self)
-        self.input_field.setPlaceholderText("输入函数名进行搜索...")
-        self.input_field.textChanged.connect(self.filter_functions)
+        self.input_field.setPlaceholderText(placeholder)
+        self.input_field.textChanged.connect(self.filter_items)
+        
+        # 强化输入法支持
+        self.input_field.setAttribute(Qt.WA_InputMethodEnabled, True)
+        self.input_field.setFocusPolicy(Qt.StrongFocus)
+        
         layout.addWidget(self.input_field)
         
-        # 创建函数列表
-        self.function_list = QListWidget(self)
-        self.function_list.setMaximumHeight(200)
-        self.function_list.itemClicked.connect(self.on_function_selected)
-        layout.addWidget(self.function_list)
+        # 创建项目列表
+        self.item_list = QListWidget(self)
+        self.item_list.setMaximumHeight(200)
+        self.item_list.itemClicked.connect(self.on_item_selected)
+        layout.addWidget(self.item_list)
         
-        # 添加函数到列表
-        for func in self.functions:
-            self.function_list.addItem(func)
+        # 添加项目到列表
+        for item in self.items:
+            self.item_list.addItem(item)
             
         # 设置样式
         self.setStyleSheet("""
@@ -293,49 +407,327 @@ class FormulaInputDialog(QDialog):
                 color: #01579B;
             }
             QListWidget::item:selected {
-                background-color: #e0f7fa;
-                color: #01579B;
+                background-color: #0288d1;
+                color: white;
+                font-weight: bold;
             }
             QListWidget::item:hover {
                 background-color: #b3e5fc;
             }
+            QListWidget:focus {
+                outline: 2px solid #29B6F6;
+                border-radius: 3px;
+            }
         """)
+    
+    def showEvent(self, event):
+        """处理显示事件"""
+        super().showEvent(event)
         
-        # 设置焦点
+        # 使用定时器确保在对话框完全显示后设置焦点
+        QTimer.singleShot(10, self._ensureFocus)
+    
+    def _ensureFocus(self):
+        """确保输入框获得焦点和输入法支持"""
+        # 强制将输入法焦点设置到输入框
         self.input_field.setFocus()
         
-    def filter_functions(self, text):
-        """根据输入文本过滤函数列表"""
-        for i in range(self.function_list.count()):
-            item = self.function_list.item(i)
+        # 在Windows上，有时需要额外激活输入法
+        if hasattr(self.input_field, 'inputContext') and self.input_field.inputContext():
+            self.input_field.inputContext().update()
+            
+        # 预先选择第一个可见项
+        for i in range(self.item_list.count()):
+            if not self.item_list.item(i).isHidden():
+                self.item_list.setCurrentRow(i)
+                break
+
+    def filter_items(self, text):
+        """根据输入文本过滤项目列表"""
+        visible_count = 0
+        visible_item = None
+        
+        # 过滤项目并计算可见项数量
+        for i in range(self.item_list.count()):
+            item = self.item_list.item(i)
             if text.lower() in item.text().lower():
                 item.setHidden(False)
+                visible_count += 1
+                visible_item = item
             else:
                 item.setHidden(True)
-                
-        # 选中第一个可见项
-        for i in range(self.function_list.count()):
-            if not self.function_list.item(i).isHidden():
-                self.function_list.setCurrentRow(i)
-                break
-                
-    def on_function_selected(self, item):
-        """处理函数选择事件"""
-        self.selected_function = item.text()
-        self.accept()
         
+        # 如果有可见项，选中第一个
+        if visible_count > 0:
+            for i in range(self.item_list.count()):
+                if not self.item_list.item(i).isHidden():
+                    self.item_list.setCurrentRow(i)
+                    break
+            
+            # 如果只有一个匹配项且输入长度大于等于2（避免频繁自动选择）
+            if visible_count == 1 and len(text) >= 2:
+                # 高亮显示唯一选项，提供视觉提示
+                visible_item.setBackground(self.palette().highlight())
+                visible_item.setForeground(self.palette().highlightedText())
+                
+                # 如果开启了自动确认选项
+                if self.auto_confirm:
+                    # 延迟自动选择，给用户一个取消的机会
+                    QTimer.singleShot(500, lambda: self._auto_select_item(visible_item))
+    
+    def _auto_select_item(self, item):
+        """自动选择项目，但仅在对话框仍处于活动状态时"""
+        if self.isVisible() and item and not item.isHidden():
+            self.on_item_selected(item)
+
+    def on_item_selected(self, item):
+        """处理项目选择事件"""
+        # 处理item为None的情况（自动选择）
+        if item is None:
+            # 尝试获取第一个可见项
+            for i in range(self.item_list.count()):
+                if not self.item_list.item(i).isHidden():
+                    item = self.item_list.item(i)
+                    break
+            
+            # 如果没有可见项，则退出
+            if item is None:
+                return
+        
+        self.selected_item = item.text()
+        
+        # 如果指定了目标输入框，直接处理选择结果
+        if self.target_input:
+            self.apply_selection()
+        
+        self.accept()
+    
+    def apply_selection(self):
+        """将选择应用到目标输入框"""
+        if not self.target_input or not self.selected_item:
+            return
+            
+        selected_text = self.selection_prefix + self.selected_item + self.selection_suffix
+        
+        if self.selection_mode == 'replace':
+            self.target_input.setText(selected_text)
+        elif self.selection_mode == 'append':
+            current_text = self.target_input.text()
+            self.target_input.setText(current_text + selected_text)
+        elif self.selection_mode == 'insert':
+            current_text = self.target_input.text()
+            position = self.target_input.cursorPosition()
+            new_text = current_text[:position] + selected_text + current_text[position:]
+            self.target_input.setText(new_text)
+            # 将光标定位到插入文本后
+            self.target_input.setCursorPosition(position + len(selected_text))
+        elif self.selection_mode == 'smart_insert':
+            # 特殊模式，处理@符号后的列名插入
+            current_text = self.target_input.text()
+            
+            # 检查是否有@符号
+            if '@' in current_text:
+                last_at_pos = current_text.rfind('@')
+                
+                # 提取@后面的内容
+                after_content = current_text[last_at_pos+1:]
+                
+                # 找到第一个分隔符
+                separator_pos = -1
+                for separator in [' ', ',', '=']:
+                    pos = after_content.find(separator)
+                    if pos != -1 and (separator_pos == -1 or pos < separator_pos):
+                        separator_pos = pos
+                
+                # 构建新文本
+                if separator_pos != -1:
+                    # 有分隔符，保留分隔符及之后的内容
+                    new_text = current_text[:last_at_pos+1] + selected_text + after_content[separator_pos:]
+                else:
+                    # 没有分隔符，直接替换@后面的全部内容
+                    new_text = current_text[:last_at_pos+1] + selected_text
+                
+                self.target_input.setText(new_text)
+                # 将光标定位到@符号后的新文本末尾
+                new_cursor_pos = last_at_pos + 1 + len(selected_text)
+                self.target_input.setCursorPosition(new_cursor_pos)
+            else:
+                # 如果没有@符号，直接在当前位置插入
+                position = self.target_input.cursorPosition()
+                new_text = current_text[:position] + selected_text + current_text[position:]
+                self.target_input.setText(new_text)
+                self.target_input.setCursorPosition(position + len(selected_text))
+    
     def keyPressEvent(self, event):
         """处理键盘事件"""
-        if event.key() in (Qt.Key_Return, Qt.Key_Enter):
-            # 获取当前选中的项
-            current_item = self.function_list.currentItem()
-            if current_item and not current_item.isHidden():
-                self.on_function_selected(current_item)
+        key = event.key()
+        
+        # 处理上下键，直接在列表中导航
+        if key == Qt.Key_Up:
+            # 获取当前选定行
+            current_row = self.item_list.currentRow()
+            
+            # 如果没有选定行，从最后一行开始向上查找可见项
+            if current_row == -1:
+                for row in range(self.item_list.count()-1, -1, -1):
+                    if not self.item_list.item(row).isHidden():
+                        self.item_list.setCurrentRow(row)
+                        self.item_list.setFocus()
+                        return
+            
+            # 如果已有选定行，则选择上一个可见项
+            found = False
+            for row in range(current_row-1, -1, -1):
+                if not self.item_list.item(row).isHidden():
+                    self.item_list.setCurrentRow(row)
+                    self.item_list.setFocus()
+                    found = True
+                    break
+                    
+            # 如果没找到上一个可见项，尝试选择最后一个可见项（循环选择）
+            if not found:
+                for row in range(self.item_list.count()-1, current_row, -1):
+                    if not self.item_list.item(row).isHidden():
+                        self.item_list.setCurrentRow(row)
+                        self.item_list.setFocus()
+                        break
+                
+        elif key == Qt.Key_Down:
+            # 获取当前选定行
+            current_row = self.item_list.currentRow()
+            
+            # 如果没有选定行，则选择第一个可见项
+            if current_row == -1:
+                for row in range(self.item_list.count()):
+                    if not self.item_list.item(row).isHidden():
+                        self.item_list.setCurrentRow(row)
+                        self.item_list.setFocus()
+                        return
+            
+            # 如果已有选定行，则选择下一个可见项
+            found = False
+            for row in range(current_row+1, self.item_list.count()):
+                if not self.item_list.item(row).isHidden():
+                    self.item_list.setCurrentRow(row)
+                    self.item_list.setFocus()
+                    found = True
+                    break
+                    
+            # 如果没找到下一个可见项，尝试选择第一个可见项（循环选择）
+            if not found:
+                for row in range(0, current_row):
+                    if not self.item_list.item(row).isHidden():
+                        self.item_list.setCurrentRow(row)
+                        self.item_list.setFocus()
+                        break
+        
+        elif key == Qt.Key_Tab:
+            # Tab键在输入框和列表之间切换焦点
+            if self.input_field.hasFocus():
+                self.item_list.setFocus()
+            else:
+                self.input_field.setFocus()
+            
+        elif key == Qt.Key_Return or key == Qt.Key_Enter:
+            # 处理回车/确认键
+            if self.item_list.hasFocus() and self.item_list.currentItem():
+                # 如果列表有焦点且有选中项，直接选择
+                self.on_item_selected(self.item_list.currentItem())
+                event.accept()
+                return
+                
+            # 其他情况下，查找可见项
+            current_item = self.item_list.currentItem()
+            
+            # 计算可见项数量
+            visible_count = 0
+            for i in range(self.item_list.count()):
+                if not self.item_list.item(i).isHidden():
+                    visible_count += 1
+            
+            # 如果只有一个可见项或者有已选中的非隐藏项，则选择它
+            if (visible_count == 1) or (current_item and not current_item.isHidden()):
+                self.on_item_selected(current_item if current_item and not current_item.isHidden() else None)
             event.accept()
-        elif event.key() == Qt.Key_Escape:
+            
+        elif key == Qt.Key_Escape:
             self.reject()
+            
         else:
+            # 其他键继续传递给默认处理
             super().keyPressEvent(event)
+
+    def focusInEvent(self, event):
+        """处理获得焦点事件"""
+        super().focusInEvent(event)
+        # 确保焦点传递给输入框
+        self.input_field.setFocus()
+        
+    def event(self, event):
+        """处理所有事件"""
+        # 确保输入法事件正确传递
+        if event.type() == QEvent.InputMethod:
+            return self.input_field.event(event)
+        
+        return super().event(event)
+        
+    def inputMethodEvent(self, event):
+        """直接处理输入法事件"""
+        # 确保事件被输入框处理
+        self.input_field.inputMethodEvent(event)
+        event.accept()
+        
+    def inputMethodQuery(self, query):
+        """处理输入法查询"""
+        # 直接返回输入框的查询结果
+        return self.input_field.inputMethodQuery(query)
+
+
+# 保持向后兼容性，使用新类实现原有的FormulaInputDialog
+class FormulaInputDialog(ItemSelectorDialog):
+    """函数选择对话框，继承自ItemSelectorDialog"""
+    def __init__(self, parent=None, functions=None, auto_confirm=True):
+        super().__init__(
+            parent=parent,
+            items=functions,
+            title="选择函数",
+            placeholder="输入函数名进行搜索...",
+            target_input=self.li_com,
+            selection_prefix="",
+            selection_suffix="(",
+            selection_mode="append",
+            auto_confirm=auto_confirm
+        )
+        # 为兼容性保留原有属性名
+        self.functions = functions or []
+        self.function_list = self.item_list
+        self.selected_function = None
+    
+    def on_item_selected(self, item):
+        """重写以兼容原有代码"""
+        # 可能是自动选择传入了None
+        if item is None:
+            # 尝试获取当前选中的可见项
+            for i in range(self.item_list.count()):
+                if not self.item_list.item(i).isHidden():
+                    item = self.item_list.item(i)
+                    break
+            
+            # 如果没有可见项，则退出
+            if item is None:
+                return
+        
+        self.selected_function = item.text()
+        self.selected_item = self.selected_function
+        self.accept()
+    
+    def on_function_selected(self, item):
+        """保留原有方法名称以兼容性"""
+        self.on_item_selected(item)
+        
+    def filter_functions(self, text):
+        """保留原有方法名称以兼容性"""
+        self.filter_items(text)
 
 
 class TBSQLWindow(QWidget):
@@ -347,6 +739,10 @@ class TBSQLWindow(QWidget):
         self.ui.setupUi(self)
         # 创建 TableManager 实例
         self.table_manager = EditableTableManager()
+        
+        # 初始化变量
+        self.last_search_rule = ""
+        self.last_command_input = ""
         
         # 注册自定义函数
         self._register_custom_functions()
@@ -529,11 +925,6 @@ class TBSQLWindow(QWidget):
             # 绑定执行按钮事件
             self.pb_run.clicked.connect(self.execute_command)
             
-            # 记录上一个search_rule 
-            self.last_search_rule = ""
-            # 记录上一个command_input
-            self.last_command_input = ""
-
             # 添加公式单元格图例标签
             self.formula_legend = QLabel(self)
             self.formula_legend.setText("绿色文字表示公式单元格")
@@ -558,7 +949,7 @@ class TBSQLWindow(QWidget):
             # 将图例容器添加到表格上方
             # 在水平布局3（包含表格的布局）前插入图例
             self.ui.verticalLayout_3.insertWidget(3, legend_container)
-
+            
             # 初始化上一次输入的表格名
             self.last_table_input = ""
             
@@ -666,81 +1057,25 @@ class TBSQLWindow(QWidget):
             logging.error(f"处理列名输入时出错: {str(e)}")
             
     def show_column_selector_for_col(self, table_name, filter_text=""):
-        """显示列名选择器（用于列名输入框）"""
+        """显示列名选择器（用于列输入框）"""
         try:
-            # 获取表的列名
-            if table_name in self.data_dict.get("表格列表", {}):
-                columns = self.data_dict["表格列表"][table_name]["表格字段"]
-            else:
-                logging.warning(f"表 {table_name} 不存在")
+            # 确保表格名称存在
+            if table_name not in self.data_dict["表格列表"]:
+                logging.warning(f"表格 {table_name} 不存在")
                 return
                 
-            if not columns:
-                logging.warning(f"表 {table_name} 没有列信息")
-                return
+            # 获取表格字段列表
+            columns = self.data_dict["表格列表"][table_name]["表格字段"]
+            
+            # 使用通用的列选择对话框
+            self.show_column_selector_dialog(
+                target_input=self.li_col,
+                columns=columns,
+                filter_text=filter_text,
+                selection_mode="smart_insert",  # 特殊模式，根据@位置插入
+                title=f"选择 {table_name} 的列"
+            )
                 
-            # 初始化列选择器
-            if not hasattr(self, 'column_selector_for_col'):
-                self.column_selector_for_col = ColumnSelector(self)
-                
-                # 定义选择回调函数
-                def on_column_selected(item):
-                    try:
-                        # 获取当前文本和@符号位置
-                        current_text = self.li_col.text()
-                        last_at_pos = current_text.rfind('@')
-                        
-                        # 获取项目文本（安全方式）
-                        column_name = item.text() if hasattr(item, 'text') else str(item)
-                        
-                        # 替换@后面的内容
-                        new_text = current_text[:last_at_pos+1] + column_name
-                        if last_at_pos + len(column_name) + 1 < len(current_text):
-                            # 如果有后续内容，保留
-                            after_content = current_text[last_at_pos+1:]
-                            # 找到第一个分隔符
-                            separator_pos = -1
-                            for separator in [' ', ',', '=']:
-                                pos = after_content.find(separator)
-                                if pos != -1 and (separator_pos == -1 or pos < separator_pos):
-                                    separator_pos = pos
-                            
-                            if separator_pos != -1:
-                                # 有分隔符，保留分隔符及之后的内容
-                                new_text = current_text[:last_at_pos+1] + column_name + after_content[separator_pos:]
-                        
-                        self.li_col.setText(new_text)
-                        # 将光标移动到插入文本后
-                        new_cursor_pos = last_at_pos + 1 + len(column_name)
-                        self.li_col.setCursorPosition(new_cursor_pos)
-                        
-                        # 让列名输入框获得焦点
-                        self.li_col.setFocus()
-                        
-                        # 隐藏选择框
-                        self.column_selector_for_col.hide()
-                    except Exception as e:
-                        logging.error(f"选择列名时出错: {str(e)}")
-                
-                self.column_selector_for_col.on_item_clicked = on_column_selected
-            
-            # 清空并设置列名列表
-            self.column_selector_for_col.clear()
-            for col in columns:
-                self.column_selector_for_col.addItem(col)
-            
-            # 根据过滤文本筛选
-            if filter_text:
-                self.column_selector_for_col.filter_items(filter_text)
-            
-            # 计算弹出位置
-            pos = self.li_col.mapToGlobal(QPoint(0, self.li_col.height()))
-            self.column_selector_for_col.move(pos)
-            self.column_selector_for_col.setFixedWidth(self.li_col.width())
-            
-            # 显示选择器
-            self.column_selector_for_col.show()
-            
         except Exception as e:
             logging.error(f"显示列名选择器时出错: {str(e)}")
 
@@ -826,185 +1161,136 @@ class TBSQLWindow(QWidget):
             # 获取已注册的函数列表
             functions = list(self.table_manager._custom_functions.keys())
             
-            # 创建并显示公式输入对话框
-            formula_dialog = FormulaInputDialog(self, functions)
+            # 保存当前li_com的输入法状态并暂时禁用
+            self.li_com.setAttribute(Qt.WA_InputMethodEnabled, False)
+            
+            # 创建公式输入对话框，使用通用对话框直接处理选择结果
+            formula_dialog = ItemSelectorDialog(
+                parent=self,
+                items=functions,
+                title="选择函数",
+                placeholder="输入函数名进行搜索...",
+                target_input=self.li_com,
+                selection_prefix="",
+                selection_suffix="(",
+                selection_mode="append",
+                auto_confirm=True  # 启用自动确认
+            )
             
             # 设置位置和大小
             pos = self.li_com.mapToGlobal(QPoint(0, self.li_com.height()))
             formula_dialog.move(pos)
             formula_dialog.setFixedWidth(self.li_com.width())
             
+            # 设置为应用程序级别的模态对话框，确保获得输入焦点
+            formula_dialog.setWindowModality(Qt.ApplicationModal)
+            
             # 显示对话框并等待结果
-            if formula_dialog.exec() == QDialog.Accepted and formula_dialog.selected_function:
-                # 用户选择了函数
-                current_text = self.li_com.text()
-                # 保留等号，并添加选中的函数名加括号
-                new_text = current_text + formula_dialog.selected_function + "("
-                self.li_com.setText(new_text)
-                # 将光标移动到括号内
-                self.li_com.setCursorPosition(len(new_text))
+            formula_dialog.exec()
+            
+            # 恢复li_com的输入法状态
+            self.li_com.setAttribute(Qt.WA_InputMethodEnabled, True)
+            
+            # 执行完成后，焦点还给li_com
+            self.li_com.setFocus()
             
         except Exception as e:
             logging.error(f"显示公式选择器时出错: {str(e)}")
     
     def show_table_selector(self, filter_text="", parent_widget=None):
-        """显示表名选择器
-        
-        Args:
-            filter_text: 过滤文本
-            parent_widget: 父组件，默认为 li_com
-        """
+        """显示表格选择器"""
         try:
-            # 如果没有指定父组件，默认使用 li_com
+            # 如果没有指定父控件，默认使用命令输入框
             if parent_widget is None:
                 parent_widget = self.li_com
             
-            # 确保表名选择器已创建
-            if not hasattr(self, 'table_selector'):
-                self.table_selector = ColumnSelector(self)
+            # 获取表格列表
+            table_names = list(self.data_dict.get("表格列表", {}).keys())
             
-            # 设置父组件
-            self.table_selector.parent_widget = parent_widget
+            # 确定选择模式
+            selection_mode = "smart_insert"
+            selection_prefix = ""
+            selection_suffix = ""
             
-            # 获取所有表名
-            tables = list(self.data_dict.get("表格列表", {}).keys())
+            # 根据父控件类型调整选择行为
+            if parent_widget == self.li_com:
+                # 如果是命令输入框，选择后在@后插入
+                selection_mode = "smart_insert"
             
-            # 清空并重新添加表名
-            self.table_selector.clear()
-            for table in tables:
-                self.table_selector.addItem(table)
-            
-            # 设置位置和大小
-            pos = parent_widget.mapToGlobal(QPoint(0, parent_widget.height()))
-            self.table_selector.move(pos)
-            self.table_selector.setFixedWidth(parent_widget.width())
-            
-            # 根据输入过滤列表项
-            self.table_selector.filter_items(filter_text)
-            
-            # 设置选择器的点击事件处理
-            def on_table_selected(item):
-                current_text = parent_widget.text()
-                # 找到最后一个@符号的位置
-                last_at_pos = current_text.rfind('@')
-                # 替换@后面的内容为选中的表名
-                new_text = current_text[:last_at_pos + 1] + item.text()
+            # 使用通用的选择对话框
+            self.show_column_selector_dialog(
+                target_input=parent_widget,
+                columns=table_names,
+                filter_text=filter_text,
+                selection_prefix=selection_prefix,
+                selection_suffix=selection_suffix,
+                selection_mode=selection_mode,
+                title="选择表格"
+            )
                 
-                # 如果父组件是 li_com，则在表名后添加点号
-                if parent_widget == self.li_com:
-                    new_text += "."
-                
-                parent_widget.setText(new_text)
-                # 将光标移动到末尾
-                parent_widget.setCursorPosition(len(new_text))
-                self.table_selector.hide()
-                
-                # 如果父组件是 li_com，自动触发列名选择器
-                if parent_widget == self.li_com:
-                    self.show_column_selector_for_command(item.text(), "")
-            
-            # 绑定选择事件
-            self.table_selector.on_item_clicked = on_table_selected
-            
-            # 显示选择器
-            self.table_selector.show()
-            
         except Exception as e:
-            logging.error(f"显示表名选择器时出错: {str(e)}")
+            logging.error(f"显示表格选择器时出错: {str(e)}")
     
     def show_column_selector_for_command(self, table_name, filter_text=""):
-        """显示列名选择器（用于命令输入）"""
+        """显示列名选择器（用于命令输入框）"""
         try:
-            # 确保列名选择器已创建
-            if not hasattr(self, 'column_selector_for_command'):
-                self.column_selector_for_command = ColumnSelector(self)
-                self.column_selector_for_command.parent_widget = self.li_com
+            # 确保表格名称存在
+            if table_name not in self.data_dict["表格列表"]:
+                logging.warning(f"表格 {table_name} 不存在")
+                return
+                
+            # 获取表格字段列表
+            columns = self.data_dict["表格列表"][table_name]["表格字段"]
             
-            # 获取指定表的列名
-            if table_name in self.data_dict.get("表格列表", {}):
-                columns = self.data_dict["表格列表"][table_name]["表格字段"]
+            # 使用通用的列选择对话框
+            self.show_column_selector_dialog(
+                target_input=self.li_com,
+                columns=columns,
+                filter_text=filter_text,
+                selection_mode="smart_insert",  # 特殊模式，根据@位置插入
+                title=f"选择 {table_name} 的列"
+            )
                 
-                # 清空并重新添加列名
-                self.column_selector_for_command.clear()
-                for col in columns:
-                    self.column_selector_for_command.addItem(col)
-                
-                # 设置位置和大小
-                pos = self.li_com.mapToGlobal(QPoint(0, self.li_com.height()))
-                self.column_selector_for_command.move(pos)
-                self.column_selector_for_command.setFixedWidth(self.li_com.width())
-                
-                # 根据输入过滤列表项
-                self.column_selector_for_command.filter_items(filter_text)
-                
-                # 设置选择器的点击事件处理
-                def on_column_selected(item):
-                    current_text = self.li_com.text()
-                    # 找到最后一个点号的位置
-                    last_dot_pos = current_text.rfind('.')
-                    # 替换点号后面的内容为选中的列名
-                    new_text = current_text[:last_dot_pos + 1] + item.text()
-                    self.li_com.setText(new_text)
-                    # 将光标移动到末尾
-                    self.li_com.setCursorPosition(len(new_text))
-                    self.column_selector_for_command.hide()
-                
-                # 绑定选择事件
-                self.column_selector_for_command.on_item_clicked = on_column_selected
-            
         except Exception as e:
-            logging.error(f"显示列名选择器时出错: {str(e)}")
+            logging.error(f"显示命令列名选择器时出错: {str(e)}")
 
     # 弹出选择器，选择文本（用于表格搜索）
     def show_column_selector(self, search_rule):
         """弹出选择器，选择文本（用于表格搜索）"""
-        # 如果search_rule 比 last_search_rule 长度短，说明是删除，则不显示选择框
-        if len(search_rule) < len(self.last_search_rule):
-            if hasattr(self, 'column_selector'):
-                self.column_selector.hide()
-            return
-            
-        # 检查是否刚输入了@符号
-        if '@' in search_rule:
-            last_at_pos = search_rule.rfind('@')
-            after_at = search_rule[last_at_pos + 1:].strip()
-            logging.info(f"after_at: {after_at}")
-            
-            # 如果@后面有空格或其他分隔符，则不显示选择框
-            if '=' in after_at or ' ' in after_at or ',' in after_at:
-                if hasattr(self, 'column_selector'):
-                    self.column_selector.hide()
-            else:
-                current_table = self.com_table.currentText()
-                if current_table:
-                    # 确保列名选择器已创建
-                    if not hasattr(self, 'column_selector'):
-                        self.column_selector = ColumnSelector(self)
-                        self.column_selector.parent_widget = self.li_tab1_search
+        try:
+            # 如果search_rule 比 last_search_rule 长度短，说明是删除，则不显示选择框
+            if hasattr(self, 'last_search_rule') and len(search_rule) < len(self.last_search_rule):
+                self.last_search_rule = search_rule
+                return
+                
+            # 更新上一次搜索规则
+            self.last_search_rule = search_rule
+                
+            # 检查是否刚输入了@符号
+            if '@' in search_rule:
+                last_at_pos = search_rule.rfind('@')
+                after_at = search_rule[last_at_pos + 1:].strip()
+                logging.info(f"after_at: {after_at}")
+                
+                # 如果@后面有空格或其他分隔符，则不显示选择框
+                if '=' in after_at or ' ' in after_at or ',' in after_at:
+                    return
                     
+                current_table = self.com_table.currentText()
+                if current_table and current_table in self.data_dict.get("表格列表", {}):
                     # 获取当前表格的列名
                     columns = self.data_dict["表格列表"][current_table]["表格字段"]
                     
-                    # 清空并重新添加列名
-                    self.column_selector.clear()
-                    for col in columns:
-                        self.column_selector.addItem(col)
-                    
-                    # 设置位置和大小
-                    pos = self.li_tab1_search.mapToGlobal(QPoint(0, self.li_tab1_search.height()))
-                    self.column_selector.move(pos)
-                    self.column_selector.setFixedWidth(self.li_tab1_search.width())
-                    
-                    # 根据输入过滤列表项（这会自动处理显示/隐藏）
-                    self.column_selector.filter_items(after_at)
-                    
-                    # 如果没有@后的文本，不进行搜索
-                    if not after_at:
-                        return
-        else:
-            # 如果没有@符号，确保选择框是隐藏的
-            if hasattr(self, 'column_selector'):
-                self.column_selector.hide()
+                    # 使用通用的选择对话框
+                    self.show_column_selector_dialog(
+                        target_input=self.li_tab1_search,
+                        columns=columns,
+                        filter_text=after_at,
+                        selection_mode="smart_insert",  # 特殊模式，根据@位置插入
+                        title=f"选择 {current_table} 的列"
+                    )
+        except Exception as e:
+            logging.error(f"显示列名选择器时出错: {str(e)}")
 
     # 表格中数据搜索
     def search_data_by_rule(self):
@@ -1015,9 +1301,6 @@ class TBSQLWindow(QWidget):
             
             # 弹出选择器，选择文本
             self.show_column_selector(search_rule)
-
-            # 记录上一个search_rule
-            self.last_search_rule = search_rule
 
             # 调用 table_manager 的 search_by_rule 方法进行搜索
             filtered_model = self.table_manager.search_by_rule(search_rule)
@@ -1064,90 +1347,32 @@ class TBSQLWindow(QWidget):
 
     # 绑定键盘事件
     def keyPressEvent(self, event):
-        """处理键盘事件"""
-        # 处理Ctrl+C复制表格内容
-        if event.key() == Qt.Key_C and event.modifiers() == Qt.ControlModifier:
-            # 检查焦点是否在表格上
-            if self.tb_data.hasFocus():
-                self.copy_selected_cells()
-                event.accept()
-                return
-        
-        # 处理表格选择器的键盘事件
-        if hasattr(self, 'table_selector') and self.table_selector.isVisible():
-            if event.key() == Qt.Key_Up:
-                # 向上选择
-                current_row = self.table_selector.currentRow()
-                if current_row > 0:
-                    # 找到上一个可见项
-                    for i in range(current_row - 1, -1, -1):
-                        if not self.table_selector.item(i).isHidden():
-                            self.table_selector.setCurrentRow(i)
-                            break
-                event.accept()
-                return
-            elif event.key() == Qt.Key_Down:
-                # 向下选择
-                current_row = self.table_selector.currentRow()
-                if current_row < self.table_selector.count() - 1:
-                    # 找到下一个可见项
-                    for i in range(current_row + 1, self.table_selector.count()):
-                        if not self.table_selector.item(i).isHidden():
-                            self.table_selector.setCurrentRow(i)
-                            break
-                event.accept()
-                return
-            elif event.key() == Qt.Key_Return or event.key() == Qt.Key_Enter:
-                # 确认选择
-                current_item = self.table_selector.currentItem()
-                if current_item and not current_item.isHidden():
-                    self.table_selector.on_item_clicked(current_item)
-                event.accept()
-                return
-            elif event.key() == Qt.Key_Escape:
-                # 关闭选择器
-                self.table_selector.hide()
-                event.accept()
-                return
-                
-        if hasattr(self, 'column_selector') and self.column_selector.isVisible():
-            if event.key() == Qt.Key_Up:
-                # 向上选择
-                current_row = self.column_selector.currentRow()
-                if current_row > 0:
-                    # 找到上一个可见项
-                    for i in range(current_row - 1, -1, -1):
-                        if not self.column_selector.item(i).isHidden():
-                            self.column_selector.setCurrentRow(i)
-                            break
-                event.accept()
-                return
-            elif event.key() == Qt.Key_Down:
-                # 向下选择
-                current_row = self.column_selector.currentRow()
-                if current_row < self.column_selector.count() - 1:
-                    # 找到下一个可见项
-                    for i in range(current_row + 1, self.column_selector.count()):
-                        if not self.column_selector.item(i).isHidden():
-                            self.column_selector.setCurrentRow(i)
-                            break
-                event.accept()
-                return
-            elif event.key() == Qt.Key_Return or event.key() == Qt.Key_Enter:
-                # 确认选择
-                current_item = self.column_selector.currentItem()
-                if current_item and not current_item.isHidden():
-                    self.column_selector.on_item_clicked(current_item)
-                event.accept()
-                return
-            elif event.key() == Qt.Key_Escape:
-                # 关闭选择器
-                self.column_selector.hide()
-                event.accept()
-                return
-        
-        # 其他键盘事件交给默认处理
-        super().keyPressEvent(event)
+        """键盘事件处理"""
+        key = event.key()
+        if key == Qt.Key.Key_Escape:
+            # ESC键隐藏窗口
+            self.hide()
+        elif key == Qt.Key_Up:
+            # 上键选择上一项
+            current_row = self.currentRow()
+            if current_row > 0:
+                # 找到上一个可见项
+                for i in range(current_row - 1, -1, -1):
+                    if not self.item(i).isHidden():
+                        self.setCurrentRow(i)
+                        break
+        elif key == Qt.Key_Down:
+            # 下键选择下一项
+            current_row = self.currentRow()
+            if current_row < self.count() - 1:
+                # 找到下一个可见项
+                for i in range(current_row + 1, self.count()):
+                    if not self.item(i).isHidden():
+                        self.setCurrentRow(i)
+                        break
+        else:
+            # 其他键传递给父类
+            super().keyPressEvent(event)
         
     def copy_selected_cells(self):
         """复制表格中选中的单元格内容"""
@@ -1632,6 +1857,62 @@ class TBSQLWindow(QWidget):
                 
         except Exception as e:
             logging.error(f"处理表格名称输入时出错: {str(e)}")
+
+    def show_column_selector_dialog(self, target_input, columns, filter_text="", 
+                                   selection_prefix="", selection_suffix="", 
+                                   selection_mode="replace", title="选择列名"):
+        """显示通用的列名选择对话框
+        
+        参数:
+        target_input -- 目标输入框，选择结果将被应用到此输入框
+        columns -- 列名列表
+        filter_text -- 初始过滤文本
+        selection_prefix -- 选择列名前缀
+        selection_suffix -- 选择列名后缀
+        selection_mode -- 选择模式：'replace', 'append' 或 'insert'
+        title -- 对话框标题
+        """
+        try:
+            # 保存目标输入框的输入法状态并暂时禁用
+            target_input.setAttribute(Qt.WA_InputMethodEnabled, False)
+            
+            # 创建列选择对话框
+            column_dialog = ItemSelectorDialog(
+                parent=self,
+                items=columns,
+                title=title,
+                placeholder="输入列名进行搜索...",
+                target_input=target_input,
+                selection_prefix=selection_prefix,
+                selection_suffix=selection_suffix,
+                selection_mode=selection_mode,
+                auto_confirm=True  # 启用自动确认功能
+            )
+            
+            # 如果有过滤文本，预先过滤列表
+            if filter_text:
+                column_dialog.input_field.setText(filter_text)
+                column_dialog.filter_items(filter_text)
+            
+            # 设置位置和大小
+            pos = target_input.mapToGlobal(QPoint(0, target_input.height()))
+            column_dialog.move(pos)
+            column_dialog.setFixedWidth(target_input.width())
+            
+            # 设置为应用程序级别的模态对话框，确保获得输入焦点
+            column_dialog.setWindowModality(Qt.ApplicationModal)
+            
+            # 显示对话框并等待结果
+            column_dialog.exec()
+            
+            # 恢复目标输入框的输入法状态
+            target_input.setAttribute(Qt.WA_InputMethodEnabled, True)
+            
+            # 执行完成后，焦点还给目标输入框
+            target_input.setFocus()
+            
+        except Exception as e:
+            logging.error(f"显示列名选择对话框时出错: {str(e)}")
 
 
 def main():
