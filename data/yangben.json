@@ -5,7 +5,7 @@
             "表格数据": [
                 {
                     "值": ["001", "张三", "研发部", "工程师", "2023-01-01", null],
-                    "公式": [null, null, null, null, null, "=calculate_age(入职日期)"]
+                    "公式": [null, null, null, null, null, "=calculate_age(@员工信息表.入职日期)"]
                 },
                 {
                     "值": ["002", "李四", "市场部", "经理", "2022-06-15", null],
