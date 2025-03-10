@@ -521,6 +521,42 @@ class ItemSelectorDialog(QDialog):
             self.target_input.setText(new_text)
             # 将光标定位到插入文本后
             self.target_input.setCursorPosition(position + len(selected_text))
+        elif self.selection_mode == 'smart_append':
+            # 特殊模式，处理点号后的列名插入
+            current_text = self.target_input.text()
+            
+            # 检查是否有点号
+            if '.' in current_text:
+                last_dot_pos = current_text.rfind('.')
+                
+                # 提取点号后面的内容
+                after_content = current_text[last_dot_pos+1:]
+                
+                # 找到第一个分隔符
+                separator_pos = -1
+                for separator in [' ', ',', '=']:
+                    pos = after_content.find(separator)
+                    if pos != -1 and (separator_pos == -1 or pos < separator_pos):
+                        separator_pos = pos
+                
+                # 构建新文本
+                if separator_pos != -1:
+                    # 有分隔符，保留分隔符及之后的内容
+                    new_text = current_text[:last_dot_pos+1] + selected_text + after_content[separator_pos:]
+                else:
+                    # 没有分隔符，直接替换点号后面的全部内容
+                    new_text = current_text[:last_dot_pos+1] + selected_text
+                
+                self.target_input.setText(new_text)
+                # 将光标定位到点号后的新文本末尾
+                new_cursor_pos = last_dot_pos + 1 + len(selected_text)
+                self.target_input.setCursorPosition(new_cursor_pos)
+            else:
+                # 如果没有点号，直接在当前位置插入
+                position = self.target_input.cursorPosition()
+                new_text = current_text[:position] + selected_text + current_text[position:]
+                self.target_input.setText(new_text)
+                self.target_input.setCursorPosition(position + len(selected_text))
         elif self.selection_mode == 'smart_insert':
             # 特殊模式，处理@符号后的列名插入
             current_text = self.target_input.text()
@@ -692,10 +728,8 @@ class FormulaInputDialog(ItemSelectorDialog):
             items=functions,
             title="选择函数",
             placeholder="输入函数名进行搜索...",
-            target_input=self.li_com,
             selection_prefix="",
             selection_suffix="(",
-            selection_mode="append",
             auto_confirm=auto_confirm
         )
         # 为兼容性保留原有属性名
@@ -1105,6 +1139,22 @@ class TBSQLWindow(QWidget):
                 self.show_formula_selector()
                 return
                 
+            # 检查是否输入了点号，弹出列名选择器
+            if '.' in command_input and command_input.endswith('.'):
+                # 获取点号前的内容
+                dot_context = command_input[:-1].strip()
+                
+                # 尝试从@符号后提取表名
+                if '@' in dot_context:
+                    last_at_pos = dot_context.rfind('@')
+                    table_name = dot_context[last_at_pos + 1:].strip()
+                    
+                    # 检查表名是否存在
+                    if table_name and table_name in self.data_dict.get("表格列表", {}):
+                        # 显示该表的列名选择器
+                        self.show_column_selector_for_command(table_name, "")
+                        return
+                
             # 检查是否输入了@符号，弹出表名选择器
             if '@' in command_input:
                 last_at_pos = command_input.rfind('@')
@@ -1118,8 +1168,8 @@ class TBSQLWindow(QWidget):
                     self.show_table_selector(after_at, self.li_com)
                 return
                 
-            # 检查是否输入了点号，弹出列名选择器
-            if '.' in command_input:
+            # 检查是否输入了点号但不是结尾，弹出列名选择器
+            if '.' in command_input and not command_input.endswith('.'):
                 last_dot_pos = command_input.rfind('.')
                 # 获取点号前的表名
                 dot_context = command_input[:last_dot_pos]
@@ -1170,10 +1220,10 @@ class TBSQLWindow(QWidget):
                 items=functions,
                 title="选择函数",
                 placeholder="输入函数名进行搜索...",
-                target_input=self.li_com,
+                target_input=self.li_com,  # 指定目标输入框
                 selection_prefix="",
                 selection_suffix="(",
-                selection_mode="append",
+                selection_mode="append",  # 使用追加模式，将函数名追加到等号后面
                 auto_confirm=True  # 启用自动确认
             )
             
@@ -1242,12 +1292,26 @@ class TBSQLWindow(QWidget):
             # 获取表格字段列表
             columns = self.data_dict["表格列表"][table_name]["表格字段"]
             
+            # 确定选择模式和后缀
+            selection_mode = "smart_insert"
+            selection_suffix = ""
+            
+            # 检查是否是点号触发的选择
+            current_text = self.li_com.text()
+            if current_text.endswith('.'):
+                # 点号触发的选择，使用smart_append模式
+                selection_mode = "smart_append"
+                # 点号已经存在，不需要添加额外的后缀
+                selection_suffix = ""
+                
             # 使用通用的列选择对话框
             self.show_column_selector_dialog(
                 target_input=self.li_com,
                 columns=columns,
                 filter_text=filter_text,
-                selection_mode="smart_insert",  # 特殊模式，根据@位置插入
+                selection_prefix="",
+                selection_suffix=selection_suffix,
+                selection_mode=selection_mode,  # 根据触发方式选择模式
                 title=f"选择 {table_name} 的列"
             )
                 
@@ -1265,6 +1329,10 @@ class TBSQLWindow(QWidget):
                 
             # 更新上一次搜索规则
             self.last_search_rule = search_rule
+            
+            # 如果输入了点号(.)，不弹出选择框
+            if '.' in search_rule:
+                return
                 
             # 检查是否刚输入了@符号
             if '@' in search_rule:
