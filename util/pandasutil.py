@@ -1,9 +1,10 @@
 import pandas as pd
 from PySide6.QtCore import Qt, QAbstractTableModel
-from typing import List, Any, Optional
+from typing import List, Any, Optional, Dict, Tuple, Set
 import logging
 import re
 from PySide6.QtGui import QColor
+import networkx as nx
 
 # 设置loging 打印到控制台
 logging.basicConfig(level=logging.INFO,format='%(asctime)s - %(levelname)s -%(filename)s- %(funcName)s - %(message)s')
@@ -51,6 +52,11 @@ class EditableTableManager(QAbstractTableModel):
         self._editing_cell = None  # 存储当前正在编辑的单元格
         self._table_name = ""  # 当前表名
         self._all_tables = {}  # 存储所有表格数据 {表名: {列名: [值]}}
+        
+        # 创建依赖图
+        self._dependency_graph = nx.DiGraph()  # 存储单元格之间的依赖关系
+        self._cell_dependencies = {}  # 存储每个单元格的依赖关系 {(row, col): [(依赖的行, 依赖的列), ...]}
+        self._reverse_dependencies = {}  # 存储反向依赖关系 {(row, col): [(依赖此单元格的行, 依赖此单元格的列), ...]}
 
     def register_function(self, name: str, func: callable):
         """注册自定义函数"""
@@ -58,31 +64,80 @@ class EditableTableManager(QAbstractTableModel):
         
     def set_data(self, data: List[dict], columns: List[str], table_name: str = ""):
         """设置表格数据和列名"""
-        self._columns = columns
-        self._data = []
-        self._formulas = []
-        self._table_name = table_name
-        
-        # 处理数据和公式
-        for row in data:
-            self._data.append(row.get("值", [""] * len(columns)))
-            self._formulas.append(row.get("公式", [None] * len(columns)))
+        try:
+            self._columns = columns
+            self._data = []
+            self._formulas = []
+            self._table_name = table_name
             
-        # 更新所有表格数据字典
-        if table_name:
-            # 构建列数据字典
-            table_data = {}
-            for col_idx, col_name in enumerate(columns):
-                table_data[col_name] = [row[col_idx] if col_idx < len(row) else "" for row in self._data]
-            self._all_tables[table_name] = table_data
+            # 处理数据和公式
+            for row in data:
+                try:
+                    # 确保行数据格式正确
+                    row_values = row.get("值", [])
+                    if not isinstance(row_values, list):
+                        row_values = []
+                    
+                    # 确保公式数据格式正确
+                    row_formulas = row.get("公式", [])
+                    if not isinstance(row_formulas, list):
+                        row_formulas = []
+                    
+                    # 填充数据长度
+                    while len(row_values) < len(columns):
+                        row_values.append("")
+                    
+                    # 填充公式长度
+                    while len(row_formulas) < len(columns):
+                        row_formulas.append(None)
+                    
+                    self._data.append(row_values)
+                    self._formulas.append(row_formulas)
+                except Exception as e:
+                    logging.error(f"处理行数据错误: {str(e)}")
+                    # 添加空行
+                    self._data.append([""] * len(columns))
+                    self._formulas.append([None] * len(columns))
             
-        self.layoutChanged.emit()
-        return self
+            # 更新所有表格数据字典
+            if table_name:
+                try:
+                    # 构建列数据字典
+                    table_data = {}
+                    for col_idx, col_name in enumerate(columns):
+                        column_values = []
+                        for row in self._data:
+                            if col_idx < len(row):
+                                column_values.append(row[col_idx])
+                            else:
+                                column_values.append("")
+                        table_data[col_name] = column_values
+                    self._all_tables[table_name] = table_data
+                except Exception as e:
+                    logging.error(f"更新表格数据字典错误: {str(e)}")
+            
+            # 更新依赖图
+            try:
+                self._update_dependency_graph()
+            except Exception as e:
+                logging.error(f"更新依赖图错误: {str(e)}")
+            
+            self.layoutChanged.emit()
+            return self
+        except Exception as e:
+            logging.error(f"设置表格数据错误: {str(e)}")
+            # 确保至少有一些有效的数据
+            self._columns = columns if columns else []
+            self._data = []
+            self._formulas = []
+            self.layoutChanged.emit()
+            return self
 
     def _evaluate_formula(self, formula: str, row: int, col: int) -> Any:
         """计算公式结果"""
         try:
             # 如果不是公式，直接返回None
+            formula = formula.replace('@', '')
             if not formula or not formula.startswith("="):
                 return None
                 
@@ -223,10 +278,28 @@ class EditableTableManager(QAbstractTableModel):
         
     def setData(self, index, value, role=Qt.EditRole):
         """设置单元格数据"""
-        if role == Qt.EditRole and index.isValid():
-            row, col = index.row(), index.column()
+        if not index.isValid():
+            return False
             
-            # 检查是否是公式
+        row, col = index.row(), index.column()
+        
+        try:
+            # 检查行列边界
+            if row < 0 or row >= len(self._data) or col < 0 or col >= len(self._columns):
+                return False
+                
+            # 确保数据行长度足够
+            while len(self._data[row]) <= col:
+                self._data[row].append("")
+                
+            # 确保公式行长度足够
+            while len(self._formulas[row]) <= col:
+                self._formulas[row].append(None)
+                
+            old_value = self._data[row][col]
+            old_formula = self._formulas[row][col]
+            
+            # 检查值是否为公式
             if isinstance(value, str) and value.startswith('='):
                 try:
                     # 尝试计算公式是否有效
@@ -239,13 +312,46 @@ class EditableTableManager(QAbstractTableModel):
                 except Exception as e:
                     logging.error(f"公式计算错误: {str(e)}")
             else:
-                self._data[row][col] = value
+                # 普通值
                 self._formulas[row][col] = None
+                self._data[row][col] = value
                 
-            # 发出数据改变信号
+            # 更新表格数据字典
+            if self._table_name and col < len(self._columns):
+                col_name = self._columns[col]
+                if col_name in self._all_tables.get(self._table_name, {}):
+                    # 确保行数足够
+                    while len(self._all_tables[self._table_name][col_name]) <= row:
+                        self._all_tables[self._table_name][col_name].append("")
+                    
+                    # 更新列数据
+                    if self._formulas[row][col]:
+                        # 如果是公式，使用计算结果
+                        result = self._evaluate_formula(self._formulas[row][col], row, col)
+                        self._all_tables[self._table_name][col_name][row] = result
+                    else:
+                        # 否则使用实际值
+                        self._all_tables[self._table_name][col_name][row] = self._data[row][col]
+                        
+            # 如果单元格内容有变化，更新依赖图
+            if old_value != self._data[row][col] or old_formula != self._formulas[row][col]:
+                # 分析新的依赖关系
+                try:
+                    # 更新整个依赖图（更加健壮但可能较慢）
+                    self._update_dependency_graph()
+                    
+                    # 更新依赖此单元格的所有单元格
+                    self._update_dependent_cells(row, col)
+                except Exception as e:
+                    logging.error(f"更新依赖单元格时发生错误: {str(e)}")
+            
+            # 发送数据更改信号
             self.dataChanged.emit(index, index)
             return True
-        return False
+            
+        except Exception as e:
+            logging.error(f"设置单元格数据错误: {str(e)}")
+            return False
 
     def rowCount(self, parent=None):
         """获取行数
@@ -564,4 +670,111 @@ class EditableTableManager(QAbstractTableModel):
             List[List[Any]]: 二维列表形式的表格数据
         """
         return self._data
+
+    def _parse_formula_dependencies(self, formula: str, row: int, col: int) -> List[Tuple[int, int]]:
+        """分析公式依赖的单元格，返回依赖的单元格列表[(row, col), ...]"""
+        if not formula or not isinstance(formula, str) or not formula.startswith("="):
+            return []
+            
+        dependencies = []
+        
+        # 去掉等号
+        formula = formula[1:]
+        
+        # 检查是否是 函数名(@表名.列名) 格式
+        func_table_col_pattern = r'(\w+)\(\@(\w+)\.(\w+)\)'
+        func_table_col_matches = re.finditer(func_table_col_pattern, formula)
+        
+        for match in func_table_col_matches:
+            table_name = match.group(2)
+            col_name = match.group(3)
+            
+            # 记录整列依赖
+            if table_name == self._table_name and col_name in self._columns:
+                col_idx = self._columns.index(col_name)
+                # 记录依赖此列的所有单元格
+                for r in range(len(self._data)):
+                    dependencies.append((r, col_idx))
+        
+        # 解析单元格引用 (例如: A1, B2 等)
+        cell_ref_pattern = r'[A-Z]+[0-9]+'
+        cell_refs = re.findall(cell_ref_pattern, formula)
+        
+        for cell_ref in cell_refs:
+            col_name = ''.join(filter(str.isalpha, cell_ref))
+            row_num = int(''.join(filter(str.isdigit, cell_ref))) - 1
+            
+            col_idx = 0
+            for i, c in enumerate(reversed(col_name)):
+                col_idx += (ord(c) - ord('A') + 1) * (26 ** i)
+            col_idx -= 1
+            
+            dependencies.append((row_num, col_idx))
+        
+        return dependencies
+        
+    def _update_dependency_graph(self):
+        """更新整个依赖图"""
+        # 清空现有图
+        self._dependency_graph.clear()
+        self._cell_dependencies.clear()
+        self._reverse_dependencies.clear()
+        
+        # 遍历所有单元格，构建依赖关系
+        for row in range(len(self._formulas)):
+            for col in range(len(self._formulas[row])):
+                formula = self._formulas[row][col]
+                if formula:
+                    # 分析公式依赖
+                    dependencies = self._parse_formula_dependencies(formula, row, col)
+                    
+                    # 记录依赖关系
+                    self._cell_dependencies[(row, col)] = dependencies
+                    
+                    # 构建依赖图
+                    for dep_row, dep_col in dependencies:
+                        # 添加节点和边
+                        self._dependency_graph.add_edge((dep_row, dep_col), (row, col))
+                        
+                        # 记录反向依赖
+                        if (dep_row, dep_col) not in self._reverse_dependencies:
+                            self._reverse_dependencies[(dep_row, dep_col)] = []
+                        self._reverse_dependencies[(dep_row, dep_col)].append((row, col))
+    
+    def _update_dependent_cells(self, row: int, col: int):
+        """更新依赖于指定单元格的所有单元格"""
+        # 使用拓扑排序获取更新顺序
+        if (row, col) in self._reverse_dependencies:
+            visited = set()
+            to_visit = [(row, col)]
+            
+            # 按依赖顺序更新单元格
+            while to_visit:
+                curr_row, curr_col = to_visit.pop(0)
+                if (curr_row, curr_col) in visited:
+                    continue
+                    
+                visited.add((curr_row, curr_col))
+                
+                # 查找所有依赖此单元格的单元格
+                if (curr_row, curr_col) in self._reverse_dependencies:
+                    for dep_row, dep_col in self._reverse_dependencies[(curr_row, curr_col)]:
+                        # 更新单元格值
+                        formula = self._formulas[dep_row][dep_col]
+                        if formula:
+                            try:
+                                # 重新计算公式
+                                result = self._evaluate_formula(formula, dep_row, dep_col)
+                                self._data[dep_row][dep_col] = result
+                                
+                                # 添加到访问队列
+                                to_visit.append((dep_row, dep_col))
+                            except Exception as e:
+                                logging.error(f"更新依赖单元格时发生错误: {str(e)}")
+            
+            # 发出数据变化信号
+            self.dataChanged.emit(
+                self.index(0, 0), 
+                self.index(len(self._data) - 1, len(self._columns) - 1)
+            )
 
