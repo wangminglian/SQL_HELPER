@@ -1,5 +1,12 @@
 import datetime
+import sys
+import os
+import logging
 
+# 添加项目根目录到Python路径
+current_dir = os.path.dirname(os.path.abspath(__file__))
+root_dir = os.path.dirname(current_dir)
+sys.path.append(root_dir)
 from peewee import *
 
 import os,sys
@@ -96,8 +103,34 @@ class JB_INFO(Base_Model):
     type = CharField(verbose_name='类型') #开发/提交（版本）
     version = IntegerField(verbose_name='版本号')
     path = CharField(verbose_name='路径')
+    gd_name = CharField(verbose_name='归档名称')
     class Meta:
         database = dp
+
+# 引用脚本
+class YY_JB_INFO(Base_Model):
+    id = AutoField(verbose_name='引用脚本编号', primary_key=True)
+    s_xq_id = ForeignKeyField(XQ_INFO,on_delete='CASCADE',verbose_name='源需求id')
+    sjb_id = ForeignKeyField(JB_INFO,on_delete='CASCADE',verbose_name='源脚本id')
+    t_xq_id = ForeignKeyField(XQ_INFO,on_delete='CASCADE',verbose_name='目标需求id')
+    yy_desc = CharField(verbose_name='引用描述',null=True)
+    class Meta:
+        database = dp
+
+class MD_INFO(Base_Model):
+    '''
+        markdown 文件信息
+    '''
+    file_id = AutoField(verbose_name='主键', primary_key=True)
+    xq_id = ForeignKeyField(XQ_INFO,on_delete='CASCADE')
+    xq_name = CharField(verbose_name='需求名称')
+    name = CharField(verbose_name='名称')
+    path = CharField(verbose_name='路径')
+    bz = CharField(verbose_name='备注')
+    tj_time = DateTimeField(verbose_name='提交时间')
+    class Meta:
+        database = dp
+
 
 class TABLE_INFO(Base_Model):
     table_id = CharField(verbose_name='表名&主键',primary_key=True)
@@ -156,14 +189,14 @@ class MY_CONFIG(Base_Model):
 
 
 
-create_tables = [Project_detail,SQL_arg,History]
+create_tables = [YY_JB_INFO]
 if __name__ == '__main__':
     print(os.path.join(os.getcwd().split('SQL_Helper')[0],'SQL_Helper/clinet/data.json/SQL_Helper.db'))
     db.connect()
-    # db.drop_tables([MY_CONFIG])
-    # db.create_tables([MY_CONFIG])
-    print(db.get_tables())
-    # db.create_tables([History,])
+    # # db.drop_tables([MY_CONFIG])
+    db.create_tables([YY_JB_INFO])
+    # print(db.get_tables())
+    # db.create_tables([MD_INFO,])
     # com = db.get_tables()
     # print(com)
     # z = YSJ_KJ.select()

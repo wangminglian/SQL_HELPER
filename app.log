@@ -1,0 +1,710 @@
+2025-03-10 19:02:59,756 - INFO - pandasutil.py - load_all_tables - 表格列表:{'员工信息表': {'表格字段': ['工号', '姓名', '部门', '职位', '入职日期', '年龄'], '表格数据': [{'值': ['001', '张三', '研发部', '工程师', '2023-01-01', None], '公式': [None, None, None, None, None, '=calculate_age(@员工信息表.入职日期)']}, {'值': ['002', '李四', '市场部', '经理', '2022-06-15', None], '公式': [None, None, None, None, None, '=calculate_age(@员工信息表.入职日期)']}, {'值': ['003', '王五', '财务部', '主管', '2023-03-20', None], '公式': [None, None, None, None, None, '=calculate_age(@员工信息表.入职日期)']}]}, '部门信息表': {'表格字段': ['部门编号', '部门名称', '部门主管', '人数', '平均年龄'], '表格数据': [{'值': ['D001', '研发部', '张三', '20', None], '公式': [None, None, None, None, '=calculate_age(@员工信息表.部门)']}, {'值': ['D002', '市场部', '李四', '15', None], '公式': [None, None, None, None, '=calculate_age(@员工信息表.部门)']}, {'值': ['D003', '财务部', '王五', '10', None], '公式': [None, None, None, None, '=calculate_age(员工信息表.部门)']}]}} 
+2025-03-10 19:02:59,756 - INFO - pandasutil.py - load_all_tables - 已预加载 2 个表格
+2025-03-10 19:02:59,756 - INFO - tbsql.py - on_table_changed - 切换到表格: '员工信息表'
+2025-03-10 19:02:59,756 - INFO - pandasutil.py - get_table_model - 加载表格: '员工信息表'
+2025-03-10 19:02:59,759 - INFO - pandasutil.py - get_table_model - 加载表格: '员工信息表'
+2025-03-10 19:02:59,759 - INFO - tbsql.py - init_data - 初始化表格: '员工信息表'
+2025-03-10 19:07:19,279 - INFO - pandasutil.py - register_function - 注册自定义函数: calculate_age
+2025-03-10 19:07:19,279 - INFO - pandasutil.py - register_function - 注册自定义函数: sum_range
+2025-03-10 19:07:19,280 - INFO - pandasutil.py - register_function - 注册自定义函数: average_range
+2025-03-10 19:07:19,280 - INFO - tbsql.py - load_json - 开始加载JSON文件: ./data/yangben.json
+2025-03-10 19:07:19,281 - INFO - tbsql.py - load_json - JSON文件加载成功: ./data/yangben.json
+2025-03-10 19:07:37,627 - INFO - pandasutil.py - register_function - 注册自定义函数: calculate_age
+2025-03-10 19:07:37,628 - INFO - pandasutil.py - register_function - 注册自定义函数: sum_range
+2025-03-10 19:07:37,628 - INFO - pandasutil.py - register_function - 注册自定义函数: average_range
+2025-03-10 19:07:37,629 - INFO - tbsql.py - load_json - 开始加载JSON文件: ./data/yangben.json
+2025-03-10 19:07:37,631 - INFO - tbsql.py - load_json - JSON文件加载成功: ./data/yangben.json
+2025-03-10 19:07:42,330 - INFO - tbsql.py - import_json - 开始导入JSON文件
+2025-03-10 19:07:48,643 - INFO - tbsql.py - import_json - 用户选择的文件路径: D:/code/SQL_Helper/data/yangben.json
+2025-03-10 19:07:48,643 - INFO - tbsql.py - load_json - 开始加载JSON文件: D:/code/SQL_Helper/data/yangben.json
+2025-03-10 19:07:48,644 - INFO - tbsql.py - load_json - JSON文件加载成功: D:/code/SQL_Helper/data/yangben.json
+2025-03-10 19:07:48,644 - INFO - tbsql.py - import_json - JSON数据导入成功，开始初始化界面
+2025-03-10 19:07:48,644 - INFO - tbsql.py - init_data - 开始初始化数据
+2025-03-10 19:07:48,645 - INFO - tbsql.py - init_data - 发现 2 个表格，开始预加载
+2025-03-10 19:07:48,645 - INFO - pandasutil.py - load_all_tables - 表格列表:{'员工信息表': {'表格字段': ['工号', '姓名', '部门', '职位', '入职日期', '年龄'], '表格数据': [{'值': ['001', '张三', '研发部', '工程师', '2023-01-01', None], '公式': [None, None, None, None, None, '=calculate_age(@员工信息表.入职日期)']}, {'值': ['002', '李四', '市场部', '经理', '2022-06-15', None], '公式': [None, None, None, None, None, '=calculate_age(@员工信息表.入职日期)']}, {'值': ['003', '王五', '财务部', '主管', '2023-03-20', None], '公式': [None, None, None, None, None, '=calculate_age(@员工信息表.入职日期)']}]}, '部门信息表': {'表格字段': ['部门编号', '部门名称', '部门主管', '人数', '平均年龄'], '表格数据': [{'值': ['D001', '研发部', '张三', '20', None], '公式': [None, None, None, None, '=calculate_age(@员工信息表.部门)']}, {'值': ['D002', '市场部', '李四', '15', None], '公式': [None, None, None, None, '=calculate_age(@员工信息表.部门)']}, {'值': ['D003', '财务部', '王五', '10', None], '公式': [None, None, None, None, '=calculate_age(员工信息表.部门)']}]}} 
+2025-03-10 19:07:48,645 - INFO - pandasutil.py - load_all_tables - 已预加载 2 个表格
+2025-03-10 19:07:48,646 - INFO - tbsql.py - on_table_changed - 切换到表格: '员工信息表'
+2025-03-10 19:07:48,646 - INFO - pandasutil.py - get_table_model - 获取表格模型: 表名='员工信息表'
+2025-03-10 19:07:48,646 - INFO - pandasutil.py - get_table_model - 加载表格: '员工信息表'
+2025-03-10 19:07:48,646 - INFO - pandasutil.py - set_data - 设置表格数据开始: 表名=员工信息表, 列数=6, 行数=3
+2025-03-10 19:07:48,646 - INFO - pandasutil.py - set_data - 开始处理行数据和公式: 表名=员工信息表, 行数=3
+2025-03-10 19:07:48,647 - INFO - pandasutil.py - _process_row_data - 行数据处理完成: 成功=3, 跳过=0, 总计=3
+2025-03-10 19:07:48,647 - INFO - pandasutil.py - set_data - 更新表格数据字典: 表名=员工信息表
+2025-03-10 19:07:48,647 - INFO - pandasutil.py - _update_table_data_dict - 开始更新表格数据字典: 表名=员工信息表
+2025-03-10 19:07:48,647 - INFO - pandasutil.py - _update_table_data_dict - 表格数据字典更新完成: 表名=员工信息表, 列数=6
+2025-03-10 19:07:48,647 - INFO - pandasutil.py - set_data - 开始更新依赖图: 表名=员工信息表
+2025-03-10 19:07:48,649 - INFO - pandasutil.py - _update_dependency_graph - 开始构建依赖图
+2025-03-10 19:07:48,649 - INFO - pandasutil.py - _update_dependency_graph - 依赖图构建完成: 公式数=3, 依赖关系数=9
+2025-03-10 19:07:48,651 - INFO - pandasutil.py - set_data - 完成依赖图更新: 表名=员工信息表, 节点数=6
+2025-03-10 19:07:48,652 - INFO - pandasutil.py - set_data - 完成表格数据设置: 表名=员工信息表, 最终行数=3, 列数=6
+2025-03-10 19:07:48,654 - INFO - tbsql.py - on_table_changed - 成功加载表格: '员工信息表'
+2025-03-10 19:07:48,655 - INFO - tbsql.py - init_data - 加载第一个表格: '员工信息表'
+2025-03-10 19:07:48,655 - INFO - pandasutil.py - get_table_model - 获取表格模型: 表名='员工信息表'
+2025-03-10 19:07:48,655 - INFO - pandasutil.py - get_table_model - 加载表格: '员工信息表'
+2025-03-10 19:07:48,655 - INFO - pandasutil.py - set_data - 设置表格数据开始: 表名=员工信息表, 列数=6, 行数=3
+2025-03-10 19:07:48,656 - INFO - pandasutil.py - set_data - 开始处理行数据和公式: 表名=员工信息表, 行数=3
+2025-03-10 19:07:48,657 - INFO - pandasutil.py - _process_row_data - 行数据处理完成: 成功=3, 跳过=0, 总计=3
+2025-03-10 19:07:48,657 - INFO - pandasutil.py - set_data - 更新表格数据字典: 表名=员工信息表
+2025-03-10 19:07:48,657 - INFO - pandasutil.py - _update_table_data_dict - 开始更新表格数据字典: 表名=员工信息表
+2025-03-10 19:07:48,657 - INFO - pandasutil.py - _update_table_data_dict - 表格数据字典更新完成: 表名=员工信息表, 列数=6
+2025-03-10 19:07:48,657 - INFO - pandasutil.py - set_data - 开始更新依赖图: 表名=员工信息表
+2025-03-10 19:07:48,657 - INFO - pandasutil.py - _update_dependency_graph - 开始构建依赖图
+2025-03-10 19:07:48,658 - INFO - pandasutil.py - _update_dependency_graph - 依赖图构建完成: 公式数=3, 依赖关系数=9
+2025-03-10 19:07:48,658 - INFO - pandasutil.py - set_data - 完成依赖图更新: 表名=员工信息表, 节点数=6
+2025-03-10 19:07:48,658 - INFO - pandasutil.py - set_data - 完成表格数据设置: 表名=员工信息表, 最终行数=3, 列数=6
+2025-03-10 19:07:48,659 - INFO - tbsql.py - init_data - 初始化表格完成: '员工信息表'
+2025-03-10 19:08:10,232 - INFO - pandasutil.py - register_function - 注册自定义函数: calculate_age
+2025-03-10 19:08:10,233 - INFO - pandasutil.py - register_function - 注册自定义函数: sum_range
+2025-03-10 19:08:10,233 - INFO - pandasutil.py - register_function - 注册自定义函数: average_range
+2025-03-10 19:08:10,234 - INFO - tbsql.py - load_json - 开始加载JSON文件: ./data/yangben.json
+2025-03-10 19:08:10,235 - INFO - tbsql.py - load_json - JSON文件加载成功: ./data/yangben.json
+2025-03-10 19:09:09,404 - INFO - pandasutil.py - register_function - 注册自定义函数: calculate_age
+2025-03-10 19:09:09,405 - INFO - pandasutil.py - register_function - 注册自定义函数: sum_range
+2025-03-10 19:09:09,405 - INFO - pandasutil.py - register_function - 注册自定义函数: average_range
+2025-03-10 19:09:09,406 - INFO - tbsql.py - load_json - 开始加载JSON文件: ./data/yangben.json
+2025-03-10 19:09:09,407 - INFO - tbsql.py - load_json - JSON文件加载成功: ./data/yangben.json
+2025-03-10 19:12:02,861 - INFO - pandasutil.py - register_function - 注册自定义函数: calculate_age
+2025-03-10 19:12:02,862 - INFO - pandasutil.py - register_function - 注册自定义函数: sum_range
+2025-03-10 19:12:02,862 - INFO - pandasutil.py - register_function - 注册自定义函数: average_range
+2025-03-10 19:12:02,862 - INFO - tbsql.py - load_json - 开始加载JSON文件: ./data/yangben.json
+2025-03-10 19:12:02,862 - INFO - tbsql.py - load_json - JSON文件加载成功: ./data/yangben.json, 找到 2 个表格: ['员工信息表', '部门信息表']
+2025-03-10 19:22:00,158 - INFO - pandasutil.py - register_function - 注册自定义函数: calculate_age
+2025-03-10 19:22:00,158 - INFO - pandasutil.py - register_function - 注册自定义函数: sum_range
+2025-03-10 19:22:00,158 - INFO - pandasutil.py - register_function - 注册自定义函数: average_range
+2025-03-10 19:22:00,159 - INFO - tbsql.py - load_json - 开始加载JSON文件: ./data/yangben.json
+2025-03-10 19:22:00,159 - INFO - tbsql.py - load_json - JSON文件加载成功: ./data/yangben.json, 找到 2 个表格: ['员工信息表', '部门信息表']
+2025-03-10 19:22:00,160 - INFO - tbsql.py - __init__ - JSON数据导入成功, 表格数量: 2
+2025-03-10 19:22:00,160 - INFO - tbsql.py - init_data - 开始初始化数据
+2025-03-10 19:22:00,160 - INFO - tbsql.py - init_data - 数据字典中的表格列表: ['员工信息表', '部门信息表']
+2025-03-10 19:22:00,160 - INFO - tbsql.py - init_data - 发现 2 个表格，开始预加载
+2025-03-10 19:22:00,160 - INFO - pandasutil.py - load_all_tables - 开始加载表格列表, 共 2 个表格: ['员工信息表', '部门信息表']
+2025-03-10 19:22:00,160 - INFO - pandasutil.py - load_all_tables - 处理表格 '员工信息表': 列数=6, 行数=3
+2025-03-10 19:22:00,160 - INFO - pandasutil.py - load_all_tables - 处理表格 '部门信息表': 列数=5, 行数=3
+2025-03-10 19:22:00,161 - INFO - pandasutil.py - load_all_tables - 表格预加载完成: 成功=2, 总计=2
+2025-03-10 19:22:00,161 - INFO - tbsql.py - on_table_changed - 切换到表格: '员工信息表'
+2025-03-10 19:22:00,161 - INFO - pandasutil.py - get_table_model - 获取表格模型: 表名='员工信息表'
+2025-03-10 19:22:00,161 - INFO - pandasutil.py - get_table_model - 表格 '员工信息表' 状态: 列数=6, 行数=3, 已加载=False
+2025-03-10 19:22:00,161 - INFO - pandasutil.py - get_table_model - 开始加载表格数据: '员工信息表'
+2025-03-10 19:22:00,161 - INFO - pandasutil.py - set_data - 设置表格数据开始: 表名='员工信息表', 传入列数=6, 传入行数=3
+2025-03-10 19:22:00,162 - INFO - pandasutil.py - set_data - 发现预加载表格: '员工信息表'
+2025-03-10 19:22:00,162 - INFO - pandasutil.py - set_data - 数据检查结果: 有效行=3, 无效行=0, 空值行=0, 空公式行=0
+2025-03-10 19:22:00,162 - INFO - pandasutil.py - set_data - 开始处理行数据和公式: 表名='员工信息表', 行数=3
+2025-03-10 19:22:00,163 - INFO - pandasutil.py - _process_row_data - 开始处理行数据: 列数=6, 行数=3
+2025-03-10 19:22:00,163 - INFO - pandasutil.py - _process_row_data - 行数据处理完成: 成功=3, 跳过=0, 空行=0, 总计=3
+2025-03-10 19:22:00,163 - INFO - pandasutil.py - _process_row_data - 最终数据状态: 总行数=3, 列数=6
+2025-03-10 19:22:00,163 - INFO - pandasutil.py - set_data - 更新表格数据字典: 表名='员工信息表'
+2025-03-10 19:22:00,163 - INFO - pandasutil.py - _update_table_data_dict - 开始更新表格数据字典: 表名=员工信息表
+2025-03-10 19:22:00,163 - INFO - pandasutil.py - _update_table_data_dict - 表格数据字典更新完成: 表名=员工信息表, 列数=6
+2025-03-10 19:22:00,164 - INFO - pandasutil.py - set_data - 开始更新依赖图: 表名='员工信息表'
+2025-03-10 19:22:00,164 - INFO - pandasutil.py - _update_dependency_graph - 开始构建依赖图
+2025-03-10 19:22:00,164 - INFO - pandasutil.py - _update_dependency_graph - 依赖图构建完成: 公式数=3, 依赖关系数=9
+2025-03-10 19:22:00,165 - INFO - pandasutil.py - set_data - 完成依赖图更新: 表名='员工信息表', 节点数=6
+2025-03-10 19:22:00,166 - INFO - pandasutil.py - set_data - 完成表格数据设置: 表名='员工信息表', 最终行数=3, 列数=6
+2025-03-10 19:22:00,166 - INFO - pandasutil.py - get_table_model - 表格 '员工信息表' 加载完成: 行数=3, 列数=6
+2025-03-10 19:22:00,167 - INFO - tbsql.py - on_table_changed - 成功加载表格: '员工信息表'
+2025-03-10 19:22:00,168 - INFO - tbsql.py - init_data - 加载第一个表格: '员工信息表', 列数=6, 行数=3
+2025-03-10 19:22:00,168 - INFO - pandasutil.py - get_table_model - 获取表格模型: 表名='员工信息表'
+2025-03-10 19:22:00,168 - INFO - pandasutil.py - get_table_model - 表格 '员工信息表' 状态: 列数=6, 行数=3, 已加载=False
+2025-03-10 19:22:00,168 - INFO - pandasutil.py - get_table_model - 开始加载表格数据: '员工信息表'
+2025-03-10 19:22:00,168 - INFO - pandasutil.py - set_data - 设置表格数据开始: 表名='员工信息表', 传入列数=6, 传入行数=3
+2025-03-10 19:22:00,168 - INFO - pandasutil.py - set_data - 发现预加载表格: '员工信息表'
+2025-03-10 19:22:00,169 - INFO - pandasutil.py - set_data - 数据检查结果: 有效行=3, 无效行=0, 空值行=0, 空公式行=0
+2025-03-10 19:22:00,169 - INFO - pandasutil.py - set_data - 开始处理行数据和公式: 表名='员工信息表', 行数=3
+2025-03-10 19:22:00,169 - INFO - pandasutil.py - _process_row_data - 开始处理行数据: 列数=6, 行数=3
+2025-03-10 19:22:00,170 - INFO - pandasutil.py - _process_row_data - 行数据处理完成: 成功=3, 跳过=0, 空行=0, 总计=3
+2025-03-10 19:22:00,170 - INFO - pandasutil.py - _process_row_data - 最终数据状态: 总行数=3, 列数=6
+2025-03-10 19:22:00,170 - INFO - pandasutil.py - set_data - 更新表格数据字典: 表名='员工信息表'
+2025-03-10 19:22:00,170 - INFO - pandasutil.py - _update_table_data_dict - 开始更新表格数据字典: 表名=员工信息表
+2025-03-10 19:22:00,170 - INFO - pandasutil.py - _update_table_data_dict - 表格数据字典更新完成: 表名=员工信息表, 列数=6
+2025-03-10 19:22:00,170 - INFO - pandasutil.py - set_data - 开始更新依赖图: 表名='员工信息表'
+2025-03-10 19:22:00,170 - INFO - pandasutil.py - _update_dependency_graph - 开始构建依赖图
+2025-03-10 19:22:00,170 - INFO - pandasutil.py - _update_dependency_graph - 依赖图构建完成: 公式数=3, 依赖关系数=9
+2025-03-10 19:22:00,171 - INFO - pandasutil.py - set_data - 完成依赖图更新: 表名='员工信息表', 节点数=6
+2025-03-10 19:22:00,171 - INFO - pandasutil.py - set_data - 完成表格数据设置: 表名='员工信息表', 最终行数=3, 列数=6
+2025-03-10 19:22:00,171 - INFO - pandasutil.py - get_table_model - 表格 '员工信息表' 加载完成: 行数=3, 列数=6
+2025-03-10 19:22:00,171 - INFO - tbsql.py - init_data - 表格模型创建成功: 行数=3, 列数=6
+2025-03-10 19:22:00,171 - INFO - tbsql.py - init_data - 初始化表格完成: '员工信息表'
+2025-03-10 19:22:26,014 - INFO - pandasutil.py - _update_dependency_graph - 开始构建依赖图
+2025-03-10 19:22:26,016 - INFO - pandasutil.py - _update_dependency_graph - 依赖图构建完成: 公式数=4, 依赖关系数=9
+2025-03-10 19:22:26,016 - INFO - pandasutil.py - _update_dependency_graph - 开始构建依赖图
+2025-03-10 19:22:26,016 - INFO - pandasutil.py - _update_dependency_graph - 依赖图构建完成: 公式数=5, 依赖关系数=9
+2025-03-10 19:22:26,018 - INFO - pandasutil.py - _update_dependency_graph - 开始构建依赖图
+2025-03-10 19:22:26,018 - INFO - pandasutil.py - _update_dependency_graph - 依赖图构建完成: 公式数=6, 依赖关系数=9
+2025-03-10 19:23:44,270 - INFO - pandasutil.py - register_function - 注册自定义函数: calculate_age
+2025-03-10 19:23:44,271 - INFO - pandasutil.py - register_function - 注册自定义函数: sum_range
+2025-03-10 19:23:44,271 - INFO - pandasutil.py - register_function - 注册自定义函数: average_range
+2025-03-10 19:23:44,272 - INFO - tbsql.py - load_json - 开始加载JSON文件: ./data/yangben.json
+2025-03-10 19:23:44,272 - INFO - tbsql.py - load_json - JSON文件加载成功: ./data/yangben.json, 找到 2 个表格: ['员工信息表', '部门信息表']
+2025-03-10 19:23:44,272 - INFO - tbsql.py - __init__ - JSON数据导入成功, 表格数量: 2
+2025-03-10 19:23:44,272 - INFO - tbsql.py - init_data - 开始初始化数据
+2025-03-10 19:23:44,273 - INFO - tbsql.py - init_data - 数据字典中的表格列表: ['员工信息表', '部门信息表']
+2025-03-10 19:23:44,273 - INFO - tbsql.py - init_data - 发现 2 个表格，开始预加载
+2025-03-10 19:23:44,273 - INFO - pandasutil.py - load_all_tables - 开始加载表格列表, 共 2 个表格: ['员工信息表', '部门信息表']
+2025-03-10 19:23:44,273 - INFO - pandasutil.py - load_all_tables - 处理表格 '员工信息表': 列数=6, 行数=3
+2025-03-10 19:23:44,273 - INFO - pandasutil.py - load_all_tables - 处理表格 '部门信息表': 列数=5, 行数=3
+2025-03-10 19:23:44,273 - INFO - pandasutil.py - load_all_tables - 表格预加载完成: 成功=2, 总计=2
+2025-03-10 19:23:44,274 - INFO - tbsql.py - on_table_changed - 切换到表格: '员工信息表'
+2025-03-10 19:23:44,274 - INFO - pandasutil.py - get_table_model - 获取表格模型: 表名='员工信息表'
+2025-03-10 19:23:44,275 - INFO - pandasutil.py - get_table_model - 表格 '员工信息表' 状态: 列数=6, 行数=3, 已加载=False
+2025-03-10 19:23:44,275 - INFO - pandasutil.py - get_table_model - 开始加载表格数据: '员工信息表'
+2025-03-10 19:23:44,275 - INFO - pandasutil.py - set_data - 设置表格数据开始: 表名='员工信息表', 传入列数=6, 传入行数=3
+2025-03-10 19:23:44,275 - INFO - pandasutil.py - set_data - 发现预加载表格: '员工信息表'
+2025-03-10 19:23:44,275 - INFO - pandasutil.py - set_data - 数据检查结果: 有效行=3, 无效行=0, 空值行=0, 空公式行=0
+2025-03-10 19:23:44,275 - INFO - pandasutil.py - set_data - 开始处理行数据和公式: 表名='员工信息表', 行数=3
+2025-03-10 19:23:44,276 - INFO - pandasutil.py - _process_row_data - 开始处理行数据: 列数=6, 行数=3
+2025-03-10 19:23:44,276 - INFO - pandasutil.py - _process_row_data - 行数据处理完成: 成功=3, 跳过=0, 空行=0, 总计=3
+2025-03-10 19:23:44,276 - INFO - pandasutil.py - _process_row_data - 最终数据状态: 总行数=3, 列数=6
+2025-03-10 19:23:44,276 - INFO - pandasutil.py - set_data - 更新表格数据字典: 表名='员工信息表'
+2025-03-10 19:23:44,276 - INFO - pandasutil.py - _update_table_data_dict - 开始更新表格数据字典: 表名=员工信息表
+2025-03-10 19:23:44,276 - INFO - pandasutil.py - _update_table_data_dict - 表格数据字典更新完成: 表名=员工信息表, 列数=6
+2025-03-10 19:23:44,277 - INFO - pandasutil.py - set_data - 开始更新依赖图: 表名='员工信息表'
+2025-03-10 19:23:44,277 - INFO - pandasutil.py - _update_dependency_graph - 开始构建依赖图
+2025-03-10 19:23:44,277 - INFO - pandasutil.py - _update_dependency_graph - 依赖图构建完成: 公式数=3, 依赖关系数=9
+2025-03-10 19:23:44,278 - INFO - pandasutil.py - _update_dependency_graph - 依赖关系图: [((0, 4), (0, 5)), ((0, 4), (1, 5)), ((0, 4), (2, 5)), ((1, 4), (0, 5)), ((1, 4), (1, 5)), ((1, 4), (2, 5)), ((2, 4), (0, 5)), ((2, 4), (1, 5)), ((2, 4), (2, 5))]
+2025-03-10 19:23:44,279 - INFO - pandasutil.py - set_data - 完成依赖图更新: 表名='员工信息表', 节点数=6
+2025-03-10 19:23:44,279 - INFO - pandasutil.py - set_data - 完成表格数据设置: 表名='员工信息表', 最终行数=3, 列数=6
+2025-03-10 19:23:44,279 - INFO - pandasutil.py - get_table_model - 表格 '员工信息表' 加载完成: 行数=3, 列数=6
+2025-03-10 19:23:44,281 - INFO - tbsql.py - on_table_changed - 成功加载表格: '员工信息表'
+2025-03-10 19:23:44,281 - INFO - tbsql.py - init_data - 加载第一个表格: '员工信息表', 列数=6, 行数=3
+2025-03-10 19:23:44,282 - INFO - pandasutil.py - get_table_model - 获取表格模型: 表名='员工信息表'
+2025-03-10 19:23:44,282 - INFO - pandasutil.py - get_table_model - 表格 '员工信息表' 状态: 列数=6, 行数=3, 已加载=False
+2025-03-10 19:23:44,282 - INFO - pandasutil.py - get_table_model - 开始加载表格数据: '员工信息表'
+2025-03-10 19:23:44,282 - INFO - pandasutil.py - set_data - 设置表格数据开始: 表名='员工信息表', 传入列数=6, 传入行数=3
+2025-03-10 19:23:44,282 - INFO - pandasutil.py - set_data - 发现预加载表格: '员工信息表'
+2025-03-10 19:23:44,282 - INFO - pandasutil.py - set_data - 数据检查结果: 有效行=3, 无效行=0, 空值行=0, 空公式行=0
+2025-03-10 19:23:44,283 - INFO - pandasutil.py - set_data - 开始处理行数据和公式: 表名='员工信息表', 行数=3
+2025-03-10 19:23:44,283 - INFO - pandasutil.py - _process_row_data - 开始处理行数据: 列数=6, 行数=3
+2025-03-10 19:23:44,283 - INFO - pandasutil.py - _process_row_data - 行数据处理完成: 成功=3, 跳过=0, 空行=0, 总计=3
+2025-03-10 19:23:44,284 - INFO - pandasutil.py - _process_row_data - 最终数据状态: 总行数=3, 列数=6
+2025-03-10 19:23:44,284 - INFO - pandasutil.py - set_data - 更新表格数据字典: 表名='员工信息表'
+2025-03-10 19:23:44,284 - INFO - pandasutil.py - _update_table_data_dict - 开始更新表格数据字典: 表名=员工信息表
+2025-03-10 19:23:44,284 - INFO - pandasutil.py - _update_table_data_dict - 表格数据字典更新完成: 表名=员工信息表, 列数=6
+2025-03-10 19:23:44,284 - INFO - pandasutil.py - set_data - 开始更新依赖图: 表名='员工信息表'
+2025-03-10 19:23:44,284 - INFO - pandasutil.py - _update_dependency_graph - 开始构建依赖图
+2025-03-10 19:23:44,285 - INFO - pandasutil.py - _update_dependency_graph - 依赖图构建完成: 公式数=3, 依赖关系数=9
+2025-03-10 19:23:44,285 - INFO - pandasutil.py - _update_dependency_graph - 依赖关系图: [((0, 4), (0, 5)), ((0, 4), (1, 5)), ((0, 4), (2, 5)), ((1, 4), (0, 5)), ((1, 4), (1, 5)), ((1, 4), (2, 5)), ((2, 4), (0, 5)), ((2, 4), (1, 5)), ((2, 4), (2, 5))]
+2025-03-10 19:23:44,285 - INFO - pandasutil.py - set_data - 完成依赖图更新: 表名='员工信息表', 节点数=6
+2025-03-10 19:23:44,286 - INFO - pandasutil.py - set_data - 完成表格数据设置: 表名='员工信息表', 最终行数=3, 列数=6
+2025-03-10 19:23:44,286 - INFO - pandasutil.py - get_table_model - 表格 '员工信息表' 加载完成: 行数=3, 列数=6
+2025-03-10 19:23:44,286 - INFO - tbsql.py - init_data - 表格模型创建成功: 行数=3, 列数=6
+2025-03-10 19:23:44,286 - INFO - tbsql.py - init_data - 初始化表格完成: '员工信息表'
+2025-03-10 19:27:08,746 - INFO - tbsql.py - on_tb_data_double_clicked - 表格单元格双击: 行=0, 列=4
+2025-03-10 19:27:10,450 - INFO - pandasutil.py - _update_dependency_graph - 开始构建依赖图
+2025-03-10 19:27:10,451 - INFO - pandasutil.py - _update_dependency_graph - 依赖图构建完成: 公式数=3, 依赖关系数=9
+2025-03-10 19:27:10,451 - INFO - pandasutil.py - _update_dependency_graph - 依赖关系图: [((0, 4), (0, 5)), ((0, 4), (1, 5)), ((0, 4), (2, 5)), ((1, 4), (0, 5)), ((1, 4), (1, 5)), ((1, 4), (2, 5)), ((2, 4), (0, 5)), ((2, 4), (1, 5)), ((2, 4), (2, 5))]
+2025-03-10 19:27:13,188 - INFO - pandasutil.py - _update_dependency_graph - 开始构建依赖图
+2025-03-10 19:27:13,188 - INFO - pandasutil.py - _update_dependency_graph - 依赖图构建完成: 公式数=3, 依赖关系数=9
+2025-03-10 19:27:13,189 - INFO - pandasutil.py - _update_dependency_graph - 依赖关系图: [((0, 4), (0, 5)), ((0, 4), (1, 5)), ((0, 4), (2, 5)), ((1, 4), (0, 5)), ((1, 4), (1, 5)), ((1, 4), (2, 5)), ((2, 4), (0, 5)), ((2, 4), (1, 5)), ((2, 4), (2, 5))]
+2025-03-10 19:30:15,066 - INFO - pandasutil.py - register_function - 注册自定义函数: calculate_age
+2025-03-10 19:30:15,067 - INFO - pandasutil.py - register_function - 注册自定义函数: sum_range
+2025-03-10 19:30:15,067 - INFO - pandasutil.py - register_function - 注册自定义函数: average_range
+2025-03-10 19:30:15,068 - INFO - tbsql.py - load_json - 开始加载JSON文件: ./data/yangben.json
+2025-03-10 19:30:15,068 - INFO - tbsql.py - load_json - JSON文件加载成功: ./data/yangben.json, 找到 2 个表格: ['员工信息表', '部门信息表']
+2025-03-10 19:30:15,068 - INFO - tbsql.py - __init__ - JSON数据导入成功, 表格数量: 2
+2025-03-10 19:30:15,068 - INFO - tbsql.py - init_data - 开始初始化数据
+2025-03-10 19:30:15,068 - INFO - tbsql.py - init_data - 数据字典中的表格列表: ['员工信息表', '部门信息表']
+2025-03-10 19:30:15,068 - INFO - tbsql.py - init_data - 发现 2 个表格，开始预加载
+2025-03-10 19:30:15,069 - INFO - pandasutil.py - load_all_tables - 开始加载表格列表, 共 2 个表格: ['员工信息表', '部门信息表']
+2025-03-10 19:30:15,069 - INFO - pandasutil.py - load_all_tables - 处理表格 '员工信息表': 列数=6, 行数=3
+2025-03-10 19:30:15,069 - INFO - pandasutil.py - load_all_tables - 处理表格 '部门信息表': 列数=5, 行数=3
+2025-03-10 19:30:15,069 - INFO - pandasutil.py - load_all_tables - 表格预加载完成: 成功=2, 总计=2
+2025-03-10 19:30:15,070 - INFO - tbsql.py - on_table_changed - 切换到表格: '员工信息表'
+2025-03-10 19:30:15,070 - INFO - pandasutil.py - get_table_model - 获取表格模型: 表名='员工信息表'
+2025-03-10 19:30:15,070 - INFO - pandasutil.py - get_table_model - 表格 '员工信息表' 状态: 列数=6, 行数=3, 已加载=False
+2025-03-10 19:30:15,070 - INFO - pandasutil.py - get_table_model - 开始加载表格数据: '员工信息表'
+2025-03-10 19:30:15,070 - INFO - pandasutil.py - set_data - 设置表格数据开始: 表名='员工信息表', 传入列数=6, 传入行数=3
+2025-03-10 19:30:15,070 - INFO - pandasutil.py - set_data - 发现预加载表格: '员工信息表'
+2025-03-10 19:30:15,070 - INFO - pandasutil.py - set_data - 数据检查结果: 有效行=3, 无效行=0, 空值行=0, 空公式行=0
+2025-03-10 19:30:15,070 - INFO - pandasutil.py - set_data - 开始处理行数据和公式: 表名='员工信息表', 行数=3
+2025-03-10 19:30:15,071 - INFO - pandasutil.py - _process_row_data - 开始处理行数据: 列数=6, 行数=3
+2025-03-10 19:30:15,071 - INFO - pandasutil.py - _process_row_data - 行数据处理完成: 成功=3, 跳过=0, 空行=0, 总计=3
+2025-03-10 19:30:15,071 - INFO - pandasutil.py - _process_row_data - 最终数据状态: 总行数=3, 列数=6
+2025-03-10 19:30:15,071 - INFO - pandasutil.py - set_data - 更新表格数据字典: 表名='员工信息表'
+2025-03-10 19:30:15,071 - INFO - pandasutil.py - _update_table_data_dict - 开始更新表格数据字典: 表名=员工信息表
+2025-03-10 19:30:15,072 - INFO - pandasutil.py - _update_table_data_dict - 表格数据字典更新完成: 表名=员工信息表, 列数=6
+2025-03-10 19:30:15,072 - INFO - pandasutil.py - set_data - 开始更新依赖图: 表名='员工信息表'
+2025-03-10 19:30:15,073 - INFO - pandasutil.py - _update_dependency_graph - 开始构建依赖图
+2025-03-10 19:30:15,073 - INFO - pandasutil.py - _update_dependency_graph - 依赖图构建完成: 公式数=3, 依赖关系数=9
+2025-03-10 19:30:15,073 - INFO - pandasutil.py - _update_dependency_graph - 依赖关系图: [((0, 4), (0, 5)), ((0, 4), (1, 5)), ((0, 4), (2, 5)), ((1, 4), (0, 5)), ((1, 4), (1, 5)), ((1, 4), (2, 5)), ((2, 4), (0, 5)), ((2, 4), (1, 5)), ((2, 4), (2, 5))]
+2025-03-10 19:30:15,074 - INFO - pandasutil.py - set_data - 完成依赖图更新: 表名='员工信息表', 节点数=6
+2025-03-10 19:30:15,074 - INFO - pandasutil.py - set_data - 完成表格数据设置: 表名='员工信息表', 最终行数=3, 列数=6
+2025-03-10 19:30:15,075 - INFO - pandasutil.py - get_table_model - 表格 '员工信息表' 加载完成: 行数=3, 列数=6
+2025-03-10 19:30:15,076 - INFO - tbsql.py - on_table_changed - 成功加载表格: '员工信息表'
+2025-03-10 19:30:15,077 - INFO - tbsql.py - init_data - 加载第一个表格: '员工信息表', 列数=6, 行数=3
+2025-03-10 19:30:15,077 - INFO - pandasutil.py - get_table_model - 获取表格模型: 表名='员工信息表'
+2025-03-10 19:30:15,077 - INFO - pandasutil.py - get_table_model - 表格 '员工信息表' 状态: 列数=6, 行数=3, 已加载=False
+2025-03-10 19:30:15,077 - INFO - pandasutil.py - get_table_model - 开始加载表格数据: '员工信息表'
+2025-03-10 19:30:15,077 - INFO - pandasutil.py - set_data - 设置表格数据开始: 表名='员工信息表', 传入列数=6, 传入行数=3
+2025-03-10 19:30:15,078 - INFO - pandasutil.py - set_data - 发现预加载表格: '员工信息表'
+2025-03-10 19:30:15,078 - INFO - pandasutil.py - set_data - 数据检查结果: 有效行=3, 无效行=0, 空值行=0, 空公式行=0
+2025-03-10 19:30:15,078 - INFO - pandasutil.py - set_data - 开始处理行数据和公式: 表名='员工信息表', 行数=3
+2025-03-10 19:30:15,078 - INFO - pandasutil.py - _process_row_data - 开始处理行数据: 列数=6, 行数=3
+2025-03-10 19:30:15,079 - INFO - pandasutil.py - _process_row_data - 行数据处理完成: 成功=3, 跳过=0, 空行=0, 总计=3
+2025-03-10 19:30:15,079 - INFO - pandasutil.py - _process_row_data - 最终数据状态: 总行数=3, 列数=6
+2025-03-10 19:30:15,079 - INFO - pandasutil.py - set_data - 更新表格数据字典: 表名='员工信息表'
+2025-03-10 19:30:15,079 - INFO - pandasutil.py - _update_table_data_dict - 开始更新表格数据字典: 表名=员工信息表
+2025-03-10 19:30:15,079 - INFO - pandasutil.py - _update_table_data_dict - 表格数据字典更新完成: 表名=员工信息表, 列数=6
+2025-03-10 19:30:15,079 - INFO - pandasutil.py - set_data - 开始更新依赖图: 表名='员工信息表'
+2025-03-10 19:30:15,079 - INFO - pandasutil.py - _update_dependency_graph - 开始构建依赖图
+2025-03-10 19:30:15,079 - INFO - pandasutil.py - _update_dependency_graph - 依赖图构建完成: 公式数=3, 依赖关系数=9
+2025-03-10 19:30:15,080 - INFO - pandasutil.py - _update_dependency_graph - 依赖关系图: [((0, 4), (0, 5)), ((0, 4), (1, 5)), ((0, 4), (2, 5)), ((1, 4), (0, 5)), ((1, 4), (1, 5)), ((1, 4), (2, 5)), ((2, 4), (0, 5)), ((2, 4), (1, 5)), ((2, 4), (2, 5))]
+2025-03-10 19:30:15,080 - INFO - pandasutil.py - set_data - 完成依赖图更新: 表名='员工信息表', 节点数=6
+2025-03-10 19:30:15,080 - INFO - pandasutil.py - set_data - 完成表格数据设置: 表名='员工信息表', 最终行数=3, 列数=6
+2025-03-10 19:30:15,080 - INFO - pandasutil.py - get_table_model - 表格 '员工信息表' 加载完成: 行数=3, 列数=6
+2025-03-10 19:30:15,080 - INFO - tbsql.py - init_data - 表格模型创建成功: 行数=3, 列数=6
+2025-03-10 19:30:15,080 - INFO - tbsql.py - init_data - 初始化表格完成: '员工信息表'
+2025-03-10 19:30:17,291 - INFO - tbsql.py - on_tb_data_double_clicked - 表格单元格双击: 行=0, 列=4
+2025-03-10 19:30:18,626 - INFO - pandasutil.py - _update_dependency_graph - 开始构建依赖图
+2025-03-10 19:30:18,626 - INFO - pandasutil.py - _update_dependency_graph - 依赖图构建完成: 公式数=3, 依赖关系数=9
+2025-03-10 19:30:18,627 - INFO - pandasutil.py - _update_dependency_graph - 依赖关系图: [((0, 4), (0, 5)), ((0, 4), (1, 5)), ((0, 4), (2, 5)), ((1, 4), (0, 5)), ((1, 4), (1, 5)), ((1, 4), (2, 5)), ((2, 4), (0, 5)), ((2, 4), (1, 5)), ((2, 4), (2, 5))]
+2025-03-10 19:49:50,388 - INFO - pandasutil.py - register_function - 注册自定义函数: calculate_age
+2025-03-10 19:49:50,389 - INFO - pandasutil.py - register_function - 注册自定义函数: sum_range
+2025-03-10 19:49:50,389 - INFO - pandasutil.py - register_function - 注册自定义函数: average_range
+2025-03-10 19:49:50,390 - INFO - tbsql.py - load_json - 开始加载JSON文件: ./data/yangben.json
+2025-03-10 19:49:50,390 - INFO - tbsql.py - load_json - JSON文件加载成功: ./data/yangben.json, 找到 2 个表格: ['员工信息表', '部门信息表']
+2025-03-10 19:49:50,391 - INFO - tbsql.py - __init__ - JSON数据导入成功, 表格数量: 2
+2025-03-10 19:49:50,391 - INFO - tbsql.py - init_data - 开始初始化数据
+2025-03-10 19:49:50,391 - INFO - tbsql.py - init_data - 数据字典中的表格列表: ['员工信息表', '部门信息表']
+2025-03-10 19:49:50,391 - INFO - tbsql.py - init_data - 发现 2 个表格，开始预加载
+2025-03-10 19:49:50,391 - INFO - pandasutil.py - load_all_tables - 开始加载表格列表, 共 2 个表格: ['员工信息表', '部门信息表']
+2025-03-10 19:49:50,391 - INFO - pandasutil.py - load_all_tables - 处理表格 '员工信息表': 列数=6, 行数=3
+2025-03-10 19:49:50,395 - INFO - pandasutil.py - load_all_tables - 处理表格 '部门信息表': 列数=5, 行数=3
+2025-03-10 19:49:50,398 - INFO - pandasutil.py - load_all_tables - 大宽表构建完成: 行数=3, 列数=11
+2025-03-10 19:49:50,399 - INFO - pandasutil.py - load_all_tables - 表格预加载完成: 成功加载=2, 总表格数=2
+2025-03-10 19:49:50,399 - INFO - tbsql.py - on_table_changed - 切换到表格: '员工信息表'
+2025-03-10 19:49:50,399 - INFO - pandasutil.py - get_table_model - 获取表格模型: 表名='员工信息表'
+2025-03-10 19:49:50,400 - INFO - pandasutil.py - get_table_model - 表格 '员工信息表' 加载完成: 行数=3, 列数=6
+2025-03-10 19:49:50,402 - INFO - tbsql.py - on_table_changed - 成功加载表格: '员工信息表'
+2025-03-10 19:49:50,402 - INFO - tbsql.py - init_data - 加载第一个表格: '员工信息表', 列数=6, 行数=3
+2025-03-10 19:49:50,402 - INFO - pandasutil.py - get_table_model - 获取表格模型: 表名='员工信息表'
+2025-03-10 19:49:50,402 - INFO - pandasutil.py - get_table_model - 表格 '员工信息表' 加载完成: 行数=3, 列数=6
+2025-03-10 19:49:50,403 - INFO - tbsql.py - init_data - 表格模型创建成功: 行数=3, 列数=6
+2025-03-10 19:49:50,403 - INFO - tbsql.py - init_data - 初始化表格完成: '员工信息表'
+2025-03-10 19:49:53,528 - INFO - tbsql.py - on_table_changed - 切换到表格: '部门信息表'
+2025-03-10 19:49:53,528 - INFO - pandasutil.py - get_table_model - 获取表格模型: 表名='部门信息表'
+2025-03-10 19:49:53,529 - INFO - pandasutil.py - get_table_model - 表格 '部门信息表' 加载完成: 行数=3, 列数=5
+2025-03-10 19:49:53,529 - INFO - tbsql.py - on_table_changed - 成功加载表格: '部门信息表'
+2025-03-10 19:49:56,346 - INFO - tbsql.py - on_table_changed - 切换到表格: '员工信息表'
+2025-03-10 19:49:56,346 - INFO - pandasutil.py - get_table_model - 获取表格模型: 表名='员工信息表'
+2025-03-10 19:49:56,348 - INFO - pandasutil.py - get_table_model - 表格 '员工信息表' 加载完成: 行数=3, 列数=6
+2025-03-10 19:49:56,348 - INFO - tbsql.py - on_table_changed - 成功加载表格: '员工信息表'
+2025-03-10 19:49:57,602 - INFO - tbsql.py - on_tb_data_double_clicked - 表格单元格双击: 行=0, 列=5
+2025-03-10 19:49:58,925 - INFO - pandasutil.py - _update_dependency_graph - 开始构建依赖图
+2025-03-10 19:49:58,926 - INFO - pandasutil.py - _update_dependency_graph - 单元格(0,5)的同行依赖: [(0, 4)]
+2025-03-10 19:49:58,926 - INFO - pandasutil.py - _update_dependency_graph - 单元格(1,5)的同行依赖: [(1, 4)]
+2025-03-10 19:49:58,926 - INFO - pandasutil.py - _update_dependency_graph - 单元格(2,5)的同行依赖: [(2, 4)]
+2025-03-10 19:49:58,926 - INFO - pandasutil.py - _update_dependency_graph - 依赖图构建完成: 公式数=3, 同行依赖关系数=3
+2025-03-10 19:49:58,927 - INFO - pandasutil.py - _update_dependency_graph - 依赖关系图: [((0, 4), (0, 5)), ((1, 4), (1, 5)), ((2, 4), (2, 5))]
+2025-03-10 19:50:02,229 - INFO - tbsql.py - on_tb_data_double_clicked - 表格单元格双击: 行=0, 列=5
+2025-03-10 19:50:07,516 - INFO - tbsql.py - on_tb_data_double_clicked - 表格单元格双击: 行=0, 列=3
+2025-03-10 19:50:09,632 - INFO - tbsql.py - on_tb_data_double_clicked - 表格单元格双击: 行=0, 列=5
+2025-03-10 19:50:12,958 - INFO - tbsql.py - on_table_changed - 切换到表格: '部门信息表'
+2025-03-10 19:50:12,958 - INFO - pandasutil.py - get_table_model - 获取表格模型: 表名='部门信息表'
+2025-03-10 19:50:12,959 - INFO - pandasutil.py - get_table_model - 表格 '部门信息表' 加载完成: 行数=3, 列数=5
+2025-03-10 19:50:12,959 - INFO - tbsql.py - on_table_changed - 成功加载表格: '部门信息表'
+2025-03-10 19:50:14,765 - INFO - tbsql.py - on_table_changed - 切换到表格: '员工信息表'
+2025-03-10 19:50:14,766 - INFO - pandasutil.py - get_table_model - 获取表格模型: 表名='员工信息表'
+2025-03-10 19:50:14,766 - INFO - pandasutil.py - get_table_model - 表格 '员工信息表' 加载完成: 行数=3, 列数=6
+2025-03-10 19:50:14,768 - INFO - tbsql.py - on_table_changed - 成功加载表格: '员工信息表'
+2025-03-10 19:50:29,140 - INFO - tbsql.py - on_tb_data_double_clicked - 表格单元格双击: 行=0, 列=4
+2025-03-10 19:55:19,488 - INFO - pandasutil.py - register_function - 注册自定义函数: calculate_age
+2025-03-10 19:55:19,490 - INFO - pandasutil.py - register_function - 注册自定义函数: sum_range
+2025-03-10 19:55:19,490 - INFO - pandasutil.py - register_function - 注册自定义函数: average_range
+2025-03-10 19:55:19,490 - INFO - tbsql.py - load_json - 开始加载JSON文件: ./data/yangben.json
+2025-03-10 19:55:19,491 - INFO - tbsql.py - load_json - JSON文件加载成功: ./data/yangben.json, 找到 2 个表格: ['员工信息表', '部门信息表']
+2025-03-10 19:55:19,491 - INFO - tbsql.py - __init__ - JSON数据导入成功, 表格数量: 2
+2025-03-10 19:55:19,491 - INFO - tbsql.py - init_data - 开始初始化数据
+2025-03-10 19:55:19,491 - INFO - tbsql.py - init_data - 数据字典中的表格列表: ['员工信息表', '部门信息表']
+2025-03-10 19:55:19,491 - INFO - tbsql.py - init_data - 发现 2 个表格，开始预加载
+2025-03-10 19:55:19,491 - INFO - pandasutil.py - load_all_tables - 开始加载表格列表, 共 2 个表格: ['员工信息表', '部门信息表']
+2025-03-10 19:55:19,491 - INFO - pandasutil.py - load_all_tables - 处理表格 '员工信息表': 列数=6, 行数=3
+2025-03-10 19:55:19,495 - INFO - pandasutil.py - load_all_tables - 处理表格 '部门信息表': 列数=5, 行数=3
+2025-03-10 19:55:19,498 - INFO - pandasutil.py - load_all_tables - 大宽表构建完成: 行数=3, 列数=11
+2025-03-10 19:55:19,499 - INFO - pandasutil.py - load_all_tables - 表格预加载完成: 成功加载=2, 总表格数=2
+2025-03-10 19:55:19,499 - INFO - tbsql.py - on_table_changed - 切换到表格: '员工信息表'
+2025-03-10 19:55:19,499 - INFO - pandasutil.py - get_table_model - 获取表格模型: 表名='员工信息表'
+2025-03-10 19:55:19,501 - INFO - pandasutil.py - get_table_model - 表格 '员工信息表' 加载完成: 行数=3, 列数=6
+2025-03-10 19:55:19,502 - INFO - tbsql.py - on_table_changed - 成功加载表格: '员工信息表'
+2025-03-10 19:55:19,502 - INFO - tbsql.py - init_data - 加载第一个表格: '员工信息表', 列数=6, 行数=3
+2025-03-10 19:55:19,502 - INFO - pandasutil.py - get_table_model - 获取表格模型: 表名='员工信息表'
+2025-03-10 19:55:19,503 - INFO - pandasutil.py - get_table_model - 表格 '员工信息表' 加载完成: 行数=3, 列数=6
+2025-03-10 19:55:19,503 - INFO - tbsql.py - init_data - 表格模型创建成功: 行数=3, 列数=6
+2025-03-10 19:55:19,503 - INFO - tbsql.py - init_data - 初始化表格完成: '员工信息表'
+2025-03-10 19:55:21,850 - INFO - tbsql.py - on_table_changed - 切换到表格: '部门信息表'
+2025-03-10 19:55:21,851 - INFO - pandasutil.py - get_table_model - 获取表格模型: 表名='部门信息表'
+2025-03-10 19:55:21,853 - INFO - pandasutil.py - get_table_model - 表格 '部门信息表' 加载完成: 行数=3, 列数=5
+2025-03-10 19:55:21,853 - INFO - tbsql.py - on_table_changed - 成功加载表格: '部门信息表'
+2025-03-10 19:55:24,783 - INFO - tbsql.py - on_table_changed - 切换到表格: '员工信息表'
+2025-03-10 19:55:24,783 - INFO - pandasutil.py - get_table_model - 获取表格模型: 表名='员工信息表'
+2025-03-10 19:55:24,785 - INFO - pandasutil.py - get_table_model - 表格 '员工信息表' 加载完成: 行数=3, 列数=6
+2025-03-10 19:55:24,786 - INFO - tbsql.py - on_table_changed - 成功加载表格: '员工信息表'
+2025-03-10 19:55:25,896 - INFO - tbsql.py - on_tb_data_double_clicked - 表格单元格双击: 行=0, 列=4
+2025-03-10 19:55:26,672 - INFO - tbsql.py - on_tb_data_double_clicked - 表格单元格双击: 行=0, 列=5
+2025-03-10 19:55:27,690 - INFO - pandasutil.py - _update_dependency_graph - 开始构建依赖图
+2025-03-10 19:55:27,690 - INFO - pandasutil.py - _update_dependency_graph - 单元格(0,5)的同行依赖: [(0, 4)]
+2025-03-10 19:55:27,690 - INFO - pandasutil.py - _update_dependency_graph - 单元格(1,5)的同行依赖: [(1, 4)]
+2025-03-10 19:55:27,691 - INFO - pandasutil.py - _update_dependency_graph - 单元格(2,5)的同行依赖: [(2, 4)]
+2025-03-10 19:55:27,691 - INFO - pandasutil.py - _update_dependency_graph - 依赖图构建完成: 公式数=3, 同行依赖关系数=3
+2025-03-10 19:55:27,691 - INFO - pandasutil.py - _update_dependency_graph - 依赖关系图: [((0, 4), (0, 5)), ((1, 4), (1, 5)), ((2, 4), (2, 5))]
+2025-03-10 19:55:31,968 - INFO - tbsql.py - on_tb_data_double_clicked - 表格单元格双击: 行=1, 列=5
+2025-03-10 19:55:33,067 - INFO - pandasutil.py - _update_dependency_graph - 开始构建依赖图
+2025-03-10 19:55:33,068 - INFO - pandasutil.py - _update_dependency_graph - 单元格(0,5)的同行依赖: [(0, 4)]
+2025-03-10 19:55:33,068 - INFO - pandasutil.py - _update_dependency_graph - 单元格(1,5)的同行依赖: [(1, 4)]
+2025-03-10 19:55:33,068 - INFO - pandasutil.py - _update_dependency_graph - 单元格(2,5)的同行依赖: [(2, 4)]
+2025-03-10 19:55:33,068 - INFO - pandasutil.py - _update_dependency_graph - 依赖图构建完成: 公式数=3, 同行依赖关系数=3
+2025-03-10 19:55:33,068 - INFO - pandasutil.py - _update_dependency_graph - 依赖关系图: [((0, 4), (0, 5)), ((1, 4), (1, 5)), ((2, 4), (2, 5))]
+2025-03-10 19:57:36,498 - INFO - pandasutil.py - register_function - 注册自定义函数: calculate_age
+2025-03-10 19:57:36,499 - INFO - pandasutil.py - register_function - 注册自定义函数: sum_range
+2025-03-10 19:57:36,499 - INFO - pandasutil.py - register_function - 注册自定义函数: average_range
+2025-03-10 19:57:36,501 - INFO - tbsql.py - load_json - 开始加载JSON文件: ./data/yangben.json
+2025-03-10 19:57:36,501 - INFO - tbsql.py - load_json - JSON文件加载成功: ./data/yangben.json, 找到 2 个表格: ['员工信息表', '部门信息表']
+2025-03-10 19:57:36,501 - INFO - tbsql.py - __init__ - JSON数据导入成功, 表格数量: 2
+2025-03-10 19:57:36,501 - INFO - tbsql.py - init_data - 开始初始化数据
+2025-03-10 19:57:36,501 - INFO - tbsql.py - init_data - 数据字典中的表格列表: ['员工信息表', '部门信息表']
+2025-03-10 19:57:36,501 - INFO - tbsql.py - init_data - 发现 2 个表格，开始预加载
+2025-03-10 19:57:36,502 - INFO - pandasutil.py - load_all_tables - 开始加载表格列表, 共 2 个表格: ['员工信息表', '部门信息表']
+2025-03-10 19:57:36,502 - INFO - pandasutil.py - load_all_tables - 处理表格 '员工信息表': 列数=6, 行数=3
+2025-03-10 19:57:36,505 - INFO - pandasutil.py - load_all_tables - 处理表格 '部门信息表': 列数=5, 行数=3
+2025-03-10 19:57:36,509 - INFO - pandasutil.py - load_all_tables - 大宽表构建完成: 行数=3, 列数=11
+2025-03-10 19:57:36,509 - INFO - pandasutil.py - load_all_tables - 表格预加载完成: 成功加载=2, 总表格数=2
+2025-03-10 19:57:36,510 - INFO - tbsql.py - on_table_changed - 切换到表格: '员工信息表'
+2025-03-10 19:57:36,510 - INFO - pandasutil.py - get_table_model - 获取表格模型: 表名='员工信息表'
+2025-03-10 19:57:36,510 - INFO - pandasutil.py - get_table_model - 表格 '员工信息表' 加载完成: 行数=3, 列数=6
+2025-03-10 19:57:36,512 - INFO - tbsql.py - on_table_changed - 成功加载表格: '员工信息表'
+2025-03-10 19:57:36,513 - INFO - tbsql.py - init_data - 加载第一个表格: '员工信息表', 列数=6, 行数=3
+2025-03-10 19:57:36,513 - INFO - pandasutil.py - get_table_model - 获取表格模型: 表名='员工信息表'
+2025-03-10 19:57:36,513 - INFO - pandasutil.py - get_table_model - 表格 '员工信息表' 加载完成: 行数=3, 列数=6
+2025-03-10 19:57:36,514 - INFO - tbsql.py - init_data - 表格模型创建成功: 行数=3, 列数=6
+2025-03-10 19:57:36,514 - INFO - tbsql.py - init_data - 初始化表格完成: '员工信息表'
+2025-03-10 19:57:37,921 - INFO - tbsql.py - on_table_changed - 切换到表格: '部门信息表'
+2025-03-10 19:57:37,921 - INFO - pandasutil.py - get_table_model - 获取表格模型: 表名='部门信息表'
+2025-03-10 19:57:37,921 - INFO - pandasutil.py - get_table_model - 表格 '部门信息表' 加载完成: 行数=3, 列数=5
+2025-03-10 19:57:37,922 - INFO - tbsql.py - on_table_changed - 成功加载表格: '部门信息表'
+2025-03-10 19:57:40,156 - INFO - tbsql.py - on_table_changed - 切换到表格: '员工信息表'
+2025-03-10 19:57:40,156 - INFO - pandasutil.py - get_table_model - 获取表格模型: 表名='员工信息表'
+2025-03-10 19:57:40,157 - INFO - pandasutil.py - get_table_model - 表格 '员工信息表' 加载完成: 行数=3, 列数=6
+2025-03-10 19:57:40,157 - INFO - tbsql.py - on_table_changed - 成功加载表格: '员工信息表'
+2025-03-10 19:57:49,703 - INFO - tbsql.py - show_column_selector - after_at: 
+2025-03-10 19:57:50,827 - INFO - tbsql.py - show_column_selector - after_at: 工号
+2025-03-10 19:57:51,330 - INFO - pandasutil.py - search_by_rule - 未找到匹配的数据
+2025-03-10 19:57:51,331 - INFO - tbsql.py - search_data_by_rule - 过滤后的数据行数: 0
+2025-03-10 19:57:51,344 - INFO - pandasutil.py - search_by_rule - 未找到匹配的数据
+2025-03-10 19:57:51,346 - INFO - tbsql.py - search_data_by_rule - 过滤后的数据行数: 0
+2025-03-10 19:57:52,137 - INFO - tbsql.py - show_column_selector - after_at: 工号=
+2025-03-10 19:57:52,138 - INFO - tbsql.py - search_data_by_rule - 过滤后的数据行数: 3
+2025-03-10 19:57:52,925 - INFO - tbsql.py - show_column_selector - after_at: 工号=0
+2025-03-10 19:57:52,926 - INFO - tbsql.py - search_data_by_rule - 过滤后的数据行数: 3
+2025-03-10 19:57:53,121 - INFO - tbsql.py - show_column_selector - after_at: 工号=01
+2025-03-10 19:57:53,123 - INFO - tbsql.py - search_data_by_rule - 过滤后的数据行数: 1
+2025-03-10 20:09:12,049 - INFO - pandasutil.py - register_function - 注册自定义函数: calculate_age
+2025-03-10 20:09:12,049 - INFO - pandasutil.py - register_function - 注册自定义函数: sum_range
+2025-03-10 20:09:12,049 - INFO - pandasutil.py - register_function - 注册自定义函数: average_range
+2025-03-10 20:09:12,050 - INFO - tbsql.py - load_json - 开始加载JSON文件: ./data/yangben.json
+2025-03-10 20:09:12,052 - INFO - tbsql.py - load_json - JSON文件加载成功: ./data/yangben.json, 找到 2 个表格: ['员工信息表', '部门信息表']
+2025-03-10 20:09:12,052 - INFO - tbsql.py - __init__ - JSON数据导入成功, 表格数量: 2
+2025-03-10 20:09:12,052 - INFO - tbsql.py - init_data - 开始初始化数据
+2025-03-10 20:09:12,052 - INFO - tbsql.py - init_data - 数据字典中的表格列表: ['员工信息表', '部门信息表']
+2025-03-10 20:09:12,052 - INFO - tbsql.py - init_data - 发现 2 个表格，开始预加载
+2025-03-10 20:09:12,052 - INFO - pandasutil.py - load_all_tables - 开始加载表格列表, 共 2 个表格: ['员工信息表', '部门信息表']
+2025-03-10 20:09:12,052 - INFO - pandasutil.py - load_all_tables - 处理表格 '员工信息表': 列数=6, 行数=3
+2025-03-10 20:09:12,055 - INFO - pandasutil.py - load_all_tables - 处理表格 '部门信息表': 列数=5, 行数=3
+2025-03-10 20:09:12,059 - INFO - pandasutil.py - load_all_tables - 大宽表构建完成: 行数=3, 列数=11
+2025-03-10 20:09:12,059 - INFO - pandasutil.py - _update_dependency_graph - 开始构建依赖图
+2025-03-10 20:09:12,060 - ERROR - pandasutil.py - _update_dependency_graph - 更新依赖图失败: 'EditableTableManager' object has no attribute '_formulas'
+2025-03-10 20:09:12,060 - INFO - tbsql.py - on_table_changed - 切换到表格: '员工信息表'
+2025-03-10 20:09:12,060 - INFO - pandasutil.py - get_table_model - 获取表格模型: 表名='员工信息表'
+2025-03-10 20:09:12,061 - INFO - pandasutil.py - get_table_model - 表格 '员工信息表' 准备完成: 行数=3, 列数=6
+2025-03-10 20:09:12,061 - ERROR - tbsql.py - on_table_changed - 切换表格错误: Error calling Python override of QAbstractTableModel::rowCount(): 'EditableTableManager' object has no attribute '_data'
+2025-03-10 20:09:12,061 - INFO - tbsql.py - init_data - 加载第一个表格: '员工信息表', 列数=6, 行数=3
+2025-03-10 20:09:12,061 - INFO - pandasutil.py - get_table_model - 获取表格模型: 表名='员工信息表'
+2025-03-10 20:09:12,062 - ERROR - tbsql.py - init_data - 初始化数据错误: Error calling Python override of QAbstractTableModel::rowCount(): 'EditableTableManager' object has no attribute '_data'
+2025-03-10 20:09:15,389 - INFO - tbsql.py - on_table_changed - 切换到表格: '部门信息表'
+2025-03-10 20:09:15,391 - INFO - pandasutil.py - get_table_model - 获取表格模型: 表名='部门信息表'
+2025-03-10 20:09:15,391 - ERROR - tbsql.py - on_table_changed - 切换表格错误: Error calling Python override of QAbstractTableModel::rowCount(): 'EditableTableManager' object has no attribute '_data'
+2025-03-10 20:11:22,330 - INFO - pandasutil.py - register_function - 注册自定义函数: calculate_age
+2025-03-10 20:11:22,331 - INFO - pandasutil.py - register_function - 注册自定义函数: sum_range
+2025-03-10 20:11:22,331 - INFO - pandasutil.py - register_function - 注册自定义函数: average_range
+2025-03-10 20:11:22,332 - INFO - tbsql.py - load_json - 开始加载JSON文件: ./data/yangben.json
+2025-03-10 20:11:22,332 - INFO - tbsql.py - load_json - JSON文件加载成功: ./data/yangben.json, 找到 2 个表格: ['员工信息表', '部门信息表']
+2025-03-10 20:11:22,332 - INFO - tbsql.py - __init__ - JSON数据导入成功, 表格数量: 2
+2025-03-10 20:11:22,332 - INFO - tbsql.py - init_data - 开始初始化数据
+2025-03-10 20:11:22,334 - INFO - tbsql.py - init_data - 数据字典中的表格列表: ['员工信息表', '部门信息表']
+2025-03-10 20:11:22,334 - INFO - tbsql.py - init_data - 发现 2 个表格，开始预加载
+2025-03-10 20:11:22,334 - INFO - pandasutil.py - load_all_tables - 开始加载表格列表, 共 2 个表格: ['员工信息表', '部门信息表']
+2025-03-10 20:11:22,334 - INFO - pandasutil.py - load_all_tables - 处理表格 '员工信息表': 列数=6, 行数=3
+2025-03-10 20:11:22,336 - INFO - pandasutil.py - load_all_tables - 处理表格 '部门信息表': 列数=5, 行数=3
+2025-03-10 20:11:22,342 - INFO - pandasutil.py - load_all_tables - 大宽表构建完成: 行数=3, 列数=11
+2025-03-10 20:11:22,343 - INFO - pandasutil.py - _update_dependency_graph - 开始构建依赖图
+2025-03-10 20:11:22,343 - ERROR - pandasutil.py - _update_dependency_graph - 更新依赖图失败: 'EditableTableManager' object has no attribute '_formulas'
+2025-03-10 20:11:22,343 - INFO - tbsql.py - on_table_changed - 切换到表格: '员工信息表'
+2025-03-10 20:11:22,344 - INFO - pandasutil.py - get_table_model - 获取表格模型: 表名='员工信息表'
+2025-03-10 20:11:22,344 - INFO - pandasutil.py - get_table_model - 表格 '员工信息表' 准备完成: 行数=3, 列数=6
+2025-03-10 20:11:22,344 - ERROR - tbsql.py - on_table_changed - 切换表格错误: Error calling Python override of QAbstractTableModel::rowCount(): 'EditableTableManager' object has no attribute '_data'
+2025-03-10 20:11:22,345 - INFO - tbsql.py - init_data - 加载第一个表格: '员工信息表', 列数=6, 行数=3
+2025-03-10 20:11:22,345 - INFO - pandasutil.py - get_table_model - 获取表格模型: 表名='员工信息表'
+2025-03-10 20:11:22,345 - ERROR - tbsql.py - init_data - 初始化数据错误: Error calling Python override of QAbstractTableModel::rowCount(): 'EditableTableManager' object has no attribute '_data'
+2025-03-10 20:12:58,217 - INFO - pandasutil.py - register_function - 注册自定义函数: calculate_age
+2025-03-10 20:12:58,218 - INFO - pandasutil.py - register_function - 注册自定义函数: sum_range
+2025-03-10 20:12:58,218 - INFO - pandasutil.py - register_function - 注册自定义函数: average_range
+2025-03-10 20:12:58,219 - INFO - tbsql.py - load_json - 开始加载JSON文件: ./data/yangben.json
+2025-03-10 20:12:58,220 - INFO - tbsql.py - load_json - JSON文件加载成功: ./data/yangben.json, 找到 2 个表格: ['员工信息表', '部门信息表']
+2025-03-10 20:12:58,220 - INFO - tbsql.py - __init__ - JSON数据导入成功, 表格数量: 2
+2025-03-10 20:12:58,220 - INFO - tbsql.py - init_data - 开始初始化数据
+2025-03-10 20:12:58,220 - INFO - tbsql.py - init_data - 数据字典中的表格列表: ['员工信息表', '部门信息表']
+2025-03-10 20:12:58,220 - INFO - tbsql.py - init_data - 发现 2 个表格，开始预加载
+2025-03-10 20:12:58,221 - INFO - pandasutil.py - load_all_tables - 开始加载表格列表, 共 2 个表格: ['员工信息表', '部门信息表']
+2025-03-10 20:12:58,221 - INFO - pandasutil.py - load_all_tables - 处理表格 '员工信息表': 列数=6, 行数=3
+2025-03-10 20:12:58,223 - INFO - pandasutil.py - load_all_tables - 处理表格 '部门信息表': 列数=5, 行数=3
+2025-03-10 20:12:58,228 - INFO - pandasutil.py - load_all_tables - 大宽表构建完成: 行数=3, 列数=11
+2025-03-10 20:12:58,229 - INFO - pandasutil.py - _update_dependency_graph - 开始构建依赖图
+2025-03-10 20:12:58,229 - ERROR - pandasutil.py - _update_dependency_graph - 更新依赖图失败: 'EditableTableManager' object has no attribute '_formulas'
+2025-03-10 20:12:58,229 - INFO - tbsql.py - on_table_changed - 切换到表格: '员工信息表'
+2025-03-10 20:12:58,229 - INFO - pandasutil.py - get_table_model - 获取表格模型: 表名='员工信息表'
+2025-03-10 20:12:58,230 - INFO - pandasutil.py - get_table_model - 表格 '员工信息表' 准备完成: 行数=3, 列数=6
+2025-03-10 20:12:58,230 - ERROR - tbsql.py - on_table_changed - 切换表格错误: Error calling Python override of QAbstractTableModel::rowCount(): 'EditableTableManager' object has no attribute '_data'
+2025-03-10 20:12:58,231 - INFO - tbsql.py - init_data - 加载第一个表格: '员工信息表', 列数=6, 行数=3
+2025-03-10 20:12:58,231 - INFO - pandasutil.py - get_table_model - 获取表格模型: 表名='员工信息表'
+2025-03-10 20:12:58,231 - ERROR - tbsql.py - init_data - 初始化数据错误: Error calling Python override of QAbstractTableModel::rowCount(): 'EditableTableManager' object has no attribute '_data'
+2025-03-10 20:13:01,275 - INFO - tbsql.py - on_table_changed - 切换到表格: '部门信息表'
+2025-03-10 20:13:01,275 - INFO - pandasutil.py - get_table_model - 获取表格模型: 表名='部门信息表'
+2025-03-10 20:13:01,275 - ERROR - tbsql.py - on_table_changed - 切换表格错误: Error calling Python override of QAbstractTableModel::rowCount(): 'EditableTableManager' object has no attribute '_data'
+2025-03-10 20:13:02,817 - INFO - pandasutil.py - add_row_to_wide_table - 向大宽表添加行: 表=部门信息表, 行ID=4, 列数=5
+2025-03-10 20:13:02,817 - ERROR - pandasutil.py - add_row_to_wide_table - 向大宽表添加行错误: 'EditableTableManager' object has no attribute '_data'
+Traceback (most recent call last):
+  File "d:\code\SQL_Helper\util\pandasutil.py", line 1427, in add_row_to_wide_table
+    self._data.append(new_values)
+AttributeError: 'EditableTableManager' object has no attribute '_data'
+2025-03-10 20:13:07,874 - INFO - tbsql.py - add_column - 输入的列名: 11
+2025-03-10 20:13:07,875 - INFO - pandasutil.py - add_column_to_wide_table - 向大宽表添加列: 表=部门信息表, 列=11
+2025-03-10 20:13:07,875 - ERROR - pandasutil.py - add_column_to_wide_table - 向大宽表添加列错误: 'EditableTableManager' object has no attribute '_data'
+Traceback (most recent call last):
+  File "d:\code\SQL_Helper\util\pandasutil.py", line 1535, in add_column_to_wide_table
+    for i in range(len(self._data)):
+AttributeError: 'EditableTableManager' object has no attribute '_data'
+2025-03-10 20:14:11,989 - INFO - pandasutil.py - register_function - 注册自定义函数: calculate_age
+2025-03-10 20:14:11,990 - INFO - pandasutil.py - register_function - 注册自定义函数: sum_range
+2025-03-10 20:14:11,990 - INFO - pandasutil.py - register_function - 注册自定义函数: average_range
+2025-03-10 20:14:11,991 - INFO - tbsql.py - load_json - 开始加载JSON文件: ./data/yangben.json
+2025-03-10 20:14:11,991 - INFO - tbsql.py - load_json - JSON文件加载成功: ./data/yangben.json, 找到 2 个表格: ['员工信息表', '部门信息表']
+2025-03-10 20:14:11,992 - INFO - tbsql.py - __init__ - JSON数据导入成功, 表格数量: 2
+2025-03-10 20:14:11,992 - INFO - tbsql.py - init_data - 开始初始化数据
+2025-03-10 20:14:11,992 - INFO - tbsql.py - init_data - 数据字典中的表格列表: ['员工信息表', '部门信息表']
+2025-03-10 20:14:11,992 - INFO - tbsql.py - init_data - 发现 2 个表格，开始预加载
+2025-03-10 20:14:11,992 - INFO - pandasutil.py - load_all_tables - 开始加载表格列表, 共 2 个表格: ['员工信息表', '部门信息表']
+2025-03-10 20:14:11,993 - INFO - pandasutil.py - load_all_tables - 处理表格 '员工信息表': 列数=6, 行数=3
+2025-03-10 20:14:11,996 - INFO - pandasutil.py - load_all_tables - 处理表格 '部门信息表': 列数=5, 行数=3
+2025-03-10 20:14:11,999 - INFO - pandasutil.py - load_all_tables - 大宽表构建完成: 行数=3, 列数=11
+2025-03-10 20:14:12,000 - INFO - tbsql.py - on_table_changed - 切换到表格: '员工信息表'
+2025-03-10 20:14:12,000 - INFO - pandasutil.py - get_table_model - 获取表格模型: 表名='员工信息表'
+2025-03-10 20:14:12,000 - INFO - pandasutil.py - get_table_model - 表格 '员工信息表' 准备完成: 行数=3, 列数=6
+2025-03-10 20:14:12,003 - INFO - tbsql.py - on_table_changed - 成功加载表格: '员工信息表'
+2025-03-10 20:14:12,003 - INFO - tbsql.py - init_data - 加载第一个表格: '员工信息表', 列数=6, 行数=3
+2025-03-10 20:14:12,003 - INFO - pandasutil.py - get_table_model - 获取表格模型: 表名='员工信息表'
+2025-03-10 20:14:12,004 - INFO - pandasutil.py - get_table_model - 表格 '员工信息表' 准备完成: 行数=3, 列数=6
+2025-03-10 20:14:12,004 - INFO - tbsql.py - init_data - 表格模型创建成功: 行数=3, 列数=6
+2025-03-10 20:14:12,004 - INFO - tbsql.py - init_data - 初始化表格完成: '员工信息表'
+2025-03-10 20:14:14,589 - INFO - tbsql.py - on_tb_data_double_clicked - 表格单元格双击: 行=0, 列=5
+2025-03-10 20:14:20,295 - INFO - tbsql.py - add_column - 输入的列名: 12
+2025-03-10 20:14:20,297 - ERROR - tbsql.py - add_column - 添加列到数据模型时出错: 'EditableTableManager' object has no attribute 'add_column_to_wide_table'
+2025-03-10 20:14:30,097 - ERROR - tbsql.py - delete_column - 删除列时出错: 'EditableTableManager' object has no attribute 'delete_column_from_wide_table'
+2025-03-10 20:14:35,459 - INFO - tbsql.py - show_column_selector - after_at: 
+2025-03-10 20:14:36,358 - INFO - tbsql.py - show_column_selector - after_at: 工号
+2025-03-10 20:14:36,869 - ERROR - tbsql.py - search_data_by_rule - 搜索数据时出错: 'EditableTableManager' object has no attribute 'search_by_rule'
+2025-03-10 20:14:38,641 - INFO - tbsql.py - on_table_changed - 切换到表格: '员工信息表'
+2025-03-10 20:14:38,641 - INFO - pandasutil.py - get_table_model - 获取表格模型: 表名='员工信息表'
+2025-03-10 20:14:38,641 - INFO - pandasutil.py - get_table_model - 表格 '员工信息表' 准备完成: 行数=3, 列数=6
+2025-03-10 20:14:38,642 - INFO - tbsql.py - on_table_changed - 成功加载表格: '员工信息表'
+2025-03-10 20:14:38,656 - ERROR - tbsql.py - search_data_by_rule - 搜索数据时出错: 'EditableTableManager' object has no attribute 'search_by_rule'
+2025-03-10 20:14:40,182 - INFO - tbsql.py - on_table_changed - 切换到表格: '员工信息表'
+2025-03-10 20:14:40,182 - INFO - pandasutil.py - get_table_model - 获取表格模型: 表名='员工信息表'
+2025-03-10 20:14:40,183 - INFO - pandasutil.py - get_table_model - 表格 '员工信息表' 准备完成: 行数=3, 列数=6
+2025-03-10 20:14:40,183 - INFO - tbsql.py - on_table_changed - 成功加载表格: '员工信息表'
+2025-03-10 20:16:09,341 - INFO - pandasutil.py - register_function - 注册自定义函数: calculate_age
+2025-03-10 20:16:09,342 - INFO - pandasutil.py - register_function - 注册自定义函数: sum_range
+2025-03-10 20:16:09,342 - INFO - pandasutil.py - register_function - 注册自定义函数: average_range
+2025-03-10 20:16:09,342 - INFO - tbsql.py - load_json - 开始加载JSON文件: ./data/yangben.json
+2025-03-10 20:16:09,344 - INFO - tbsql.py - load_json - JSON文件加载成功: ./data/yangben.json, 找到 2 个表格: ['员工信息表', '部门信息表']
+2025-03-10 20:16:09,344 - INFO - tbsql.py - __init__ - JSON数据导入成功, 表格数量: 2
+2025-03-10 20:16:09,345 - INFO - tbsql.py - init_data - 开始初始化数据
+2025-03-10 20:16:09,345 - INFO - tbsql.py - init_data - 数据字典中的表格列表: ['员工信息表', '部门信息表']
+2025-03-10 20:16:09,345 - INFO - tbsql.py - init_data - 发现 2 个表格，开始预加载
+2025-03-10 20:16:09,345 - INFO - pandasutil.py - load_all_tables - 开始加载表格列表, 共 2 个表格: ['员工信息表', '部门信息表']
+2025-03-10 20:16:09,345 - INFO - pandasutil.py - load_all_tables - 处理表格 '员工信息表': 列数=6, 行数=3
+2025-03-10 20:16:09,348 - INFO - pandasutil.py - load_all_tables - 处理表格 '部门信息表': 列数=5, 行数=3
+2025-03-10 20:16:09,353 - INFO - pandasutil.py - load_all_tables - 大宽表构建完成: 行数=3, 列数=11
+2025-03-10 20:16:09,353 - INFO - tbsql.py - on_table_changed - 切换到表格: '员工信息表'
+2025-03-10 20:16:09,353 - INFO - pandasutil.py - get_table_model - 获取表格模型: 表名='员工信息表'
+2025-03-10 20:16:09,354 - INFO - pandasutil.py - get_table_model - 表格 '员工信息表' 准备完成: 行数=3, 列数=6
+2025-03-10 20:16:09,356 - INFO - tbsql.py - on_table_changed - 成功加载表格: '员工信息表'
+2025-03-10 20:16:09,356 - INFO - tbsql.py - init_data - 加载第一个表格: '员工信息表', 列数=6, 行数=3
+2025-03-10 20:16:09,356 - INFO - pandasutil.py - get_table_model - 获取表格模型: 表名='员工信息表'
+2025-03-10 20:16:09,357 - INFO - pandasutil.py - get_table_model - 表格 '员工信息表' 准备完成: 行数=3, 列数=6
+2025-03-10 20:16:09,357 - INFO - tbsql.py - init_data - 表格模型创建成功: 行数=3, 列数=6
+2025-03-10 20:16:09,358 - INFO - tbsql.py - init_data - 初始化表格完成: '员工信息表'
+2025-03-10 20:16:10,523 - INFO - tbsql.py - show_column_selector - after_at: 
+2025-03-10 20:16:11,650 - INFO - tbsql.py - show_column_selector - after_at: 工号
+2025-03-10 20:16:12,174 - INFO - pandasutil.py - search_by_rule - 开始按规则搜索数据: 规则='@工号'
+2025-03-10 20:16:12,174 - WARNING - pandasutil.py - search_by_rule - 跳过无法解析的条件: @工号
+2025-03-10 20:16:12,175 - INFO - pandasutil.py - search_by_rule - 未找到匹配的数据
+2025-03-10 20:16:12,175 - INFO - pandasutil.py - search_by_rule - 返回空搜索结果模型
+2025-03-10 20:16:12,176 - INFO - tbsql.py - search_data_by_rule - 过滤后的数据行数: 0
+2025-03-10 20:16:12,192 - INFO - pandasutil.py - search_by_rule - 开始按规则搜索数据: 规则='@'
+2025-03-10 20:16:12,192 - WARNING - pandasutil.py - search_by_rule - 跳过无法解析的条件: @
+2025-03-10 20:16:12,192 - INFO - pandasutil.py - search_by_rule - 未找到匹配的数据
+2025-03-10 20:16:12,193 - INFO - pandasutil.py - search_by_rule - 返回空搜索结果模型
+2025-03-10 20:16:12,193 - INFO - tbsql.py - search_data_by_rule - 过滤后的数据行数: 0
+2025-03-10 20:16:12,623 - INFO - tbsql.py - show_column_selector - after_at: 工号=
+2025-03-10 20:16:12,623 - INFO - pandasutil.py - search_by_rule - 开始按规则搜索数据: 规则='@工号='
+2025-03-10 20:16:12,623 - INFO - pandasutil.py - search_by_rule - 搜索完成，找到 3 条匹配记录
+2025-03-10 20:16:12,625 - INFO - tbsql.py - search_data_by_rule - 过滤后的数据行数: 3
+2025-03-10 20:16:13,505 - INFO - tbsql.py - show_column_selector - after_at: 工号=0
+2025-03-10 20:16:13,505 - INFO - pandasutil.py - search_by_rule - 开始按规则搜索数据: 规则='@工号=0'
+2025-03-10 20:16:13,506 - INFO - pandasutil.py - search_by_rule - 搜索完成，找到 3 条匹配记录
+2025-03-10 20:16:13,506 - INFO - tbsql.py - search_data_by_rule - 过滤后的数据行数: 3
+2025-03-10 20:16:13,949 - INFO - tbsql.py - show_column_selector - after_at: 工号=01
+2025-03-10 20:16:13,949 - INFO - pandasutil.py - search_by_rule - 开始按规则搜索数据: 规则='@工号=01'
+2025-03-10 20:16:13,950 - INFO - pandasutil.py - search_by_rule - 搜索完成，找到 1 条匹配记录
+2025-03-10 20:16:13,951 - INFO - tbsql.py - search_data_by_rule - 过滤后的数据行数: 1
+2025-03-10 20:16:15,584 - INFO - tbsql.py - show_column_selector - after_at: 工号=01|
+2025-03-10 20:16:15,584 - INFO - pandasutil.py - search_by_rule - 开始按规则搜索数据: 规则='@工号=01|'
+2025-03-10 20:16:15,585 - INFO - pandasutil.py - search_by_rule - 搜索完成，找到 1 条匹配记录
+2025-03-10 20:16:15,585 - INFO - tbsql.py - search_data_by_rule - 过滤后的数据行数: 1
+2025-03-10 20:16:16,366 - INFO - tbsql.py - show_column_selector - after_at: 
+2025-03-10 20:16:17,572 - INFO - tbsql.py - show_column_selector - after_at: 姓名
+2025-03-10 20:16:18,086 - INFO - pandasutil.py - search_by_rule - 开始按规则搜索数据: 规则='@工号=01|@姓名'
+2025-03-10 20:16:18,087 - WARNING - pandasutil.py - search_by_rule - 跳过无法解析的条件: @姓名
+2025-03-10 20:16:18,088 - INFO - pandasutil.py - search_by_rule - 搜索完成，找到 1 条匹配记录
+2025-03-10 20:16:18,088 - INFO - tbsql.py - search_data_by_rule - 过滤后的数据行数: 1
+2025-03-10 20:16:18,102 - INFO - pandasutil.py - search_by_rule - 开始按规则搜索数据: 规则='@工号=01|@'
+2025-03-10 20:16:18,102 - WARNING - pandasutil.py - search_by_rule - 跳过无法解析的条件: @
+2025-03-10 20:16:18,103 - INFO - pandasutil.py - search_by_rule - 搜索完成，找到 1 条匹配记录
+2025-03-10 20:16:18,103 - INFO - tbsql.py - search_data_by_rule - 过滤后的数据行数: 1
+2025-03-10 20:16:18,563 - INFO - tbsql.py - show_column_selector - after_at: 姓名=
+2025-03-10 20:16:18,564 - INFO - pandasutil.py - search_by_rule - 开始按规则搜索数据: 规则='@工号=01|@姓名='
+2025-03-10 20:16:18,565 - INFO - pandasutil.py - search_by_rule - 搜索完成，找到 3 条匹配记录
+2025-03-10 20:16:18,565 - INFO - tbsql.py - search_data_by_rule - 过滤后的数据行数: 3
+2025-03-10 20:16:20,572 - INFO - tbsql.py - show_column_selector - after_at: 姓名=五
+2025-03-10 20:16:20,572 - INFO - pandasutil.py - search_by_rule - 开始按规则搜索数据: 规则='@工号=01|@姓名=五'
+2025-03-10 20:16:20,573 - INFO - pandasutil.py - search_by_rule - 搜索完成，找到 2 条匹配记录
+2025-03-10 20:16:20,574 - INFO - tbsql.py - search_data_by_rule - 过滤后的数据行数: 2
+2025-03-10 20:16:22,351 - INFO - pandasutil.py - search_by_rule - 开始按规则搜索数据: 规则=''
+2025-03-10 20:16:22,351 - INFO - pandasutil.py - search_by_rule - 搜索规则为空，返回原始数据
+2025-03-10 20:16:22,351 - INFO - tbsql.py - search_data_by_rule - 过滤后的数据行数: 3
+2025-03-10 20:16:26,689 - WARNING - tbsql.py - on_table_changed - 未选择有效的表格
+2025-03-10 20:16:26,689 - INFO - tbsql.py - on_table_changed - 切换到表格: '员工信息表'
+2025-03-10 20:16:26,689 - INFO - pandasutil.py - get_table_model - 获取表格模型: 表名='员工信息表'
+2025-03-10 20:16:26,690 - INFO - pandasutil.py - get_table_model - 表格 '员工信息表' 准备完成: 行数=3, 列数=6
+2025-03-10 20:16:26,690 - INFO - tbsql.py - on_table_changed - 成功加载表格: '员工信息表'
+2025-03-10 20:16:31,744 - WARNING - tbsql.py - on_table_changed - 未选择有效的表格
+2025-03-10 20:16:31,744 - INFO - tbsql.py - on_table_changed - 切换到表格: '部门信息表'
+2025-03-10 20:16:31,744 - INFO - pandasutil.py - get_table_model - 获取表格模型: 表名='部门信息表'
+2025-03-10 20:16:31,746 - INFO - pandasutil.py - get_table_model - 表格 '部门信息表' 准备完成: 行数=3, 列数=5
+2025-03-10 20:16:31,746 - INFO - tbsql.py - on_table_changed - 成功加载表格: '部门信息表'
+2025-03-10 20:16:36,701 - WARNING - tbsql.py - on_table_changed - 未选择有效的表格
+2025-03-10 20:16:37,855 - INFO - tbsql.py - on_table_changed - 切换到表格: '员工信息表'
+2025-03-10 20:16:37,857 - INFO - pandasutil.py - get_table_model - 获取表格模型: 表名='员工信息表'
+2025-03-10 20:16:37,858 - INFO - pandasutil.py - get_table_model - 表格 '员工信息表' 准备完成: 行数=3, 列数=6
+2025-03-10 20:16:37,858 - INFO - tbsql.py - on_table_changed - 成功加载表格: '员工信息表'
+2025-03-10 20:16:40,713 - WARNING - tbsql.py - on_table_changed - 未选择有效的表格
+2025-03-10 20:16:40,713 - INFO - tbsql.py - on_table_changed - 切换到表格: '员工信息表'
+2025-03-10 20:16:40,714 - INFO - pandasutil.py - get_table_model - 获取表格模型: 表名='员工信息表'
+2025-03-10 20:16:40,714 - INFO - pandasutil.py - get_table_model - 表格 '员工信息表' 准备完成: 行数=3, 列数=6
+2025-03-10 20:16:40,715 - INFO - tbsql.py - on_table_changed - 成功加载表格: '员工信息表'
+2025-03-10 20:16:41,343 - WARNING - tbsql.py - on_table_changed - 未选择有效的表格
+2025-03-10 20:16:41,343 - INFO - tbsql.py - on_table_changed - 切换到表格: '员工信息表'
+2025-03-10 20:16:41,345 - INFO - pandasutil.py - get_table_model - 获取表格模型: 表名='员工信息表'
+2025-03-10 20:16:41,345 - INFO - pandasutil.py - get_table_model - 表格 '员工信息表' 准备完成: 行数=3, 列数=6
+2025-03-10 20:16:41,345 - INFO - tbsql.py - on_table_changed - 成功加载表格: '员工信息表'
+2025-03-10 20:16:41,491 - WARNING - tbsql.py - on_table_changed - 未选择有效的表格
+2025-03-10 20:16:41,492 - INFO - tbsql.py - on_table_changed - 切换到表格: '员工信息表'
+2025-03-10 20:16:41,492 - INFO - pandasutil.py - get_table_model - 获取表格模型: 表名='员工信息表'
+2025-03-10 20:16:41,493 - INFO - pandasutil.py - get_table_model - 表格 '员工信息表' 准备完成: 行数=3, 列数=6
+2025-03-10 20:16:41,493 - INFO - tbsql.py - on_table_changed - 成功加载表格: '员工信息表'
+2025-03-10 20:16:43,104 - WARNING - tbsql.py - on_table_changed - 未选择有效的表格
+2025-03-10 20:16:43,106 - INFO - tbsql.py - on_table_changed - 切换到表格: '部门信息表'
+2025-03-10 20:16:43,106 - INFO - pandasutil.py - get_table_model - 获取表格模型: 表名='部门信息表'
+2025-03-10 20:16:43,107 - INFO - pandasutil.py - get_table_model - 表格 '部门信息表' 准备完成: 行数=3, 列数=5
+2025-03-10 20:16:43,107 - INFO - tbsql.py - on_table_changed - 成功加载表格: '部门信息表'
+2025-03-10 20:16:46,025 - WARNING - tbsql.py - on_table_changed - 未选择有效的表格
+2025-03-10 20:16:46,026 - INFO - tbsql.py - on_table_changed - 切换到表格: '员工信息表'
+2025-03-10 20:16:46,026 - INFO - pandasutil.py - get_table_model - 获取表格模型: 表名='员工信息表'
+2025-03-10 20:16:46,027 - INFO - pandasutil.py - get_table_model - 表格 '员工信息表' 准备完成: 行数=3, 列数=6
+2025-03-10 20:16:46,027 - INFO - tbsql.py - on_table_changed - 成功加载表格: '员工信息表'
+2025-03-10 20:16:48,951 - INFO - tbsql.py - on_table_changed - 切换到表格: '部门信息表'
+2025-03-10 20:16:48,951 - INFO - pandasutil.py - get_table_model - 获取表格模型: 表名='部门信息表'
+2025-03-10 20:16:48,952 - INFO - pandasutil.py - get_table_model - 表格 '部门信息表' 准备完成: 行数=3, 列数=5
+2025-03-10 20:16:48,953 - INFO - tbsql.py - on_table_changed - 成功加载表格: '部门信息表'
+2025-03-10 20:16:50,062 - INFO - tbsql.py - on_table_changed - 切换到表格: '员工信息表'
+2025-03-10 20:16:50,063 - INFO - pandasutil.py - get_table_model - 获取表格模型: 表名='员工信息表'
+2025-03-10 20:16:50,063 - INFO - pandasutil.py - get_table_model - 表格 '员工信息表' 准备完成: 行数=3, 列数=6
+2025-03-10 20:16:50,064 - INFO - tbsql.py - on_table_changed - 成功加载表格: '员工信息表'
+2025-03-10 20:16:54,091 - INFO - tbsql.py - add_column - 输入的列名: 1
+2025-03-10 20:16:54,092 - ERROR - tbsql.py - add_column - 添加列到数据模型时出错: 'EditableTableManager' object has no attribute 'add_column_to_wide_table'
+2025-03-10 20:17:45,879 - INFO - pandasutil.py - register_function - 注册自定义函数: calculate_age
+2025-03-10 20:17:45,879 - INFO - pandasutil.py - register_function - 注册自定义函数: sum_range
+2025-03-10 20:17:45,879 - INFO - pandasutil.py - register_function - 注册自定义函数: average_range
+2025-03-10 20:17:45,881 - INFO - tbsql.py - load_json - 开始加载JSON文件: ./data/yangben.json
+2025-03-10 20:17:45,882 - INFO - tbsql.py - load_json - JSON文件加载成功: ./data/yangben.json, 找到 2 个表格: ['员工信息表', '部门信息表']
+2025-03-10 20:17:45,882 - INFO - tbsql.py - __init__ - JSON数据导入成功, 表格数量: 2
+2025-03-10 20:17:45,882 - INFO - tbsql.py - init_data - 开始初始化数据
+2025-03-10 20:17:45,882 - INFO - tbsql.py - init_data - 数据字典中的表格列表: ['员工信息表', '部门信息表']
+2025-03-10 20:17:45,882 - INFO - tbsql.py - init_data - 发现 2 个表格，开始预加载
+2025-03-10 20:17:45,882 - INFO - pandasutil.py - load_all_tables - 开始加载表格列表, 共 2 个表格: ['员工信息表', '部门信息表']
+2025-03-10 20:17:45,883 - INFO - pandasutil.py - load_all_tables - 处理表格 '员工信息表': 列数=6, 行数=3
+2025-03-10 20:17:45,885 - INFO - pandasutil.py - load_all_tables - 处理表格 '部门信息表': 列数=5, 行数=3
+2025-03-10 20:17:45,889 - INFO - pandasutil.py - load_all_tables - 大宽表构建完成: 行数=3, 列数=11
+2025-03-10 20:17:45,889 - INFO - tbsql.py - on_table_changed - 切换到表格: '员工信息表'
+2025-03-10 20:17:45,890 - INFO - pandasutil.py - get_table_model - 获取表格模型: 表名='员工信息表'
+2025-03-10 20:17:45,890 - INFO - pandasutil.py - get_table_model - 表格 '员工信息表' 准备完成: 行数=3, 列数=6
+2025-03-10 20:17:45,892 - INFO - tbsql.py - on_table_changed - 成功加载表格: '员工信息表'
+2025-03-10 20:17:45,893 - INFO - tbsql.py - init_data - 加载第一个表格: '员工信息表', 列数=6, 行数=3
+2025-03-10 20:17:45,893 - INFO - pandasutil.py - get_table_model - 获取表格模型: 表名='员工信息表'
+2025-03-10 20:17:45,893 - INFO - pandasutil.py - get_table_model - 表格 '员工信息表' 准备完成: 行数=3, 列数=6
+2025-03-10 20:17:45,894 - INFO - tbsql.py - init_data - 表格模型创建成功: 行数=3, 列数=6
+2025-03-10 20:17:45,894 - INFO - tbsql.py - init_data - 初始化表格完成: '员工信息表'
+2025-03-10 20:17:48,873 - INFO - tbsql.py - add_column - 输入的列名: 22
+2025-03-10 20:17:48,873 - INFO - pandasutil.py - add_column_to_wide_table - 调用兼容方法 add_column_to_wide_table: 表=员工信息表, 列=22
+2025-03-10 20:17:48,874 - INFO - pandasutil.py - add_column - 已添加新列: 表=员工信息表, 列=22
+2025-03-10 20:17:48,875 - INFO - tbsql.py - on_table_changed - 切换到表格: '员工信息表'
+2025-03-10 20:17:48,875 - INFO - pandasutil.py - get_table_model - 获取表格模型: 表名='员工信息表'
+2025-03-10 20:17:48,876 - INFO - pandasutil.py - get_table_model - 表格 '员工信息表' 准备完成: 行数=3, 列数=7
+2025-03-10 20:17:48,876 - INFO - tbsql.py - on_table_changed - 成功加载表格: '员工信息表'
+2025-03-10 20:17:48,876 - INFO - tbsql.py - add_column - 成功添加列到大宽表: 22
+2025-03-10 20:17:50,845 - INFO - pandasutil.py - add_row_to_wide_table - 调用兼容方法 add_row_to_wide_table: 表=员工信息表
+2025-03-10 20:17:50,848 - INFO - pandasutil.py - add_row - 已添加新行: 表=员工信息表, 行ID=4, 列数=7
+2025-03-10 20:17:50,849 - INFO - tbsql.py - on_table_changed - 切换到表格: '员工信息表'
+2025-03-10 20:17:50,850 - INFO - pandasutil.py - get_table_model - 获取表格模型: 表名='员工信息表'
+2025-03-10 20:17:50,850 - INFO - pandasutil.py - get_table_model - 表格 '员工信息表' 准备完成: 行数=4, 列数=7
+2025-03-10 20:17:50,850 - INFO - tbsql.py - on_table_changed - 成功加载表格: '员工信息表'
+2025-03-10 20:17:50,850 - INFO - tbsql.py - add_row - 成功添加行到大宽表: 行ID=4
+2025-03-10 20:17:55,047 - INFO - pandasutil.py - delete_column_from_wide_table - 调用兼容方法 delete_column_from_wide_table: 表=员工信息表, 列=22
+2025-03-10 20:17:55,049 - INFO - pandasutil.py - delete_column - 已删除列: 表=员工信息表, 列=22
+2025-03-10 20:17:55,051 - INFO - tbsql.py - delete_column - 成功从大宽表删除列: 22
+2025-03-10 20:17:55,051 - INFO - tbsql.py - on_table_changed - 切换到表格: '员工信息表'
+2025-03-10 20:17:55,051 - INFO - pandasutil.py - get_table_model - 获取表格模型: 表名='员工信息表'
+2025-03-10 20:17:55,053 - INFO - pandasutil.py - get_table_model - 表格 '员工信息表' 准备完成: 行数=4, 列数=6
+2025-03-10 20:17:55,053 - INFO - tbsql.py - on_table_changed - 成功加载表格: '员工信息表'
+2025-03-10 20:18:00,256 - INFO - pandasutil.py - delete_row_from_wide_table - 调用兼容方法 delete_row_from_wide_table: 表=员工信息表, 行ID=4
+2025-03-10 20:18:00,258 - INFO - pandasutil.py - delete_row - 已删除行: 表=员工信息表, 行ID=4
+2025-03-10 20:18:00,259 - INFO - tbsql.py - delete_row - 成功从大宽表删除行: 行ID=4
+2025-03-10 20:18:00,259 - INFO - tbsql.py - on_table_changed - 切换到表格: '员工信息表'
+2025-03-10 20:18:00,259 - INFO - pandasutil.py - get_table_model - 获取表格模型: 表名='员工信息表'
+2025-03-10 20:18:00,260 - INFO - pandasutil.py - get_table_model - 表格 '员工信息表' 准备完成: 行数=3, 列数=6
+2025-03-10 20:18:00,260 - INFO - tbsql.py - on_table_changed - 成功加载表格: '员工信息表'
+2025-03-10 20:18:02,166 - INFO - tbsql.py - on_table_changed - 切换到表格: '部门信息表'
+2025-03-10 20:18:02,167 - INFO - pandasutil.py - get_table_model - 获取表格模型: 表名='部门信息表'
+2025-03-10 20:18:02,167 - INFO - pandasutil.py - get_table_model - 表格 '部门信息表' 准备完成: 行数=3, 列数=5
+2025-03-10 20:18:02,169 - INFO - tbsql.py - on_table_changed - 成功加载表格: '部门信息表'
+2025-03-10 20:18:09,978 - INFO - tbsql.py - on_tb_data_double_clicked - 表格单元格双击: 行=0, 列=4
+2025-03-10 20:18:10,943 - INFO - tbsql.py - on_tb_data_double_clicked - 表格单元格双击: 行=2, 列=4
+2025-03-10 20:18:12,390 - INFO - tbsql.py - on_tb_data_double_clicked - 表格单元格双击: 行=1, 列=4
+2025-03-10 20:18:13,312 - INFO - tbsql.py - on_tb_data_double_clicked - 表格单元格双击: 行=0, 列=4
+2025-03-10 20:18:14,133 - INFO - tbsql.py - on_tb_data_double_clicked - 表格单元格双击: 行=2, 列=4
+2025-03-10 20:18:14,872 - INFO - tbsql.py - on_tb_data_double_clicked - 表格单元格双击: 行=0, 列=4
+2025-03-10 20:18:18,647 - INFO - tbsql.py - on_table_changed - 切换到表格: '员工信息表'
+2025-03-10 20:18:18,648 - INFO - pandasutil.py - get_table_model - 获取表格模型: 表名='员工信息表'
+2025-03-10 20:18:18,649 - INFO - pandasutil.py - get_table_model - 表格 '员工信息表' 准备完成: 行数=3, 列数=6
+2025-03-10 20:18:18,649 - INFO - tbsql.py - on_table_changed - 成功加载表格: '员工信息表'
+2025-03-10 20:18:19,637 - INFO - tbsql.py - on_tb_data_double_clicked - 表格单元格双击: 行=0, 列=5
+2025-03-10 20:18:20,963 - INFO - tbsql.py - on_tb_data_double_clicked - 表格单元格双击: 行=2, 列=5
+2025-03-10 20:18:21,638 - INFO - tbsql.py - on_tb_data_double_clicked - 表格单元格双击: 行=0, 列=5

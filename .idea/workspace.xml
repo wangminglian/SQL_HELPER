@@ -4,7 +4,14 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="3ada2794-6bee-486e-a819-2940b0e792fe" name="Changes" comment="" />
+    <list default="true" id="3ada2794-6bee-486e-a819-2940b0e792fe" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/conf.yml" beforeDir="false" afterPath="$PROJECT_DIR$/conf.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/yangben.json" beforeDir="false" afterPath="$PROJECT_DIR$/data/yangben.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tbsql.py" beforeDir="false" afterPath="$PROJECT_DIR$/tbsql.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/pandasutil.py" beforeDir="false" afterPath="$PROJECT_DIR$/util/pandasutil.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/xuqiu.py" beforeDir="false" afterPath="$PROJECT_DIR$/xuqiu.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/需求文档/tbsql需求文档" beforeDir="false" afterPath="$PROJECT_DIR$/需求文档/tbsql需求文档" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -55,28 +62,28 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;ASKED_ADD_EXTERNAL_FILES&quot;: &quot;true&quot;,
-    &quot;Python.main.executor&quot;: &quot;Run&quot;,
-    &quot;Python.sql_init.executor&quot;: &quot;Run&quot;,
-    &quot;Python.t1.executor&quot;: &quot;Run&quot;,
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
-    &quot;WebServerToolWindowFactoryState&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;&lt;未知&gt;&quot;,
-    &quot;last_opened_file_path&quot;: &quot;D:/code/SQL_Helper&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ASKED_ADD_EXTERNAL_FILES": "true",
+    "Python.main.executor": "Run",
+    "Python.sql_init.executor": "Run",
+    "Python.t1.executor": "Run",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "WebServerToolWindowFactoryState": "true",
+    "git-widget-placeholder": "main",
+    "last_opened_file_path": "D:/code/临时数据处理",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="PyConsoleOptionsProvider">
     <option name="myPythonConsoleState">
       <console-settings>
@@ -345,6 +352,7 @@
       <workItem from="1741246957904" duration="1877000" />
       <workItem from="1741259968330" duration="1994000" />
       <workItem from="1741268712858" duration="1190000" />
+      <workItem from="1742203812635" duration="15000" />
     </task>
     <servers />
   </component>

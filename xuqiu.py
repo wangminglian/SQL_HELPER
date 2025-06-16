@@ -3,6 +3,7 @@ import logging
 import os
 import stat
 import time
+import datetime
 import re
 from asyncio import sleep
 from concurrent.futures import ThreadPoolExecutor
@@ -19,14 +20,14 @@ from PySide6.QtWidgets import QTextEdit, QApplication, QMessageBox, QDateTimeEdi
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtGui import QStandardItem
 from model.model import Project_detail, SQL_arg, History, dp, create_tables, ARG_model, db, XQ_INFO, JB_INFO, YSJ_KJ, \
-    XQ_TABLE_INFO, TABLE_INFO, TABLE_COLUM_INFO
+    XQ_TABLE_INFO, TABLE_INFO, TABLE_COLUM_INFO, MD_INFO
 from sql_helper.helper_restruct import Reader_Factory, Genner_Com
 from collections import deque
 import shutil
 import subprocess
 from conf import XUQIU_MOBAN_PATH, VSDX_PATH, GONGZUOQU_PATH, DATA_PATH, HSZ_PATH, VS_PATH, WPS_PATH, EDGE_PATH, \
     LSJS_PATH, XQLX, \
-    TXT_PATH, ZDXQ, ZIP_PATH
+    TXT_PATH, ZDXQ, ZIP_PATH, MD_PATH
 from sql_helper.read_sql_file import Reader_SQL
 from tijiaobanben import Submit_banben_UI
 from yuanshuju import CJJS_UI, BGL_UI
@@ -40,6 +41,7 @@ VSDX_PATH=VSDX_PATH
 WPS_PATH=WPS_PATH
 EDGE_PATH=EDGE_PATH
 ZDXQ = ZDXQ
+MD_PATH = MD_PATH
 print(GONGZUOQU_PATH)
 # XUQIU_TTYPE= ['任务','取数']
 XUQIU_TTYPE = XQLX.split(',')
@@ -53,6 +55,8 @@ def get_files_in_directory(directory):
                 files.append(filename)
             else:
                 if filename=='代码':
+                    continue
+                if filename.endswith('.assets'):
                     continue
                 dirs.append(filename)
         return files,dirs
@@ -205,6 +209,12 @@ mhsheet="""
         }
 """
 
+jiaoben_dtl_header =['脚本ID','脚本名称','脚本备注','原需求id','原需求名称']
+jiaoben_dtl_header_id = 0
+jiaoben_dtl_header_name = 1
+jiaoben_dtl_header_bz = 2
+jiaoben_dtl_header_yxqid = 3
+jiaoben_dtl_header_yxqmc = 4
 
 class MyTableView(QTableView):
     def __init__(self, parent=None,vv=None):
@@ -218,6 +228,213 @@ class MyTableView(QTableView):
             item = self.model().itemFromIndex(index)
             if item:
                 QToolTip.showText(event.globalPos(), item.text())
+
+
+from clinet.XQXZ_UI import Ui_XQXZ
+# 需求选择
+class XQXZ_UI(QWidget):
+    def __init__(self,xqdtl_id,parent):
+        super().__init__()
+        self.ui = Ui_XQXZ()
+        self.ui.setupUi(self)
+        self.init_ui()
+        self.xqdtl_id = xqdtl_id
+        self.parent = parent
+    
+    def init_ui(self):
+        self.com_input:QComboBox = self.ui.com_input
+        self.bt_ok:QPushButton = self.ui.pb_submit
+        self.bt_ok.clicked.connect(self.f_bt_ok)
+        self.li_input:QLineEdit = self.ui.li_input
+        self.li_input.textChanged.connect(self.f_li_input)
+
+
+    def f_li_input(self):
+        # li 变更时，更新 com_input 下拉框内容，如果 li_input 为空，则 com_input 为空，
+        # XQ_INFO 表中，所有需求名称
+        xqmc = self.li_input.text()
+        xq_infos = XQ_INFO.select().where(XQ_INFO.name.contains(xqmc))
+        if len(xq_infos) == 0:
+            self.com_input.clear()
+        else:
+            self.com_input.clear()
+            for xq_info in xq_infos:
+                # item = f'{xq_info.id}$${xq_info.name}'
+                self.com_input.addItem(xq_info.name,xq_info.id)
+    
+    def f_bt_ok(self):
+        # 返回需求名称，需求id
+        xq_info = self.com_input.currentText()
+        xq_id = self.com_input.currentData()
+        xq_info = XQ_INFO.get_by_id(xq_id)
+        xq_path = xq_info.path
+        
+        # 移动脚本到指定的需求中
+        jb_info = JB_INFO.get_by_id(self.xqdtl_id)
+        old_xq_id = jb_info.xq_id
+        jb_old_path = jb_info.path
+        jb_new_path = os.path.join(xq_path,jb_info.name)
+
+        # 判断旧路径文件是否存在
+        if not os.path.exists(jb_old_path):
+            QMessageBox.warning(self,'提醒','脚本文件不存在')
+            return
+        # 判断新路径目录是否存在 xq_path
+        if not os.path.exists(xq_path):
+            QMessageBox.warning(self,'提醒','需求目录不存在')
+            return
+        # 判断新路径下是否有同名文件
+        if os.path.exists(jb_new_path):
+            QMessageBox.warning(self,'提醒','新路径下已有同名文件')
+            return
+        # 复制文件到新路径
+        shutil.copy(jb_old_path,jb_new_path)
+        # 更新数据库中内容
+        jb_info.path = jb_new_path
+        jb_info.xq_id = xq_id
+        jb_info.save()
+        # 删除旧文件
+        os.remove(jb_old_path)
+        self.parent.inint_tb_xuqiudtl(old_xq_id)
+        self.close()
+
+
+from clinet.JBXZ_UI import Ui_XQXZ as Ui_JBXZ
+from model.model import YY_JB_INFO
+# 脚本选择
+class JBXZ_UI(QWidget):
+    def __init__(self,xq_id,parent):
+        super().__init__()
+        self.ui = Ui_JBXZ()
+        self.ui.setupUi(self)
+        
+        self.xq_id = xq_id # 目标需求id 
+        self.parent = parent
+
+        self.com_input:QComboBox = self.ui.com_input
+        self.com_input.currentTextChanged.connect(self.f_com_input)
+        self.bt_ok:QPushButton = self.ui.pb_submit
+        self.bt_ok.clicked.connect(self.f_bt_ok)
+        self.li_input:QLineEdit = self.ui.li_input
+        self.li_input.textChanged.connect(self.f_li_input)
+        # tb_jiaoben 显示列名为 脚本id，脚本名称，脚本备注
+        
+        self.tb_jiaoben:QTableView = self.ui.tb_jiaoben
+        self.tb_jiaoben.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
+        self.tb_jiaoben.horizontalHeader().setStretchLastSection(True)
+        
+        self.tb_jiaoben.setSelectionBehavior(QAbstractItemView.SelectRows)
+        # INSERT_YOUR_CODE
+        # 设置选中行为的背景颜色为深蓝色
+        # 通过设置QTableView的样式表来实现
+        self.tb_jiaoben.setStyleSheet("QTableView::item:selected { background-color: #00008B; }")
+
+        model = QStandardItemModel()
+        for column, name in enumerate(jiaoben_dtl_header):
+            header_item = QStandardItem(name)
+            model.setHorizontalHeaderItem(column, header_item)
+        self.tb_jiaoben.setModel(model)
+
+    def get_row_content(self,index):
+        try:
+        # 获取行内容
+            row = [index.model().data(index.sibling(index.row(), column), Qt.DisplayRole) for column in
+                   range(index.model().columnCount())]
+            return row
+        except Exception as e:
+            raise ValueError('未正确选择行')
+    def f_li_input(self):
+        # li 变更时，更新 com_input 下拉框内容，如果 li_input 为空，则 com_input 为空，
+        # XQ_INFO 表中，所有需求名称
+        xqmc = self.li_input.text()
+        xq_infos = XQ_INFO.select().where(XQ_INFO.name.contains(xqmc))
+        if len(xq_infos) == 0:
+            self.com_input.clear()
+        else:
+            self.com_input.clear()
+            for xq_info in xq_infos:
+                # item = f'{xq_info.id}$${xq_info.name}'
+                self.com_input.addItem(xq_info.name,xq_info.id)
+
+    # COM 变化时，更新选择的脚本
+    def f_com_input(self):
+        xq_id = self.com_input.currentData()
+        xq_info = XQ_INFO.get_by_id(xq_id)
+        xq_name = xq_info.name
+        jbs = JB_INFO.select().where(JB_INFO.xq_id == xq_id).where(JB_INFO.type == '脚本' and JB_INFO.version == '0')
+        if len(jbs) == 0:
+            self.tb_jiaoben.clear()
+        else:
+            model = QStandardItemModel()
+            for column, name in enumerate(jiaoben_dtl_header):
+                header_item = QStandardItem(name)
+                model.setHorizontalHeaderItem(column, header_item)
+            for jb in jbs:
+                jb_id = jb.id
+                jb_name = jb.name
+                jb_desc = jb.desc
+                item = [str(jb_id),jb_name,jb_desc,str(xq_id),xq_name]
+                row_items =[QStandardItem(item) for item in item]
+                model.appendRow(row_items)
+            self.tb_jiaoben.setModel(model)
+    
+    def genner_jiaoben_info(self,datas):
+        ret = zip(jiaoben_dtl_header,datas)
+        return dict(ret)
+
+
+
+    # 获取选中脚本的信息
+    def get_select_jiaoben_info(self):
+        # 获取选中脚本的信息
+        select_idxs = self.tb_jiaoben.selectedIndexes()
+        if not select_idxs:
+            # 如果没有选中任何项，返回空列表
+            return []
+
+        # 去重
+        row_indexs = set()
+        
+        ret = []
+        # 遍历所有选中的索引
+        for idx in select_idxs:
+            # 获取每个选中行的内容
+            if idx.row() in row_indexs:
+                continue
+            row_indexs.add(idx.row())
+            datas = self.get_row_content(idx)
+            # 将行内容转换为字典格式
+            tmp = self.genner_jiaoben_info(datas)
+            # 将字典添加到返回列表中
+            ret.append(tmp)
+
+        # 返回所有选中行的信息
+        return ret
+
+    def f_bt_ok(self):
+        jbs = self.get_select_jiaoben_info()
+        # 引用的目标需求id
+        target_xq_id = XQ_INFO.get_by_id(self.xq_id)
+        for jb in jbs:
+            jb_id = jb.get('脚本ID')
+            jb_desc = jb.get('脚本备注')
+            jb_yxqid = jb.get('原需求id')
+            # 判断目标需求下是否已经有了引用，有了就跳过
+            yy_jbs = YY_JB_INFO.select().where(YY_JB_INFO.t_xq_id==target_xq_id).where(YY_JB_INFO.sjb_id==jb_id)
+            if len(yy_jbs) > 0:
+                continue
+            # 创建一条新的引用脚本信息
+            yy_jb_info = YY_JB_INFO(
+                s_xq_id=jb_yxqid,
+                sjb_id=jb_id,
+                t_xq_id=target_xq_id,
+                yy_desc=jb_desc
+            )
+            yy_jb_info.save()
+            # 复制一条新的脚本信息
+        # 返回所有选中行的信息
+        self.parent.inint_tb_xuqiudtl(target_xq_id)
+        self.close()
 
 
 class XUQIU_UI(QWidget):
@@ -284,6 +501,10 @@ class XUQIU_UI(QWidget):
         self.bt_xqzt.clicked.connect(self.f_bt_xqzt)
         self.ra_banben:QRadioButton = self.ui.ra_banben
 
+        # 提交md文档
+        self.bt_tj_md:QPushButton = self.ui.bt_tj_md
+        self.bt_tj_md.clicked.connect(self.f_bt_tj_md)
+
         self.tb_xuqiu.clicked.connect(self.dj_xuqiu)
         self.tb_xuqiu.doubleClicked.connect(self.ddj_xuqiu)
         self.li_search_wd:QLineEdit=self.ui.li_search_wd
@@ -315,8 +536,91 @@ class XUQIU_UI(QWidget):
 
         self.tb_xuqiu.hideColumn(5)
 
-        # self.li_search.setText('|')
-        # self.search_xuqiu()
+        self.is_guidang:QRadioButton = self.ui.is_guidang
+        self.is_guidang.toggled.connect(self.f_com_type)
+
+        self.la_xq_info:QLabel = self.ui.label_2
+
+    # 设置当前需求名称
+    def f_set_la_xq_info(self,id):
+        xq_info = XQ_INFO.get_by_id(id)
+        self.la_xq_info.setText(f'当前需求:《{xq_info.name}》')
+
+
+    def get_current_xqdtl_info(self):
+        idx = self.tb_xuqiudtl.currentIndex()
+        datas = self.get_row_content(idx)
+        ret = {
+            'id':datas[xuqiu_dtl_header_id],
+            '类型':datas[xuqiu_dtl_header_lx],
+            '文件名':datas[xuqiu_dtl_header_wjm],
+            '版本':datas[xuqiu_dtl_header_bb],
+            '备注':datas[xuqiu_dtl_header_bz],
+            '创建日期':datas[xuqiu_dtl_ctime],
+            '更新日期':datas[xuqiu_dtl_mtime],
+            '路径':datas[xuqiu_dtl_header_lj]
+        }
+        return ret
+
+    # 获取选中的dtl数据
+    def get_select_xqdtl_info(self):
+        select_idxs = self.tb_xuqiudtl.selectedIndexes()
+        if len(select_idxs) == 0:
+            return None
+        idx = select_idxs[0]
+        ret = []
+        for idx in select_idxs:
+            datas = self.get_row_content(idx)
+            tmp = {
+                'id':datas[xuqiu_dtl_header_id],
+                '类型':datas[xuqiu_dtl_header_lx],
+                '文件名':datas[xuqiu_dtl_header_wjm],
+                '版本':datas[xuqiu_dtl_header_bb],
+                '备注':datas[xuqiu_dtl_header_bz],
+            }
+            ret.append(tmp)
+        return ret
+
+    def f_bt_tj_md(self):
+        xqdtl_info = self.get_current_xqdtl_info()
+        xq_dtl_id = xqdtl_info.get('id')
+        xq_dtl_name = xqdtl_info.get('文件名')
+        xq_info = self.get_current_xq_info()
+        xq_id = xq_info.get('id')
+        path = xqdtl_info.get('路径')
+        xq_name = xq_info.get('需求名称')
+
+        if not xq_dtl_name.endswith('.md'):
+            QMessageBox.warning(self,'提醒','文件必须为md格式')
+            return
+        if xq_dtl_id =='-888':
+            QMessageBox.warning(self,'提醒','请提交原始md文档,不可提交链接文档')
+            return
+        elif xq_dtl_id =='-999': # 首次提交的md文档
+            tj_time = datetime.datetime.now()
+            md_info = MD_INFO(xq_id=xq_id,name=xq_dtl_name,path=path,bz='',tj_time=tj_time,xq_name=xq_name)
+            md_info.save()
+            xq_item = XQ_INFO.get_by_id(xq_id)
+            self.inint_tb_xuqiudtl(xq_item)
+            file_id = md_info.file_id
+            self.f_md_tijiao_zsk(file_id)
+            self.repaint()
+        else:
+            md_info = MD_INFO.get_by_id(xq_dtl_id)
+            md_info.tj_time = datetime.datetime.now()
+            md_info.xq_name = xq_name
+            md_info.save()
+            xq_item = XQ_INFO.get_by_id(xq_id)
+            self.inint_tb_xuqiudtl(xq_item)
+            file_id = md_info.file_id
+            self.f_md_tijiao_zsk(file_id)
+            self.repaint()
+    
+    def f_md_tijiao_zsk(self,id):
+        ## 传入文档id,通过调用AI接口,对Md文档存储到知识库中，进行检索增强
+        print('传入文档id,通过调用AI接口,对Md文档存储到知识库中，进行检索增强',id)
+        
+        return {'status':True,'msg':'提交成功'}
 
     def f_tz_parent(self):
         if self.main_pk is None:
@@ -357,9 +661,34 @@ class XUQIU_UI(QWidget):
 
         action2 = QAction("复制文件", self)
         action2.triggered.connect(self.fzwj)
+
+        action3 = QAction("归档", self)
+        action3.triggered.connect(self.f_guidang)
+
+        # 代码移动
+        action4 = QAction("代码移动", self)
+        action4.triggered.connect(self.f_code_move)
+
+        # 脚本重命名
+        action5 = QAction("脚本重命名", self)
+        action5.triggered.connect(self.f_script_rename)
+
+        # 脚本引用
+        action6 = QAction("脚本引用", self)
+        action6.triggered.connect(self.f_jiaobenyy)
+
+        # 跳转到指定需求
+        action7 = QAction("跳转到源", self)
+        action7.triggered.connect(self.f_tiao_zhuan_xq)
+
         # 将QAction添加到菜单中
         menu.addAction(action)
         menu.addAction(action2)
+        menu.addAction(action3)
+        menu.addAction(action4)
+        menu.addAction(action5)
+        menu.addAction(action6)
+        menu.addAction(action7)
         #
         # action2 = QAction("备注", self)
         # action2.triggered.connect(self.f_bzb)
@@ -368,21 +697,174 @@ class XUQIU_UI(QWidget):
         # 显示菜单
         menu.exec_(event.globalPos())
 
+    def f_code_move(self):
+        # 选中要移动的代码，弹出对话框，输入要移动到的需求名称，将代码移动到指定的需求中
+        cur_xq_dtl_info = self.get_current_xqdtl_info()
+
+        if cur_xq_dtl_info.get('类型') != '脚本':
+            QMessageBox.warning(self,'提醒','只能移动脚本')
+            return
+        cur_xqdtl_id = cur_xq_dtl_info.get('id')
+        # 弹出一个对话框，对话框中包含一个输入框，输入框中包含一个下拉框，下拉框中包含所有需求名称
+        
+        self.xqxz_ui = XQXZ_UI(cur_xqdtl_id,self)
+        self.xqxz_ui.show()
+    
+    # 脚本引用
+    def f_jiaobenyy(self):
+        cur_xq_info = self.get_current_xq_info()
+        xq_id = cur_xq_info['id']
+        self.jbxz_ui = JBXZ_UI(xq_id,self)
+        self.jbxz_ui.show()
+
+    def f_script_rename(self):
+        # 脚本重命名
+        cur_xq_dtl_info = self.get_current_xqdtl_info()
+        if cur_xq_dtl_info.get('类型') != '脚本':
+            QMessageBox.warning(self,'提醒','只能重命名脚本')
+            return
+        cur_xqdtl_id = cur_xq_dtl_info.get('id')
+        jb_info = JB_INFO.get_by_id(cur_xqdtl_id)
+        jb_name = jb_info.name
+        jb_path = jb_info.path
+
+        xq_id = jb_info.xq_id
+        xq_info = XQ_INFO.get_by_id(xq_id)
+        xq_path = xq_info.path
+
+        # 弹出对话框，输入新名称
+        dialog = QDialog()
+        dialog.setWindowTitle('脚本重命名')
+        dialog.setFixedSize(600, 200)
+        layout = QVBoxLayout()
+        lb1 = QLabel()
+        lb1.setText('新名称')   
+        in_name = QLineEdit()
+        in_name.setText(jb_name)
+        layout.addWidget(lb1)
+        layout.addWidget(in_name)
+        button_box = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
+        layout.addWidget(button_box)
+        dialog.setLayout(layout)
+        button_box.accepted.connect(dialog.accept)
+        button_box.rejected.connect(dialog.reject)
+        result = dialog.exec_()
+        
+        if result == QDialog.Accepted:
+            new_name = in_name.text()
+            # 判断新名称是否为空
+            if new_name == '':
+                QMessageBox.warning(self,'提醒','新名称不能为空')
+                return
+            # 拼接新路径
+            new_path = os.path.join(xq_path,new_name)
+            # 判断新路径是否存在
+            if os.path.exists(new_path):
+                QMessageBox.warning(self,'提醒','新路径已存在')
+                return
+            # 复制文件到新路径
+            shutil.copy(jb_path,new_path)
+            # 更新数据库
+            jb_info.path = new_path
+            jb_info.name = new_name
+            jb_info.save()
+            # 删除旧文件
+            os.remove(jb_path)
+            self.inint_tb_xuqiudtl(xq_id)
+            self.repaint()
+
+    # 跳转到原需求,跳转到源
+    def f_tiao_zhuan_xq(self):
+        cur_xq_dtl = self.get_current_xqdtl_info()
+        leixin = cur_xq_dtl.get('类型')
+        path = cur_xq_dtl.get('路径')
+        if leixin == '脚本引用':
+            xq_id = cur_xq_dtl.get('id')
+            item = YY_JB_INFO.get_by_id(xq_id)
+            xq_id = item.s_xq_id
+            self.f_set_la_xq_info(xq_id)
+            self.inint_tb_xuqiudtl(xq_id)
+        elif leixin =='文档':
+            if 'http' in path:
+                QMessageBox.warning(self,'提醒','文档路径为链接，不支持跳转')
+                return
+            path = os.path.normpath(path)
+            # 判断路径是否存在，不存在不跳转
+            if not os.path.exists(path):
+                QMessageBox.warning(self,'提醒','文档路径不存在，不支持跳转')
+                return
+            os.system(f'explorer /select,"{path}"')
+        else:
+            QMessageBox.warning(self,'提醒',f'{leixin}类型文件不支持跳转')
+            return
+        
+        
+    
+
+    def f_guidang(self):
+        # 弹出对话框输入归档内容
+        dialog = QDialog()
+        dialog.setWindowTitle('归档')
+        dialog.setFixedSize(600, 200)
+        layout = QVBoxLayout()
+        lb1 = QLabel()
+        lb1.setText('归档内容')
+        in_guidang = QLineEdit()
+        layout.addWidget(lb1)
+        layout.addWidget(in_guidang)
+        button_box = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
+        layout.addWidget(button_box)
+        dialog.setLayout(layout)
+        # 连接按钮事件，点击确认或取消时关闭弹窗
+        button_box.accepted.connect(dialog.accept)
+        button_box.rejected.connect(dialog.reject)
+        # 显示弹窗并等待用户操作
+        result = dialog.exec_()
+        if result == QDialog.Accepted:
+            guidang = in_guidang.text()
+            # 输出info级日志，记录归档内容
+            print(f'归档内容: {guidang}')
+
+            print('获取选择的dtl数据@@@@@@@开始')
+            datas = self.get_select_xqdtl_info()
+            ids = [data.get('id') for data in datas if data.get('类型') =='脚本']
+            if len(ids) > 0:
+                
+                # 根据id 获取到 JB_INFO 列表，批量更新他们的gd_name 字段
+                print('ids',ids)
+                jbs = JB_INFO.select().where(JB_INFO.id.in_(ids))
+                for jb in jbs:
+                    jb.gd_name = guidang
+                    jb.save()
+            print('获取选择的dtl数据@@@@@@@结束')
+
+
     #修改备注
     def xgbz(self):
         idx = self.tb_xuqiudtl.currentIndex()
         datas = self.get_row_content(idx)
-
-        id = datas[xuqiu_dtl_header_id]
-        bz = datas[xuqiu_dtl_header_bz]
-
+        
+        cur_xq_dtl = self.get_current_xqdtl_info()
+        id = cur_xq_dtl.get('id')
+        bz = cur_xq_dtl.get('备注')
+        leixin = cur_xq_dtl.get('类型')
 
         ret = self.show_rename_dialog2(bz)
-        item = JB_INFO.get_by_id(id)
+        if leixin == '脚本':
+            item = JB_INFO.get_by_id(id)
+            xq_id = item.xq_id
+        elif leixin == '脚本引用':
+            item = YY_JB_INFO.get_by_id(id)
+            xq_id = item.t_xq_id
+        else:
+            return
         if ret.get('bz'):
-            item.desc = ret.get('bz')
-        item.save()
-        self.inint_tb_xuqiudtl(item.xq_id)
+            if leixin == '脚本':
+                item.desc = ret.get('bz')
+            elif leixin == '脚本引用':
+                item.yy_desc = ret.get('bz')
+            item.save()
+        self.inint_tb_xuqiudtl(xq_id)
 
 
     # 复制文件到剪切版
@@ -519,6 +1001,28 @@ class XUQIU_UI(QWidget):
             xq_info.save()
         self.init_tb_xuqiu()
 
+# xuqiu_header = ['id','需求名称','需求类型','需求状态','需求提出人','需求存储位置','创建日期']
+# xuqiu_header_id =0
+# xuqiu_header_xqmc =1
+# xuqiu_header_xqlx =2
+# xuqiu_header_xqzt =3
+# xuqiu_header_xqtcr =4
+# xuqiu_header_xqccwz =5
+# xuqiu_header_cjrq =6
+    def get_current_xq_info(self):
+        idx = self.tb_xuqiu.currentIndex()
+        datas = self.get_row_content(idx)
+        ret = {
+            'id':datas[xuqiu_header_id],
+            '需求名称':datas[xuqiu_header_xqmc],
+            '需求类型':datas[xuqiu_header_xqlx],
+            '需求状态':datas[xuqiu_header_xqzt],
+            '需求提出人':datas[xuqiu_header_xqtcr],
+            '需求存储位置':datas[xuqiu_header_xqccwz],
+            '创建日期':datas[xuqiu_header_cjrq]  
+        }
+        return ret
+    
 
 
     def f_bt_daoru(self):
@@ -549,28 +1053,40 @@ class XUQIU_UI(QWidget):
         idx = self.tb_xuqiudtl.currentIndex()
         datas = self.get_row_content(idx)
         print(datas[4])
+
+        file_path = datas[-1]
+        # file_path = file_path.replace(' ','')
+
         if datas[1]=='文档':
-            if datas[-1].endswith('.pdf'):
-                subprocess.Popen(F'{EDGE_PATH} "{datas[-1]}"')
-            elif datas[-1].endswith('.txt') or datas[-1].endswith('.sql'):
-                subprocess.Popen(f'{TXT_PATH} "{datas[-1]}"')
-            elif datas[-1].endswith('.txt') or datas[-1].endswith('.vsdx'):
-                subprocess.Popen(f'{VSDX_PATH} "{datas[-1]}"')
+            if file_path.endswith('.pdf'):
+                subprocess.Popen(F'{EDGE_PATH} "{file_path}"')
+            elif file_path.endswith('.txt') or file_path.endswith('.sql'):
+                subprocess.Popen(f'{TXT_PATH} "{file_path}"')
+            elif file_path.endswith('.txt') or file_path.endswith('.vsdx'):
+                subprocess.Popen(f'{VSDX_PATH} "{file_path}"')
                 # VSDX_PATH
-            elif datas[-1].endswith('.zip'):
-                subprocess.Popen(f'{ZIP_PATH} "{datas[-1]}"')
+            elif file_path.endswith('.zip'):
+                subprocess.Popen(f'{ZIP_PATH} "{file_path}"')
                 # 打开zip文件
-            elif datas[-1].startswith('http'):
-                subprocess.Popen(F'{EDGE_PATH} "{datas[-1]}"')
+            elif file_path.startswith('http'):
+                subprocess.Popen(F'{EDGE_PATH} "{file_path}"')
                 pass
+            elif file_path.endswith('.md'):
+                subprocess.Popen(F'{MD_PATH}  "{file_path}"')
             else:
-                subprocess.Popen(F'{WPS_PATH} "{datas[-1]}"')
+                subprocess.Popen(F'{WPS_PATH} "{file_path}"')
         elif datas[1]=='文件夹':
-            path = datas[-1]
+            path = file_path
             os.startfile(path)
+        elif datas[1]=='MD':
+            subprocess.Popen(F'{MD_PATH}  "{file_path}"')
+        elif datas[1]=='归档':
+            pass
         else:
-            print( F'{VS_PATH}  "{datas[-1]}"')
-            subprocess.Popen(F'{VS_PATH}  "{datas[-1]}"')
+            print( F'{VS_PATH}  "{file_path}"')
+            logging.info(f"尝试打开文件: {file_path}")
+            # subprocess.Popen([VS_PATH, '--goto', datas[-1].strip()])
+            subprocess.Popen(F'{VS_PATH}  "{file_path}"')
 
     def set_file_permissions(self,file_path): #设置为可读可写
         try:
@@ -586,31 +1102,59 @@ class XUQIU_UI(QWidget):
         except Exception as e:
             print(f"设置文件权限失败：{e}")
     def rm_jb(self):
+
+        cur_xq_dtl = self.get_current_xqdtl_info()
+        dtl_leixin = cur_xq_dtl.get('类型')
+        if dtl_leixin == '脚本引用':
+            out_str = '是否删除"引用"'
+        elif dtl_leixin == '脚本':
+            out_str = '是否删除"脚本"'
+        else:
+            out_str = '是否删除选中内容'
+
         #删除脚本
-        result = QMessageBox.question(self, "提醒", "是否删除内容", QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+        result = QMessageBox.question(self, "提醒", out_str, QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
         if result == QMessageBox.No:
             return
-
-        idx = self.tb_xuqiudtl.currentIndex()
-        dts = self.get_row_content(idx)
-        id = int(dts[0])
-        if id>=0:
-            data = JB_INFO.get_by_id(id)
-            path = data.path
-            if os.path.exists(path):
-                self.set_file_permissions(path)
-                os.remove(path)
-            tmp = JB_INFO.get_by_id(id)
-            kjs = YSJ_KJ.select().where(YSJ_KJ.jb_id == tmp)
-            for i in kjs:
-                YSJ_KJ.delete_by_id(i.id)
-            JB_INFO.delete_by_id(id)
-            xqis = XQ_TABLE_INFO.select().where(XQ_TABLE_INFO.jb_id==tmp)
-            for i in xqis:
-                XQ_TABLE_INFO.delete_by_id(i.id)
-            self.f_com_type()
+        
+        
+        if dtl_leixin == '脚本':
+            id = int(cur_xq_dtl.get('id'))
+            # 删除脚本
+            if id>=0:
+                data = JB_INFO.get_by_id(id)
+                path = data.path
+                if os.path.exists(path):
+                    self.set_file_permissions(path)
+                    os.remove(path)
+                tmp = JB_INFO.get_by_id(id)
+                kjs = YSJ_KJ.select().where(YSJ_KJ.jb_id == tmp)
+                for i in kjs:
+                    YSJ_KJ.delete_by_id(i.id)
+                JB_INFO.delete_by_id(id)
+                xqis = XQ_TABLE_INFO.select().where(XQ_TABLE_INFO.jb_id==tmp)
+                for i in xqis:
+                    XQ_TABLE_INFO.delete_by_id(i.id)
+                
+                # 删除引用中的脚本记录
+                yy_jbs = YY_JB_INFO.select().where(YY_JB_INFO.sjb_id==tmp)
+                for i in yy_jbs:
+                    YY_JB_INFO.delete_by_id(i.id)
+                self.f_com_type()
+        elif dtl_leixin == '文档':
+            QMessageBox.warning(self,'','文档请去对应目录自行删除')
+        elif dtl_leixin == '脚本引用':
+            id = int(cur_xq_dtl.get('id'))
+            if id>=0:
+                data = YY_JB_INFO.get_by_id(id)
+                data.delete_by_id(id)
+                self.f_com_type()
         else:
             QMessageBox.warning(self,'','文档请去对应目录自行删除')
+
+
+
+        
 
 
     def show_input_dialog_submit(self):
@@ -755,7 +1299,7 @@ class XUQIU_UI(QWidget):
             cur_index = self.tb_xuqiu.currentIndex()
             data = self.get_row_content(cur_index)
             id = int(data[0])
-            pt = data[-1]
+            pt = data[xuqiu_header_xqccwz]
 
             result = QMessageBox.question(self, "提醒", "是否删除内容", QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
             if result == QMessageBox.Yes:
@@ -774,6 +1318,10 @@ class XUQIU_UI(QWidget):
             items = JB_INFO.select().where(JB_INFO.xq_id==xq_item).order_by(JB_INFO.name)
         else:
             items = JB_INFO.select().where((JB_INFO.xq_id == xq_item) & (JB_INFO.version==0)).order_by(JB_INFO.name)
+        
+        # md 文档
+        md_items = MD_INFO.select().where(MD_INFO.xq_id==xq_item).order_by(MD_INFO.name)
+
         model = QStandardItemModel()
         for column, name in enumerate(xuqiu_dtl_header):
             header_item = QStandardItem(name)
@@ -786,7 +1334,9 @@ class XUQIU_UI(QWidget):
 
         search_str = self.li_search_wd.text()
 
+        md_files_names = [item.name for item in md_items]
         ex_file = [item.name for item in items]
+        ex_file += md_files_names
 
         if ct == '' or ct == '文件夹':
             for file in dirs :
@@ -828,6 +1378,17 @@ class XUQIU_UI(QWidget):
                         datas.append([id,type, f'@@@{file_path}', version, desc,ctime,mtime, file_path])
         files.reverse()
         if ct == '' or ct == '文档':
+            ## md 文档
+            for item in md_items:
+                id =str(item.file_id)
+                name = item.name
+                desc = item.bz
+                type = 'MD'
+                ctime = item.ctime.strftime("%Y-%m-%d %H:%M:%S")
+                mtime = item.tj_time.strftime("%Y-%m-%d %H:%M:%S")
+                path = item.path
+                version = '0'
+                datas.append([id, type, name, version, desc,ctime, mtime,path])
             for file in files :
                 if file in ex_file:
                     continue
@@ -853,22 +1414,61 @@ class XUQIU_UI(QWidget):
 
 
         if ct == '' or ct == '脚本':
-            for item in items:
+            guidang_set = set() # 为了去重
+            # 归档开关
+            xianshi_guidang_switch = self.is_guidang.isChecked() 
+            jiaoben_data =[]
+            guidang_data =[]
 
+            # 应用脚本引入
+            yy_jbs = YY_JB_INFO.select().where(YY_JB_INFO.t_xq_id==xq_item)
+            for yyjb in yy_jbs:
+                id = str(yyjb.id)
+                jb_id = yyjb.sjb_id
+                jb_info = JB_INFO.get_by_id(jb_id)
+                name = jb_info.name
+                desc = yyjb.yy_desc
+                type = '脚本引用'
+                ctime = jb_info.ctime.strftime("%Y-%m-%d %H:%M:%S")
+                if not os.path.exists(path):
+                    mtime ='文件不存在'
+                else:
+                    mtime = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime( os.path.getmtime(path)))
+                path = jb_info.path
+                version = str(jb_info.version)
+                jiaoben_data.append([id, type, name, version, desc,ctime, mtime,path])
+
+
+            for item in items:
                 id =str(item.id)
                 name = item.name
                 desc = item.desc
                 type = item.type
                 ctime = item.ctime.strftime("%Y-%m-%d %H:%M:%S")
                 path = item.path
-                print(path)
+                gd_name = item.gd_name
+                if not gd_name:
+                    gd_name = ''
                 if not os.path.exists(path):
                     mtime ='文件不存在'
                 else:
                     mtime = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime( os.path.getmtime(path)))
                 version = str(item.version)
-                datas.append([id, type, name, version, desc,ctime, mtime,path])
+                
+                
+                if xianshi_guidang_switch or gd_name == '':
+                    if gd_name != '':
+                        name = f'{name}->【{gd_name}】'
+                    jiaoben_data.append([id, type, name, version, desc,ctime, mtime,path])
+                else:
+                    if gd_name not in guidang_set:
+                        guidang_data.append(['-777', '归档', gd_name, '0', '归档文件','', '',''])
+                        guidang_set.add(gd_name)
+        
+        
 
+
+            datas = datas + guidang_data+jiaoben_data
         for item in datas:
             if item[2].startswith('~$'):
                 continue
@@ -963,6 +1563,7 @@ class XUQIU_UI(QWidget):
         datas = self.get_row_content(index)
         id = int(datas[0])
         xq_item = XQ_INFO.get_by_id(id)
+        self.f_set_la_xq_info(id)
         self.inint_tb_xuqiudtl(xq_item)
 
     def f_com_type(self):
@@ -1064,3 +1665,11 @@ class XUQIU_UI(QWidget):
             self.creat_xq.show()
             self.init_tb_xuqiu()
             self.repaint()
+
+
+import sys
+if __name__ == '__main__':
+    app = QApplication(sys.argv)
+    xuqiu_ui = XUQIU_UI(None)
+    xuqiu_ui.show()
+    sys.exit(app.exec_())

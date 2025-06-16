@@ -9,11 +9,11 @@
                 },
                 {
                     "值": ["002", "李四", "市场部", "经理", "2022-06-15", null],
-                    "公式": [null, null, null, null, null, "=calculate_age(入职日期)"]
+                    "公式": [null, null, null, null, null, "=calculate_age(@员工信息表.入职日期)"]
                 },
                 {
                     "值": ["003", "王五", "财务部", "主管", "2023-03-20", null],
-                    "公式": [null, null, null, null, null, "=calculate_age(入职日期)"]
+                    "公式": [null, null, null, null, null, "=calculate_age(@员工信息表.入职日期)"]
                 }
             ]
         },
@@ -22,11 +22,11 @@
             "表格数据": [
                 {
                     "值": ["D001", "研发部", "张三", "20", null],
-                    "公式": [null, null, null, null, "=calculate_age(员工信息表.部门)"]
+                    "公式": [null, null, null, null, "=calculate_age(@员工信息表.部门)"]
                 },
                 {
                     "值": ["D002", "市场部", "李四", "15", null],
-                    "公式": [null, null, null, null, "=calculate_age(员工信息表.部门)"]
+                    "公式": [null, null, null, null, "=calculate_age(@员工信息表.部门)"]
                 },
                 {
                     "值": ["D003", "财务部", "王五", "10", null],

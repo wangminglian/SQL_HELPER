@@ -760,6 +760,7 @@ class ZDGL_UI(QWidget):
             select_ZDMC_MS_LS_list =[]
             ALTER_LIST = []
             SELECT_BT_LIST =[]
+            SELECT_TO_EXCEL=[]
             tmp_range = 0
             for i in select_idxs:
                 tmp = self.get_row_content(i)
@@ -773,9 +774,9 @@ class ZDGL_UI(QWidget):
                 select_ZDMC_MS_LS_list.append(f",{T_MC} {T_LX} COMMENT '{T_MS}'")
                 ALTER_LIST.append(f"ALTER TABLE {BM} MODIFY {T_MC} {T_LX} COMMENT '{T_MS}';")
                 SELECT_BT_LIST.append((f"{T_MC} AS '{T_MS}'"))
+                SELECT_TO_EXCEL.append(f"{T_MC}\t{T_MS}\t{T_LX}")
                 tmp_range +=1
                 select_RANGE_LIST.append(tmp_range.__str__())
-
             # str = f'\n-- {action.text()} \n'
             str = ''
             fname = os.path.join(SJTC_MOBAN_PATH,action.text())
@@ -802,7 +803,7 @@ class ZDGL_UI(QWidget):
                 ,'SELECT_ZDMC_MS_LS':'\n'.join(select_ZDMC_MS_LS_list)
                 ,'ALTER_LIST':'\n'.join(ALTER_LIST)
                 ,'SELECT_BT_LIST':'\n\t,'.join(SELECT_BT_LIST)
-
+                ,'SELECT_TO_EXCEL':'\n'.join(SELECT_TO_EXCEL)
             }
             for line in lines:
                 if line.startswith('-- '):

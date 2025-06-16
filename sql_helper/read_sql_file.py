@@ -52,9 +52,14 @@ class Reader_SQL:
     def read_sql_to_rtl_table(self,file_name):
         _,out_tb = self.read_sql_to_out_table(file_name)
         out_tbs = out_tb.keys()
+        print('file_name:::::::::::',file_name)
         # 获取输入表
+        
         with open(file_name,'r', encoding='utf-8') as f:
-            text = ''.join(f.readlines())
+            # text = ''.join(f.readlines())
+            text = f.read()
+            
+        print('text:::::::::::',text,len(text))
         text = self.get_real_sql(text)
         gjz_list = set()
         for line in text.split('\n'):

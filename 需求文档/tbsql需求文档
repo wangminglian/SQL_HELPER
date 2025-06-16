@@ -73,3 +73,6 @@ json 形式存储数据
 }
 
 
+
+
+优化 @pandasutil.py 的set_data方法，让他传入的是 @yangben.json  中的 "表格列表“ 信息，确保 在EditableTableManager存储有全部的表格的信息tb_data的model，用户通过指定表名来获取，可以在EditableTableManager之上创建新的类来实现，也可以在EditableTableManager的基础上实现，保证不改变现有的功能的基础上，提高代码的稳定新和扩展性。

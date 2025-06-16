@@ -241,7 +241,7 @@ class MainWindow(QMainWindow):
     def closeEvent(self, event):
         reply = QMessageBox.question(self, '确认', '确定要关闭窗口吗？',
                                      QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
-        reply = QMessageBox.question(self, '确认', '签退了吗？',
+        reply = QMessageBox.question(self, '确认', '签退了吗？        ',
                                      QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
         if reply == QMessageBox.Yes:
             event.accept()
@@ -460,7 +460,7 @@ class MainWindow(QMainWindow):
         self.bt_remove_arg.clicked.connect(self.remove_arg)
         self.bt_view.clicked.connect(self.view)
         self.com_project_name.currentTextChanged.connect(self.init_com_arg)
-        self.com_arg.highlighted.connect(self.save_arg)
+        # self.com_arg.highlighted.connect(self.save_arg)
         self.com_history.currentTextChanged.connect(self.relaod_history)
         self.bt_save_model.clicked.connect(self.save_arg_model)
         self.com_arg.currentTextChanged.connect(self.load_args)
@@ -761,10 +761,11 @@ class MainWindow(QMainWindow):
         if (name == None or name.strip() ==''):return
         sql_arg = SQL_arg.get(SQL_arg.project_name == self.com_project_name.currentText()
                               ,SQL_arg.arg_nike == name)
+        print(f'{name}:@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@加载参数:{sql_arg.arg_context}')
+
         self.te_input.setText(sql_arg.arg_context)
         self.te_view.setText(HELP_TEXT)
         # pyperclip.copy('${'+name+'}')
-
         self.init_ta_model_list()
         self.view()
         self.repaint()

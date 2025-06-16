@@ -103,9 +103,18 @@ class Ui_Form(object):
 
         self.horizontalLayout_2.addWidget(self.ra_banben)
 
+        
+
         self.horizontalSpacer_2 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
 
+
+
         self.horizontalLayout_2.addItem(self.horizontalSpacer_2)
+
+        self.is_guidang = QCheckBox(Form)
+        self.is_guidang.setObjectName(u"is_guidang")
+
+        self.horizontalLayout_2.addWidget(self.is_guidang)
 
         self.li_search_wd = QLineEdit(Form)
         self.li_search_wd.setObjectName(u"li_search_wd")
@@ -122,6 +131,13 @@ class Ui_Form(object):
 
         self.horizontalLayout_2.addWidget(self.com_type)
 
+
+        self.bt_tj_md = QPushButton(Form)
+        self.bt_tj_md.setObjectName(u"bt_tj_md")
+
+        self.horizontalLayout_2.addWidget(self.bt_tj_md)
+        
+        self.bt_tj_md.setText('提交md')
 
 
         self.bt_daoru = QPushButton(Form)
@@ -222,6 +238,7 @@ class Ui_Form(object):
         self.tb_xuqiu.setStyleSheet("gridline-color: #B3E5FC; selection-background-color: #0288D1; alternate-background-color: #E1F5FE;")
         self.tb_xuqiu.horizontalHeader().setStyleSheet("background-color: #0288D1; color: white;")
         self.tb_xuqiu.verticalHeader().setStyleSheet("background-color: #0288D1; color: white;")
+        self.bt_tj_md.setStyleSheet("background-color: #0288D1; color: white; border-radius: 5px; padding: 5px;")
         self.tb_xuqiu.setAlternatingRowColors(True)
         self.ra_banben.setStyleSheet("color: #01579B;")
         self.li_search_wd.setStyleSheet("color: #01579B;")
@@ -243,12 +260,17 @@ class Ui_Form(object):
             def paint(self, painter, option, index):
                 # 获取第二列的值
                 second_column_value = index.sibling(index.row(), 1).data()
+                wjm_column_value = index.sibling(index.row(), 2).data()
                 if second_column_value == "文件夹":
                     option.palette.setColor(QPalette.Text, QColor("#FF5722"))  # 橙色
                 elif second_column_value == "文档":
                     option.palette.setColor(QPalette.Text, QColor("#4CAF50"))  # 绿色
                 elif second_column_value == "脚本":
                     option.palette.setColor(QPalette.Text, QColor("#2196F3"))  # 蓝色
+                if wjm_column_value.endswith(".md"):
+                    option.palette.setColor(QPalette.Text, QColor("#9C27B0"))  # 紫色
+                if second_column_value == '脚本引用':
+                    option.palette.setColor(QPalette.Text, QColor("#9E9E9E"))  # 灰色
                 super().paint(painter, option, index)
 
         # 应用委托到整个表格
@@ -275,5 +297,6 @@ class Ui_Form(object):
         self.new_jiaoben.setText(QCoreApplication.translate("Form", u"\u65b0\u5efa\u811a\u672c", None))
         self.bt_rm_jb.setText(QCoreApplication.translate("Form", u"\u5220\u9664", None))
         self.label_2.setText(QCoreApplication.translate("Form", u"\u9700\u6c42\u8be6\u60c5", None))
+        self.is_guidang.setText(QCoreApplication.translate("Form", u"\u663e\u793a\u5f52\u6863", None))
     # retranslateUi
 

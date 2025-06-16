@@ -4,9 +4,9 @@ conf_path:
   GONGZUOQU_PATH: 学习笔记\\数仓任务\\ #工作区代码路径
   DATA_PATH: SQL_HELPER目录\\数据\\ # 数据区代码路径
   HSZ_PATH : SQL_HELPER目录\\回收站\\ # 数据区代码路径
-  VS_PATH: D:\\Program Files\\Microsoft VS Code\\Code.exe #打开代码的工具，建议使用VSCODE
-  WPS_PATH: D:\\Users\\86158\\AppData\\Local\\Kingsoft\\WPS Office\\ksolaunch.exe #WPS目录
-  TXT_PATH: D:\\Program Files\\Notepad++\\notepad++.exe
+  VS_PATH: D:\\Program Files (x86)\\Microsoft VS Code\\Code.exe #打开代码的工具，建议使用VSCODE
+  WPS_PATH: D:\\Program Files (x86)\\WPS Office\\ksolaunch.exe #WPS目录
+  TXT_PATH: D:\\Program Files\\Notepad++\\notepad++.exe # TXT文件打开程序路径
   EDGE_PATH: C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe #浏览器目录
   VSDX_PATH: C:\\Program Files\\Microsoft Office\\root\\Office16\\VISIO.EXE # visio 地址
   ZIP_PATH: D:\\Program Files (x86)\\360\\360zip\\360zip.exe
@@ -16,8 +16,12 @@ conf_path:
   SJTC_MOBAN_PATH: SQL_HELPER目录\\模板目录\\数据探查模版\\ #数据探查脚本模版目录
   LSJS_PATH: E:\\临时接收\\ # 临时接收路径，导入文档打开的初始目录
   XQLX: 任务,取数,其他 # 任务类型自定义
-  ZDGL_MAX_CNT: 3
-  TXSJ : 5 # 提醒周期，每几分钟提醒一次
-  TXHS: 3 #喝水提醒（每几个周期提醒一次）
+  ZDGL_MAX_CNT: 10 #同时打开字段管理界面的个数
+  TXSJ : 100 # 提醒周期，每几分钟提醒一次
+  TXHS: 1 #喝水提醒（每几个周期提醒一次）
   TXYD: 6 # 运动提醒（每几个周期提醒一次）
-  ZDXQ: 图书馆|周报|口径 #需要置顶的需求
+  ZDXQ: 图书馆|周报|二礼历史口径|物联网相关口径|欠费口径资料|常用模版 #需要置顶的需求
+  # MD_PATH: D:\\Program Files\\Typora\\Typora.exe # markdown 打开工具
+  MD_PATH: D:\\Program Files\\Obsidian\\Obsidian.exe  # markdown 打开工具
+
+

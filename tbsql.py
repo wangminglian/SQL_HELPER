@@ -1,54 +1,65 @@
-from PySide6.QtWidgets import (QWidget, QApplication, QPushButton, QLineEdit, 
-                             QComboBox, QRadioButton, QTableView, QTextEdit, QLabel, QFileDialog, QMessageBox,
-                             QStyledItemDelegate, QListWidget, QListWidgetItem, QHBoxLayout, QVBoxLayout, QDialog)
+from PySide6.QtWidgets import (
+    QWidget, QApplication, QPushButton, QLineEdit, 
+    QComboBox, QRadioButton, QTableView, QTextEdit, QLabel, QFileDialog, QMessageBox,
+    QStyledItemDelegate, QListWidget, QListWidgetItem, QHBoxLayout, QVBoxLayout, QDialog,
+    QInputDialog, QAbstractItemView
+)
+from PySide6.QtCore import Qt, QPoint, QTimer, QEvent
+from PySide6.QtGui import QKeySequence, QFocusEvent, QCursor
+
 from clinet.TBSQL_UI import Ui_TBSQL_UI
+from util.pandasutil import EditableTableManager
+
 import sys
 import json
-from util.pandasutil import  EditableTableManager
-from PySide6.QtWidgets import QAbstractItemView  # 确保导入了这个类
-from PySide6.QtCore import Qt, QPoint, QTimer  # 添加 Qt 和 QPoint
 import logging
-from PySide6.QtWidgets import QInputDialog
-from PySide6.QtGui import QKeySequence, QFocusEvent, QCursor
 import re
-from PySide6.QtCore import QEvent
 
-
-# 设置loging 打印到控制台
-logging.basicConfig(level=logging.INFO,format='%(asctime)s - %(levelname)s -%(filename)s- %(funcName)s - %(message)s')
-
-
-
-
-INNT_DATA = {
-    "表格列表": {}
-    ,"函数列表":{}
-    ,"模板列表":{}
-    ,"运行记录":{}
+# 配置日志输出格式
+# 配置日志输出格式
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(filename)s - %(funcName)s - %(message)s',
+    force=True,  # 强制重新配置日志
+    handlers=[
+        logging.StreamHandler(),  # 添加控制台处理器
+        logging.FileHandler('app.log', encoding='utf-8')  # 同时输出到文件
+    ]
+)
+# 初始数据结构常量
+INIT_DATA = {
+    "表格列表": {},
+    "函数列表": {},
+    "模板列表": {},
+    "运行记录": {}
 }
 
-ININT_TB_DATA ={
-    "表格字段": []
-    ,"表格数据": []
+# 初始表格数据常量
+INIT_TB_DATA = {
+    "表格字段": [],
+    "表格数据": []
 }
 
-INNT_FUNC_DATA ={
-    "函数描述": "函数描述"
-    ,"函数参数": []
-    ,"函数类型": "函数类型"
-    ,"函数数据": "函数数据"
-    ,"函数范围": "函数范围"
+# 初始函数数据常量
+INIT_FUNC_DATA = {
+    "函数描述": "函数描述",
+    "函数参数": [],
+    "函数类型": "函数类型",
+    "函数数据": "函数数据",
+    "函数范围": "函数范围"
 }
 
-INNT_MB_DATA ={
-    "模板描述": "模板描述"
-    ,"模板数据": "模板数据"
-    ,"模板范围": "模板范围"
+# 初始模板数据常量
+INIT_MB_DATA = {
+    "模板描述": "模板描述",
+    "模板数据": "模板数据",
+    "模板范围": "模板范围"
 }
 
-INNT_RUN_DATA ={
-    "运行记录时间": ""
-    ,"运行记录语句": ""
+# 初始运行记录数据常量
+INIT_RUN_DATA = {
+    "运行记录时间": "",
+    "运行记录语句": ""
 }
 
 
@@ -778,6 +789,9 @@ class TBSQLWindow(QWidget):
         self.last_search_rule = ""
         self.last_command_input = ""
         
+        # 保存所有表格模型的引用
+        self.table_models = {}
+        
         # 注册自定义函数
         self._register_custom_functions()
         
@@ -786,7 +800,15 @@ class TBSQLWindow(QWidget):
         
         # 如果指定文件名，则读取文件，初始化数据
         if filename:
-            self.load_json(filename)
+            data = self.load_json(filename)
+            if data:
+                # 设置数据
+                self.data_dict = data
+                # 新数据的表格数量
+                new_tables_count = len(self.data_dict.get("表格列表", {}))
+                logging.info(f"JSON数据导入成功, 表格数量: {new_tables_count}")
+                # 初始化界面
+                self.init_data()
         
     def _register_custom_functions(self):
         """注册自定义函数"""
@@ -800,13 +822,22 @@ class TBSQLWindow(QWidget):
             3. 其他表列名: calculate_age(员工信息表.入职日期)
             """
             try:
-                if not date_str or date_str.startswith("#REF"):
+                if not date_str or str(date_str).startswith("#REF"):
                     return "#REF!"
+                
+                # 处理不同类型的输入
+                if isinstance(date_str, (int, float)):
+                    # 如果是数字，假设是某种格式的年份或天数
+                    return f"{date_str}:@@@数字公式计算"
+                    
+                # 转换为字符串并进行处理
+                date_str = str(date_str)
                 
                 # 这里只是示例，实际应该计算真实年龄
                 # 可以使用datetime计算年龄差
                 return f"{date_str}:@@@公式计算"
             except Exception as e:
+                logging.error(f"计算年龄函数错误: {str(e)}")
                 return f"#ERROR: {str(e)}"
                 
         # 注册函数
@@ -822,9 +853,18 @@ class TBSQLWindow(QWidget):
             3. 表名.列名引用: sum_range(工资表.基本工资, 工资表.绩效)
             """
             try:
+                # 转换参数为字符串以便处理
+                start_cell_str = str(start_cell)
+                end_cell_str = str(end_cell)
+                
+                # 如果任一参数有错误引用，返回错误
+                if start_cell_str.startswith("#REF") or end_cell_str.startswith("#REF"):
+                    return "#REF!"
+                
                 # 这里只是示例，实际应该计算真实的和
-                return f"求和({start_cell},{end_cell})"
+                return f"求和({start_cell_str},{end_cell_str})"
             except Exception as e:
+                logging.error(f"求和函数错误: {str(e)}")
                 return f"#ERROR: {str(e)}"
             
         def average_range(start_cell, end_cell):
@@ -836,9 +876,18 @@ class TBSQLWindow(QWidget):
             3. 表名.列名引用: average_range(工资表.基本工资, 工资表.绩效)
             """
             try:
+                # 转换参数为字符串以便处理
+                start_cell_str = str(start_cell)
+                end_cell_str = str(end_cell)
+                
+                # 如果任一参数有错误引用，返回错误
+                if start_cell_str.startswith("#REF") or end_cell_str.startswith("#REF"):
+                    return "#REF!"
+                
                 # 这里只是示例，实际应该计算真实的平均值
-                return f"平均值({start_cell},{end_cell})"
+                return f"平均值({start_cell_str},{end_cell_str})"
             except Exception as e:
+                logging.error(f"平均值函数错误: {str(e)}")
                 return f"#ERROR: {str(e)}"
             
         # 注册更多函数
@@ -877,6 +926,8 @@ class TBSQLWindow(QWidget):
             self.pb_history: QPushButton = self.ui.pb_history
             # 生成按钮
             self.pb_run: QPushButton = self.ui.pb_run
+            # 执行按钮
+            self.pb_run_arg: QPushButton = self.ui.pb_run_arg
 
             # ====== 输入框组件 ======
             # 表格搜索输入框
@@ -915,7 +966,7 @@ class TBSQLWindow(QWidget):
             self.tx_out: QTextEdit = self.ui.tx_out
 
             # ====== 初始化数据 ======
-            self.data_dict = INNT_DATA
+            self.data_dict = INIT_DATA
             
             # ====== 绑定事件 ======
             self.pb_input_excel.clicked.connect(self.import_json)
@@ -925,6 +976,8 @@ class TBSQLWindow(QWidget):
             self.li_tb.textChanged.connect(self.handle_table_input)
             # 绑定列名输入框的文本变化信号
             self.li_col.textChanged.connect(self.handle_column_input)
+            # 绑定执行按钮事件
+            self.pb_run_arg.clicked.connect(self.execute_column_update)
             
             # 设置表格编辑触发方式
             self.tb_data.setEditTriggers(QTableView.DoubleClicked | 
@@ -1370,10 +1423,30 @@ class TBSQLWindow(QWidget):
             # 弹出选择器，选择文本
             self.show_column_selector(search_rule)
 
+            # 获取当前表名
+            current_table = self.com_table.currentText()
+
             # 调用 table_manager 的 search_by_rule 方法进行搜索
             filtered_model = self.table_manager.search_by_rule(search_rule)
             
             if filtered_model:
+                # 创建原始行到筛选行的映射
+                filtered_model._source_table_name = current_table
+                filtered_model._original_model = self.table_models.get(current_table)
+                
+                # 创建原始行到筛选行的映射
+                filtered_model._row_mapping = {}  # 筛选行 -> 原始行
+                
+                # 填充映射关系
+                for filtered_row in range(filtered_model.rowCount()):
+                    # 在原始表中查找匹配的行
+                    filtered_row_data = [filtered_model._data[filtered_row][col] for col in range(filtered_model.columnCount())]
+                    for orig_row in range(self.table_manager.rowCount()):
+                        orig_row_data = [self.table_manager._data[orig_row][col] for col in range(self.table_manager.columnCount())]
+                        if filtered_row_data == orig_row_data:
+                            filtered_model._row_mapping[filtered_row] = orig_row
+                            break
+                
                 # 设置过滤后的数据模型
                 self.tb_data.setModel(filtered_model)
                 # 记录日志
@@ -1520,14 +1593,27 @@ class TBSQLWindow(QWidget):
             if reply == QMessageBox.No:
                 return
 
+            # 获取表格字段列表
+            columns = self.data_dict["表格列表"][current_table]["表格字段"]
+            
             # 获取要删除的列索引并排序(从大到小,避免删除时索引变化)
             columns_to_delete = sorted([index.column() for index in selected_columns], reverse=True)
 
-            # 删除选中的列
-            for column in columns_to_delete:
-                success = self.table_manager.delete_column_by_index(column)
-                if not success:
-                    QMessageBox.warning(self, "错误", f"删除第 {column + 1} 列失败!")
+            # 删除选中的列 - 使用大宽表模式
+            for column_idx in columns_to_delete:
+                if column_idx < len(columns):
+                    column_name = columns[column_idx]
+                    # 使用大宽表方法删除列
+                    success = self.table_manager.delete_column_from_wide_table(current_table, column_name)
+                    if success:
+                        # 从数据字典中移除列名
+                        self.data_dict["表格列表"][current_table]["表格字段"].remove(column_name)
+                        logging.info(f"成功从大宽表删除列: {column_name}")
+                    else:
+                        QMessageBox.warning(self, "错误", f"删除列 '{column_name}' 失败!")
+                        return
+                else:
+                    QMessageBox.warning(self, "错误", f"无效的列索引: {column_idx}")
                     return
 
             # 更新表格显示
@@ -1568,12 +1654,25 @@ class TBSQLWindow(QWidget):
 
             # 获取要删除的行索引并排序(从大到小,避免删除时索引变化)
             rows_to_delete = sorted([index.row() for index in selected_rows], reverse=True)
-
-            # 删除选中的行
-            for row in rows_to_delete:
-                success = self.table_manager.delete_row(row)
-                if not success:
-                    QMessageBox.warning(self, "错误", f"删除第 {row + 1} 行失败!")
+            
+            # 获取行ID映射 - 大宽表模式下需要获取行ID
+            row_ids = list(self.table_manager._wide_df.index)
+            
+            # 删除选中的行 - 使用大宽表模式
+            for row_idx in rows_to_delete:
+                if row_idx < len(row_ids):
+                    row_id = row_ids[row_idx]
+                    success = self.table_manager.delete_row_from_wide_table(current_table, row_id)
+                    if success:
+                        # 从数据字典中移除行
+                        if row_idx < len(self.data_dict["表格列表"][current_table]["表格数据"]):
+                            self.data_dict["表格列表"][current_table]["表格数据"].pop(row_idx)
+                        logging.info(f"成功从大宽表删除行: 行ID={row_id}")
+                    else:
+                        QMessageBox.warning(self, "错误", f"删除行 ID {row_id} 失败!")
+                        return
+                else:
+                    QMessageBox.warning(self, "错误", f"无效的行索引: {row_idx}")
                     return
 
             # 更新表格显示
@@ -1605,11 +1704,16 @@ class TBSQLWindow(QWidget):
             empty_row = ["" for _ in range(col_count)]
             
             try:
-                # 添加新行到数据模型
-                success = self.table_manager.add_row(empty_row)
-                if success:
+                # 添加新行到数据模型 - 使用大宽表模式
+                row_id = self.table_manager.add_row_to_wide_table(current_table, empty_row)
+                if row_id >= 0:
+                    # 添加到数据字典
+                    empty_values = {"值": empty_row, "公式": [None] * col_count}
+                    self.data_dict["表格列表"][current_table]["表格数据"].append(empty_values)
+                    
                     # 更新表格显示
                     self.on_table_changed(current_table)
+                    logging.info(f"成功添加行到大宽表: 行ID={row_id}")
                     # QMessageBox.information(self, "成功", "已添加新行")
                 else:
                     QMessageBox.warning(self, "错误", "添加行失败!")
@@ -1618,8 +1722,8 @@ class TBSQLWindow(QWidget):
                 QMessageBox.critical(self, "错误", f"添加行失败: {str(e)}")
                 
         except Exception as e:
-            logging.error(f"新增行时出错: {str(e)}")
-            QMessageBox.critical(self, "错误", f"新增行失败: {str(e)}")
+            logging.error(f"添加行失败: {str(e)}")
+            QMessageBox.critical(self, "错误", f"添加行失败: {str(e)}")
             
 
 
@@ -1656,14 +1760,16 @@ class TBSQLWindow(QWidget):
                 QMessageBox.critical(self, "错误", "表格管理器未初始化!")
                 return
                 
-            # 添加新列到数据模型
+            # 添加新列到数据模型 - 使用大宽表模式
             try:
-                success = self.table_manager.add_column(column_name)
+                # 使用大宽表的方法添加列
+                success = self.table_manager.add_column_to_wide_table(current_table, column_name, "")
                 if success:
                     # 更新数据字典中的表格字段
-                    self.data_dict["表格列表"][current_table]["表格字段"]
+                    self.data_dict["表格列表"][current_table]["表格字段"].append(column_name)
                     # 更新表格显示
                     self.on_table_changed(current_table)
+                    logging.info(f"成功添加列到大宽表: {column_name}")
                     # QMessageBox.information(self, "成功", f"已添加列: {column_name}")
                 else:
                     QMessageBox.warning(self, "错误", "添加列失败!")
@@ -1678,96 +1784,208 @@ class TBSQLWindow(QWidget):
 
     def on_tb_data_double_clicked(self, index):
         """处理表格双击事件"""
-        # 设置当前单元格为编辑状态
-        self.table_manager.set_editing_cell(index)
-        
-        # 获取当前单元格的编辑器
-        editor = self.tb_data.edit(index)
-        if editor:
-            # 确保编辑器获得焦点
-            editor.setFocus()
-            
-            # 连接编辑完成信号
-            editor.editingFinished.connect(lambda: self._on_cell_editing_finished(index))
-            
-    def _on_cell_editing_finished(self, index):
-        """处理单元格编辑完成事件"""
-        # 清除编辑状态
-        self.table_manager.clear_editing_cell()
-        
-    def init_data(self):
-        """初始化数据到各组件"""
-        # 清空当前下拉框选项
-        self.com_table.clear()
-        
-        # 从data_dict中获取表格列表
-        tables = self.data_dict.get("表格列表", {})
-        
-        # 遍历表格列表,将表格名称添加到下拉框
-        for table_name in tables.keys():
-            self.com_table.addItem(table_name)
-            
-        # 获取第一个表格数据并显示
-        if tables:
-            # 获取第一个表格名称
-            first_table = list(tables.keys())[0]
-            table_data = tables[first_table]
-            
-            # 设置表格数据
-            model = self.table_manager.set_data(
-                data=table_data["表格数据"],
-                columns=table_data["表格字段"],
-                table_name=first_table
-            )
-            self.tb_data.setModel(model)
-
-    def on_table_changed(self, table_name):
-        """表格切换事件"""
         try:
-            # 获取选中的表格名称
+            logging.info(f"表格单元格双击: 行={index.row()}, 列={index.column()}")
+            # 获取当前表格名称
             table_name = self.com_table.currentText()
             
-            # 获取表格数据
-            table_data = self.data_dict["表格列表"][table_name]
+            # 标记当前编辑的单元格
+            self.table_manager.set_editing_cell(index)
+            logging.debug(f"标记编辑单元格: 表名='{table_name}', 行={index.row()}, 列={index.column()}")
             
-            # 设置表格数据
-            model = self.table_manager.set_data(
-                data=table_data["表格数据"],
-                columns=table_data["表格字段"],
-                table_name=table_name
-            )
-            self.tb_data.setModel(model)
-            
+            # 进入编辑模式
+            self.tb_data.edit(index)
         except Exception as e:
-            logging.error(f"表格切换失败: {str(e)}")
-    
-    
-    def load_json(self,file_path):
+            logging.error(f"处理表格双击事件错误: {str(e)}")
+
+    def _on_cell_editing_finished(self, index):
+        """单元格编辑完成事件处理"""
         try:
-            if file_path:
-                # 读取JSON文件
-                with open(file_path, 'r', encoding='utf-8') as f:
-                    self.data_dict = json.load(f)
-                # 初始化数据到组件
-                self.init_data()                
-        except Exception as e:
-            QMessageBox.critical(self, "错误", f"导入失败: {str(e)}")
+            row_idx = index.row()
+            col_idx = index.column()
+            logging.info(f"单元格编辑完成: 行={row_idx}, 列={col_idx}")
             
-    # 在导入JSON后调用初始化
+            # 获取当前表格名称
+            table_name = self.com_table.currentText()
+            
+            # 获取编辑后的值
+            model = self.tb_data.model()
+            if model:
+                value = model.data(index, Qt.DisplayRole)
+                
+                # 获取列名
+                if col_idx < len(self.data_dict["表格列表"][table_name]["表格字段"]):
+                    col_name = self.data_dict["表格列表"][table_name]["表格字段"][col_idx]
+                    
+                    # 获取行ID
+                    row_ids = list(self.table_manager._wide_df.index)
+                    if row_idx < len(row_ids):
+                        row_id = row_ids[row_idx]
+                        
+                        # 更新大宽表中的数据
+                        self.table_manager.update_wide_table_data(table_name, row_id, col_name, value)
+                        logging.info(f"更新大宽表数据: 表={table_name}, 行ID={row_id}, 列={col_name}, 值={value}")
+                        
+                        # 更新数据字典
+                        if row_idx < len(self.data_dict["表格列表"][table_name]["表格数据"]):
+                            if "值" in self.data_dict["表格列表"][table_name]["表格数据"][row_idx]:
+                                if col_idx < len(self.data_dict["表格列表"][table_name]["表格数据"][row_idx]["值"]):
+                                    self.data_dict["表格列表"][table_name]["表格数据"][row_idx]["值"][col_idx] = value
+            
+            # 清除当前编辑的单元格标记
+            self.table_manager.clear_editing_cell()
+        except Exception as e:
+            logging.error(f"处理单元格编辑完成事件错误: {str(e)}")
+
+    def init_data(self):
+        """初始化数据并加载到界面组件。
+        
+        从数据字典中加载表格列表，一次性预加载所有表格数据，
+        并显示第一个表格的内容。
+        """
+        try:
+            logging.info("开始初始化数据")
+            # 清空下拉框
+            self.com_table.clear()
+            
+            # 获取表格列表
+            tables = self.data_dict.get("表格列表", {})
+            logging.info(f"数据字典中的表格列表: {list(tables.keys())}")
+            
+            if not tables:
+                logging.warning("未找到有效的表格数据")
+                return
+                
+            logging.info(f"发现 {len(tables)} 个表格，开始预加载")
+            # 预加载所有表格数据
+            self.table_manager.load_all_tables(tables)
+            
+            # 将表格名称添加到下拉框
+            for table_name in tables.keys():
+                self.com_table.addItem(table_name)
+                logging.debug(f"添加表格到下拉框: '{table_name}'")
+                
+            # 加载第一个表格数据
+            if tables:
+                # 获取第一个表格名称
+                first_table = list(tables.keys())[0]
+                first_table_data = tables[first_table]
+                logging.info(f"加载第一个表格: '{first_table}', 列数={len(first_table_data.get('表格字段', []))}, 行数={len(first_table_data.get('表格数据', []))}")
+                
+                # 检查表格数据
+                if not first_table_data.get("表格字段"):
+                    logging.error(f"表格 '{first_table}' 缺少表格字段")
+                if not first_table_data.get("表格数据"):
+                    logging.error(f"表格 '{first_table}' 缺少表格数据")
+                
+                # 加载表格模型
+                model = self.table_manager.get_table_model(first_table)
+                if model:
+                    # 检查模型行列数
+                    rows = model.rowCount()
+                    cols = model.columnCount()
+                    logging.info(f"表格模型创建成功: 行数={rows}, 列数={cols}")
+                    
+                    # 设置模型到视图
+                    self.tb_data.setModel(model)
+                    logging.info(f"初始化表格完成: '{first_table}'")
+                else:
+                    logging.error("表格模型创建失败")
+            else:
+                logging.warning("无法加载第一个表格，表格列表为空")
+        except Exception as e:
+            logging.error(f"初始化数据错误: {str(e)}")
+
+    def on_table_changed(self, table_name):
+        """处理表格切换事件。
+        
+        当用户从下拉框选择不同表格时触发，加载并显示所选表格的数据。
+        
+        Args:
+            table_name: 表格名称（由信号传入，实际未使用）
+        """
+        try:
+            # 获取用户选择的表格名称
+            selected_table = self.com_table.currentText()
+            if not selected_table:
+                logging.warning("未选择有效的表格")
+                return
+                
+            logging.info(f"切换到表格: '{selected_table}'")
+            
+            # 获取表格模型并设置到视图
+            model = self.table_manager.get_table_model(selected_table)
+            if model:
+                self.tb_data.setModel(model)
+                logging.info(f"成功加载表格: '{selected_table}'")
+            else:
+                logging.error(f"获取表格模型失败: '{selected_table}'")
+                
+        except Exception as e:
+            logging.error(f"切换表格错误: {str(e)}")
+
+    def load_json(self, file_path):
+        """加载JSON文件"""
+        try:
+            logging.info(f"开始加载JSON文件: {file_path}")
+            with open(file_path, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+                
+                # 检查数据是否为空
+                if not data:
+                    logging.error("加载的JSON数据为空")
+                    return None
+                    
+                # 检查表格列表是否存在
+                if "表格列表" not in data:
+                    logging.error("JSON数据中缺少'表格列表'字段")
+                    return None
+                    
+                # 检查表格列表是否为空
+                if not data.get("表格列表"):
+                    logging.error("JSON数据中'表格列表'为空")
+                
+                # 记录找到的表格
+                table_list = data.get("表格列表", {})
+                logging.info(f"JSON文件加载成功: {file_path}, 找到 {len(table_list)} 个表格: {list(table_list.keys())}")
+                return data
+        except Exception as e:
+            logging.error(f"加载JSON文件错误: {str(e)}")
+            return None
+
     def import_json(self):
         """导入JSON文件"""
-        logging.info("导入JSON文件")
         try:
-            # 打开文件选择对话框
-            file_path, _ = QFileDialog.getOpenFileName(
-                    self,
-                    "选择JSON文件", 
-                    "",
-                    "JSON Files (*.json)"
-                )                
-            self.load_json(file_path)
+            logging.info("开始导入JSON文件")
+            # 打开文件对话框
+            file_path, _ = QFileDialog.getOpenFileName(self, "导入JSON文件", "", "JSON Files (*.json)")
+            
+            if file_path:
+                logging.info(f"用户选择的文件路径: {file_path}")
+                # 加载JSON文件
+                data = self.load_json(file_path)
+                
+                if data:
+                    # 保存数据前的表格数量
+                    old_tables_count = len(self.data_dict.get("表格列表", {}))
+                    
+                    # 设置数据
+                    self.data_dict = data
+                    
+                    # 新数据的表格数量
+                    new_tables_count = len(self.data_dict.get("表格列表", {}))
+                    logging.info(f"JSON数据导入成功, 表格数量: {old_tables_count} -> {new_tables_count}")
+                    
+                    # 初始化界面
+                    self.init_data()
+                else:
+                    logging.warning("JSON数据为空或格式错误")
+                    QMessageBox.warning(self, "导入失败", "JSON文件格式错误或为空")
+            else:
+                logging.info("用户取消了文件选择")
         except Exception as e:
-            QMessageBox.critical(self, "错误", f"导入失败: {str(e)}")
+            logging.error(f"导入JSON文件错误: {str(e)}")
+            QMessageBox.critical(self, "导入错误", f"导入失败: {str(e)}")
 
     # 执行命令输入框中的命令
     def execute_command(self):
@@ -1981,6 +2199,164 @@ class TBSQLWindow(QWidget):
             
         except Exception as e:
             logging.error(f"显示列名选择对话框时出错: {str(e)}")
+
+    # 执行列更新操作（批量更新筛选后的数据）
+    def execute_column_update(self):
+        """执行列更新操作，把公式值赋给指定表格的指定列"""
+        try:
+            # 获取表名、列名和公式值
+            table_name_raw = self.li_tb.text().strip()
+            column_name_raw = self.li_col.text().strip()
+            formula_value = self.li_com.text().strip()
+            
+            # 处理表名和列名前面的@符号
+            table_name = table_name_raw[1:] if table_name_raw.startswith('@') else table_name_raw
+            column_name = column_name_raw[1:] if column_name_raw.startswith('@') else column_name_raw
+            
+            # 验证输入
+            if not table_name:
+                QMessageBox.warning(self, "警告", "请输入表名!")
+                return
+                
+            if not column_name:
+                QMessageBox.warning(self, "警告", "请输入列名!")
+                return
+                
+            if not formula_value:
+                QMessageBox.warning(self, "警告", "请输入要赋值的公式或值!")
+                return
+                
+            # 检查表格是否存在
+            if table_name not in self.data_dict.get("表格列表", {}):
+                QMessageBox.warning(self, "警告", f"表格 '{table_name}' 不存在!")
+                return
+                
+            # 检查列是否存在
+            if column_name not in self.data_dict["表格列表"][table_name]["表格字段"]:
+                QMessageBox.warning(self, "警告", f"列 '{column_name}' 不存在于表格 '{table_name}'!")
+                return
+                
+            # 获取当前显示的已筛选数据模型
+            current_model = self.tb_data.model()
+            if not current_model:
+                QMessageBox.warning(self, "警告", "无数据可更新!")
+                return
+                
+            # 获取行数
+            row_count = current_model.rowCount()
+            if row_count == 0:
+                QMessageBox.warning(self, "警告", "筛选后没有数据可更新!")
+                return
+                
+            # 查找列索引
+            col_index = -1
+            for i in range(current_model.columnCount()):
+                if current_model.headerData(i, Qt.Horizontal) == column_name:
+                    col_index = i
+                    break
+                    
+            if col_index == -1:
+                QMessageBox.warning(self, "警告", f"在当前视图中找不到列 '{column_name}'!")
+                return
+                
+            # 确认是否进行更新
+            reply = QMessageBox.question(
+                self, 
+                "确认", 
+                f"确定要将值 '{formula_value}' 应用到 {row_count} 行的 '{column_name}' 列吗?",
+                QMessageBox.Yes | QMessageBox.No, 
+                QMessageBox.No
+            )
+            
+            if reply != QMessageBox.Yes:
+                return
+                
+            # 判断是否为筛选模型
+            is_filtered_model = hasattr(current_model, '_source_table_name') and hasattr(current_model, '_row_mapping')
+            
+            # 获取原始表模型
+            original_model = None
+            if is_filtered_model:
+                original_model = self.table_models.get(table_name)
+                if not original_model:
+                    # 如果找不到原始模型，尝试使用当前模型的原始模型引用
+                    original_model = getattr(current_model, '_original_model', None)
+            
+            # 更新数据
+            success_count = 0
+            
+            # 判断是否为公式（以等号开头）
+            is_formula = formula_value.startswith('=')
+            
+            # 确保原始表中的公式能够正确计算
+            if is_formula and original_model:
+                # 获取原始表中的列索引
+                orig_col_index = -1
+                for i in range(original_model.columnCount()):
+                    if original_model.headerData(i, Qt.Horizontal) == column_name:
+                        orig_col_index = i
+                        break
+                
+                if orig_col_index != -1:
+                    # 先更新原始表中的数据
+                    for filtered_row in range(row_count):
+                        # 找到对应的原始行
+                        if is_filtered_model and filtered_row in current_model._row_mapping:
+                            orig_row = current_model._row_mapping[filtered_row]
+                            orig_index = original_model.index(orig_row, orig_col_index)
+                            result = original_model.setData(orig_index, formula_value, Qt.EditRole)
+                            if result:
+                                # 获取公式计算结果
+                                calc_result = None
+                                if hasattr(original_model, '_formulas') and original_model._formulas[orig_row][orig_col_index]:
+                                    calc_result = original_model._evaluate_formula(
+                                        original_model._formulas[orig_row][orig_col_index], 
+                                        orig_row, 
+                                        orig_col_index
+                                    )
+                                
+                                # 更新筛选模型中的显示
+                                index = current_model.index(filtered_row, col_index)
+                                if calc_result is not None:
+                                    # 更新实际值而不是公式
+                                    if hasattr(current_model, '_data'):
+                                        current_model._data[filtered_row][col_index] = calc_result
+                                        current_model.dataChanged.emit(index, index)
+                                    else:
+                                        current_model.setData(index, calc_result, Qt.DisplayRole)
+                                
+                                success_count += 1
+            
+            # 如果没有原始模型或不是公式，则直接更新当前模型
+            if not original_model or not is_formula:
+                for row in range(row_count):
+                    index = current_model.index(row, col_index)
+                    result = current_model.setData(index, formula_value, Qt.EditRole)
+                    if result:
+                        success_count += 1
+            
+            # 刷新表格显示
+            current_model.layoutChanged.emit()
+            
+            # 如果是公式但没有成功更新，尝试刷新整个表格
+            if is_formula and success_count == 0:
+                QMessageBox.information(
+                    self, 
+                    "提示", 
+                    "公式应用失败，将尝试重新加载表格。请在表格重新加载后重试。"
+                )
+                self.on_table_changed(table_name)
+                return
+            
+            # 显示成功信息
+            QMessageBox.information(self, "成功", f"已成功更新 {success_count} 行数据!")
+            
+            # 记录到命令历史
+            self.tx_all_com.append(f">> 更新表格 '{table_name}' 的 '{column_name}' 列, 值: '{formula_value}', 共 {success_count} 行")
+            
+        except Exception as e:
+            logging.error(f"批量更新列值时出错: {str(e)}")
+            QMessageBox.critical(self, "错误", f"更新失败: {str(e)}")
 
 
 def main():

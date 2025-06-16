@@ -30,9 +30,10 @@ TXYD = my_conf.get_path('TXYD')
 TXSJ = my_conf.get_path('TXSJ')
 ZDXQ = my_conf.get_path('ZDXQ')
 ZIP_PATH =my_conf.get_path('ZIP_PATH')
+MD_PATH = my_conf.get_path('MD_PATH')
 INIT_FILE = './初始化文件'
 import logging
-logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+logging.basicConfig(level=logging.WARNING, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
 
 for i in [GEN_PATH,XUQIU_MOBAN_PATH,GONGZUOQU_PATH,DATA_PATH,HSZ_PATH,MOBAN_PATH,DB_PATH,SJTC_MOBAN_PATH,LSJS_PATH]:
