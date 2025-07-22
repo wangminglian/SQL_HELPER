@@ -3,32 +3,22 @@
 ################################################################################
 ## Form generated from reading UI file 'main.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.9.0
+## Created by: Qt User Interface Compiler version 5.15.2
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
 
-from PySide6.QtCore import (QCoreApplication, QDate, QDateTime, QLocale,
-    QMetaObject, QObject, QPoint, QRect,
-    QSize, QTime, QUrl, Qt)
-from PySide6.QtGui import (QAction, QBrush, QColor, QConicalGradient,
-    QCursor, QFont, QFontDatabase, QGradient,
-    QIcon, QImage, QKeySequence, QLinearGradient,
-    QPainter, QPalette, QPixmap, QRadialGradient,
-    QTransform)
-from PySide6.QtWidgets import (QApplication, QComboBox, QFrame, QGridLayout,
-    QHBoxLayout, QHeaderView, QLabel, QLayout,
-    QLineEdit, QMainWindow, QMenu, QMenuBar,
-    QPushButton, QRadioButton, QScrollBar, QSizePolicy,
-    QSpacerItem, QTableWidget, QTableWidgetItem, QTextBrowser,
-    QTextEdit, QToolBar, QVBoxLayout, QWidget)
+from PySide6.QtCore import *
+from PySide6.QtGui import *
+from PySide6.QtWidgets import *
+
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
         MainWindow.resize(1549, 796)
-        sizePolicy = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+        sizePolicy = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(MainWindow.sizePolicy().hasHeightForWidth())
@@ -50,17 +40,17 @@ class Ui_MainWindow(object):
         self.a_rwxy.setObjectName(u"a_rwxy")
         self.centralwidget = QWidget(MainWindow)
         self.centralwidget.setObjectName(u"centralwidget")
-        sizePolicy1 = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Preferred)
+        sizePolicy1 = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
         sizePolicy1.setHorizontalStretch(0)
         sizePolicy1.setVerticalStretch(0)
         sizePolicy1.setHeightForWidth(self.centralwidget.sizePolicy().hasHeightForWidth())
         self.centralwidget.setSizePolicy(sizePolicy1)
-        self.centralwidget.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
+        self.centralwidget.setLayoutDirection(Qt.LeftToRight)
         self.gridLayout = QGridLayout(self.centralwidget)
         self.gridLayout.setObjectName(u"gridLayout")
         self._2 = QVBoxLayout()
         self._2.setObjectName(u"_2")
-        self._2.setSizeConstraint(QLayout.SizeConstraint.SetNoConstraint)
+        self._2.setSizeConstraint(QLayout.SetNoConstraint)
         self.horizontalLayout_5 = QHBoxLayout()
         self.horizontalLayout_5.setObjectName(u"horizontalLayout_5")
         self.label_3 = QLabel(self.centralwidget)
@@ -83,12 +73,7 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout_5.addWidget(self.com_xuqiu)
 
-        self.pb_home = QPushButton(self.centralwidget)
-        self.pb_home.setObjectName(u"pb_home")
-
-        self.horizontalLayout_5.addWidget(self.pb_home)
-
-        self.horizontalSpacer_2 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
+        self.horizontalSpacer_2 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
 
         self.horizontalLayout_5.addItem(self.horizontalSpacer_2)
 
@@ -115,16 +100,16 @@ class Ui_MainWindow(object):
         self.horizontalLayout_5.setStretch(0, 1)
         self.horizontalLayout_5.setStretch(1, 4)
         self.horizontalLayout_5.setStretch(3, 5)
-        self.horizontalLayout_5.setStretch(5, 18)
-        self.horizontalLayout_5.setStretch(6, 4)
-        self.horizontalLayout_5.setStretch(8, 1)
+        self.horizontalLayout_5.setStretch(4, 18)
+        self.horizontalLayout_5.setStretch(5, 4)
+        self.horizontalLayout_5.setStretch(7, 1)
 
         self._2.addLayout(self.horizontalLayout_5)
 
         self.line = QFrame(self.centralwidget)
         self.line.setObjectName(u"line")
-        self.line.setFrameShape(QFrame.Shape.HLine)
-        self.line.setFrameShadow(QFrame.Shadow.Sunken)
+        self.line.setFrameShape(QFrame.HLine)
+        self.line.setFrameShadow(QFrame.Sunken)
 
         self._2.addWidget(self.line)
 
@@ -189,7 +174,7 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout_8.addWidget(self.bt_back)
 
-        self.horizontalSpacer_3 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
+        self.horizontalSpacer_3 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
 
         self.horizontalLayout_8.addItem(self.horizontalSpacer_3)
 
@@ -208,8 +193,8 @@ class Ui_MainWindow(object):
 
         self.line_3 = QFrame(self.centralwidget)
         self.line_3.setObjectName(u"line_3")
-        self.line_3.setFrameShape(QFrame.Shape.VLine)
-        self.line_3.setFrameShadow(QFrame.Shadow.Sunken)
+        self.line_3.setFrameShape(QFrame.VLine)
+        self.line_3.setFrameShadow(QFrame.Sunken)
 
         self.horizontalLayout_7.addWidget(self.line_3)
 
@@ -262,7 +247,7 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout_4.addWidget(self.bt_help)
 
-        self.horizontalSpacer = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
+        self.horizontalSpacer = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
 
         self.horizontalLayout_4.addItem(self.horizontalSpacer)
 
@@ -282,21 +267,21 @@ class Ui_MainWindow(object):
 
         self.line_6 = QFrame(self.centralwidget)
         self.line_6.setObjectName(u"line_6")
-        self.line_6.setFrameShape(QFrame.Shape.HLine)
-        self.line_6.setFrameShadow(QFrame.Shadow.Sunken)
+        self.line_6.setFrameShape(QFrame.HLine)
+        self.line_6.setFrameShadow(QFrame.Sunken)
 
         self.horizontalLayout_7.addWidget(self.line_6)
 
         self.line_7 = QFrame(self.centralwidget)
         self.line_7.setObjectName(u"line_7")
-        self.line_7.setFrameShape(QFrame.Shape.VLine)
-        self.line_7.setFrameShadow(QFrame.Shadow.Sunken)
+        self.line_7.setFrameShape(QFrame.VLine)
+        self.line_7.setFrameShadow(QFrame.Sunken)
 
         self.horizontalLayout_7.addWidget(self.line_7)
 
         self.verticalScrollBar = QScrollBar(self.centralwidget)
         self.verticalScrollBar.setObjectName(u"verticalScrollBar")
-        self.verticalScrollBar.setOrientation(Qt.Orientation.Vertical)
+        self.verticalScrollBar.setOrientation(Qt.Vertical)
 
         self.horizontalLayout_7.addWidget(self.verticalScrollBar)
 
@@ -305,8 +290,8 @@ class Ui_MainWindow(object):
 
         self.line_2 = QFrame(self.centralwidget)
         self.line_2.setObjectName(u"line_2")
-        self.line_2.setFrameShape(QFrame.Shape.HLine)
-        self.line_2.setFrameShadow(QFrame.Shadow.Sunken)
+        self.line_2.setFrameShape(QFrame.HLine)
+        self.line_2.setFrameShadow(QFrame.Sunken)
 
         self._2.addWidget(self.line_2)
 
@@ -317,46 +302,17 @@ class Ui_MainWindow(object):
 
         self.la_outputer.addWidget(self.li_complex)
 
-        self.label_8 = QLabel(self.centralwidget)
-        self.label_8.setObjectName(u"label_8")
-
-        self.la_outputer.addWidget(self.label_8)
-
-        self.label_7 = QLabel(self.centralwidget)
-        self.label_7.setObjectName(u"label_7")
-
-        self.la_outputer.addWidget(self.label_7)
-
-        self.li_xsq = QLineEdit(self.centralwidget)
-        self.li_xsq.setObjectName(u"li_xsq")
-
-        self.la_outputer.addWidget(self.li_xsq)
-
-        self.com_xsq = QComboBox(self.centralwidget)
-        self.com_xsq.setObjectName(u"com_xsq")
-
-        self.la_outputer.addWidget(self.com_xsq)
-
-        self.li_xsq_list = QLineEdit(self.centralwidget)
-        self.li_xsq_list.setObjectName(u"li_xsq_list")
-
-        self.la_outputer.addWidget(self.li_xsq_list)
-
         self.bt_gener_sql = QPushButton(self.centralwidget)
         self.bt_gener_sql.setObjectName(u"bt_gener_sql")
 
         self.la_outputer.addWidget(self.bt_gener_sql)
 
-        self.la_outputer.setStretch(0, 15)
-        self.la_outputer.setStretch(4, 3)
-        self.la_outputer.setStretch(5, 5)
-        self.la_outputer.setStretch(6, 1)
 
         self._2.addLayout(self.la_outputer)
 
         self.horizontalLayout = QHBoxLayout()
         self.horizontalLayout.setObjectName(u"horizontalLayout")
-        self.horizontalLayout.setSizeConstraint(QLayout.SizeConstraint.SetFixedSize)
+        self.horizontalLayout.setSizeConstraint(QLayout.SetFixedSize)
         self.label_4 = QLabel(self.centralwidget)
         self.label_4.setObjectName(u"label_4")
 
@@ -415,7 +371,7 @@ class Ui_MainWindow(object):
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QMenuBar(MainWindow)
         self.menubar.setObjectName(u"menubar")
-        self.menubar.setGeometry(QRect(0, 0, 1549, 33))
+        self.menubar.setGeometry(QRect(0, 0, 1549, 26))
         self.menu = QMenu(self.menubar)
         self.menu.setObjectName(u"menu")
         self.menu_2 = QMenu(self.menubar)
@@ -425,7 +381,7 @@ class Ui_MainWindow(object):
         MainWindow.setMenuBar(self.menubar)
         self.toolBar = QToolBar(MainWindow)
         self.toolBar.setObjectName(u"toolBar")
-        MainWindow.addToolBar(Qt.ToolBarArea.TopToolBarArea, self.toolBar)
+        MainWindow.addToolBar(Qt.TopToolBarArea, self.toolBar)
 
         self.menubar.addAction(self.menu.menuAction())
         self.menubar.addAction(self.menu_3.menuAction())
@@ -443,7 +399,6 @@ class Ui_MainWindow(object):
         self.toolBar.addAction(self.a_zdgl)
         self.toolBar.addAction(self.a_rwxy)
 
-        # 添加美化样式
         MainWindow.setStyleSheet("""
             QWidget {
                 background-color: #e0f7fa;
@@ -508,7 +463,6 @@ class Ui_MainWindow(object):
         self.a_rwxy.setText(QCoreApplication.translate("MainWindow", u"\u9700\u6c42\u8840\u7f18", None))
         self.label_3.setText(QCoreApplication.translate("MainWindow", u"\u5f53\u524d\u5de5\u7a0b:", None))
         self.label_5.setText(QCoreApplication.translate("MainWindow", u"\u9700\u6c42:", None))
-        self.pb_home.setText(QCoreApplication.translate("MainWindow", u"\u6253\u5f00\u9879\u76ee\u76ee\u5f55", None))
         self.is_zd.setText(QCoreApplication.translate("MainWindow", u"\u662f\u5426\u7f6e\u9876", None))
         self.bt_add_project.setText(QCoreApplication.translate("MainWindow", u"\u65b0\u5efa\u5de5\u7a0b", None))
         self.bt_project_remove.setText(QCoreApplication.translate("MainWindow", u"\u5220\u9664\u5de5\u7a0b", None))
@@ -533,8 +487,6 @@ class Ui_MainWindow(object):
         self.bt_fenfa.setText(QCoreApplication.translate("MainWindow", u"\u5206\u53d1", None))
         self.bt_help.setText(QCoreApplication.translate("MainWindow", u"\u5e2e\u52a9\u6587\u6863", None))
         self.bt_rm_model.setText(QCoreApplication.translate("MainWindow", u"\u5220\u9664", None))
-        self.label_8.setText(QCoreApplication.translate("MainWindow", u"@", None))
-        self.label_7.setText(QCoreApplication.translate("MainWindow", u"\u4fee\u9970\u5668", None))
         self.bt_gener_sql.setText(QCoreApplication.translate("MainWindow", u"\u751f\u6210\u8bed\u53e5", None))
         self.label_4.setText(QCoreApplication.translate("MainWindow", u"history\uff1a", None))
         self.label_6.setText(QCoreApplication.translate("MainWindow", u"\u641c\u7d22\u6a21\u7248\uff1a", None))

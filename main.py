@@ -1,6 +1,6 @@
 import os
 import re
-
+import ast
 from clinet.main_ui import Ui_MainWindow
 from clinet.gy_ui import Ui_SQL_HELPER
 import pyperclip
@@ -19,7 +19,8 @@ from sql_helper.helper_restruct import Reader_Factory, Genner_Com
 from collections import deque
 from xuqiu import XUQIU_UI
 from yuanshuju import YSJGL_UI, RWXY_UI, ZDGL_UI, BGL_UI
-from conf import MOBAN_PATH,DB_PATH,DB_NAME,TXHS,TXYD,TXSJ
+from conf import MOBAN_PATH,DB_PATH,DB_NAME,TXHS,TXYD,TXSJ,XSQ_PATH,GEN_PATH
+
 
 HELP_TEXT = """
                                     帮助文档
@@ -184,6 +185,7 @@ class MainWindow(QMainWindow):
 
 
         self.te_input:QTextEdit = self.ui.te_input
+        self.te_input.setAcceptRichText(False)
         self.te_view:QTextBrowser = self.ui.te_view
         self.te_printer:QTextBrowser = self.ui.te_printer
         self.a_gy:QAction = self.ui.a_gy
@@ -222,6 +224,20 @@ class MainWindow(QMainWindow):
         self.search_line.textChanged.connect(self.update_comArg)
         self.search_history.textChanged.connect(self.update_comHistory)
 
+        # 修饰器需求名称
+        self.li_xsq:QLineEdit = self.ui.li_xsq
+        self.com_xsq:QComboBox = self.ui.com_xsq
+        self.init_com_xsq()
+        self.li_xsq_list:QLineEdit = self.ui.li_xsq_list
+        self.li_xsq.textChanged.connect(self.init_com_xsq)
+        # li_xsq 回车时提交
+        self.li_xsq.returnPressed.connect(self.add_xsq_to_list)
+        self.current_xsq_list = []
+
+        # 打开项目根目录
+        self.pb_home:QPushButton = self.ui.pb_home
+        self.pb_home.clicked.connect(self.open_project_root)
+
         # 设置快捷键
         shortcut = QShortcut(QKeySequence("Ctrl+`"), self)
         shortcut.activated.connect(self.switch_focus)
@@ -230,11 +246,82 @@ class MainWindow(QMainWindow):
         shortcut3 = QShortcut(QKeySequence(Qt.ALT | Qt.Key_Return), self)
         shortcut3.activated.connect(self.view_and_copy)
 
-        # self.com_history.hide()
-        # self.ui.label_4.hide()
-        # self.search_history.hide()
 
         self.txhs = DrinkWaterReminder()
+
+    def open_project_root(self):
+        # 获取当前项目根目录
+        project_root = os.path.join(GEN_PATH,DB_PATH)
+        if not os.path.exists(project_root):
+            QMessageBox.warning(self, '警告', '项目根目录不存在')
+            return
+        # 打开项目根目录
+        os.startfile(project_root)
+
+    # 修饰器列表
+    def init_xsq_list(self):
+        tmp = self.li_xsq_list.text()
+        tmp_list = tmp.split(';')
+        # 判断修饰器文件是否存在，不存在，删除
+        for xsq_name in tmp_list:
+            if xsq_name == '':
+                continue
+            xsq_path = os.path.join(GEN_PATH, XSQ_PATH, xsq_name)
+            if not os.path.exists(xsq_path):
+                tmp_list.remove(xsq_name)
+        return tmp_list
+
+    # 添加修饰器
+    def add_xsq_to_list(self):
+        # 如果输入0，则情况修饰器列表
+        if self.li_xsq.text() == '0':
+            self.current_xsq_list = []
+            self.li_xsq_list.setText('')
+            self.li_xsq.setText('')
+            self.repaint()
+            return
+        # 如果是负数，则删除负数对应的格式的修饰器
+        # 首先判断输入时负数
+        if self.li_xsq.text().startswith('-'):
+            del_num = int(self.li_xsq.text())
+            self.current_xsq_list = self.current_xsq_list[:del_num]
+            self.li_xsq_list.setText(';'.join([i for i in self.current_xsq_list if i != '']))
+            self.li_xsq.setText('')
+            self.repaint()
+            return
+
+        # 获取当前修饰器
+        xsq_name = self.com_xsq.currentText()
+        self.current_xsq_list = self.init_xsq_list()
+        self.current_xsq_list.append(xsq_name)
+        # 初始化当前修饰器列表
+        self.li_xsq_list.setText(';'.join([i for i in self.current_xsq_list if i != '']))
+        self.li_xsq.setText('')
+        self.repaint()
+
+    # 初始化修饰器列表
+    def init_com_xsq(self):
+        self.com_xsq.clear()
+        search_txt = self.li_xsq.text().upper()
+        xsq_path = os.path.join(GEN_PATH, XSQ_PATH)
+        files = self.get_files_in_directory(xsq_path)
+        # files 排序
+        files.sort()
+        if search_txt =='':
+            self.com_xsq.addItems(files)
+        else:
+            out_list = []
+            out_list_2 = []
+            for i in files:
+                if i.upper().startswith(search_txt):
+                    out_list.append(i)
+                if search_txt in i.upper() and i not in out_list:
+                    out_list_2.append(i)
+            out_list.extend(out_list_2)
+            self.com_xsq.addItems(out_list)
+            
+        self.repaint()
+
 
 
 
@@ -559,7 +646,8 @@ class MainWindow(QMainWindow):
         if (name == None or name.strip() == ''): return
         sql_arg = SQL_arg.get(SQL_arg.project_name == self.com_project_name.currentText()
                               , SQL_arg.arg_nike == name)
-        sql_arg.arg_context = self.te_input.toPlainText().strip()
+        data= self.te_input.toPlainText()
+        sql_arg.arg_context = data.strip()
         sql_arg.save()
 
     def save_arg_context_by_name(self,name,context):
@@ -730,6 +818,23 @@ class MainWindow(QMainWindow):
             ret[item.arg_nike] = self.decode_context(item)
         return ret
 
+    def str_to_func(self,func_str):
+        # 将字符串转化为ast语法树
+        try:
+            func_ast = ast.parse(func_str.strip())
+            # 获取函数定义节点
+            func_def = func_ast.body[0]
+            # 将ast语法树转化为函数对象
+            func = compile(func_ast, "<string>", "exec")
+            # 创建一个空的命名空间
+            namespace = {}
+            # 执行函数定义节点，将函数对象存储在命名空间中
+            exec(func, namespace)
+            # 获取函数对象
+            func_obj = namespace[func_def.name]
+            return func_obj
+        except Exception as e:
+            raise ValueError('自定义函数不正确')
 
     #${字段名称}[:1] comment '${临时表名}'
     def gener_sql(self):
@@ -741,8 +846,26 @@ class MainWindow(QMainWindow):
             gc = Genner_Com(input_text,project_name)
             values = gc.value
             self.te_printer.clear()
+            ret = ''
             for item in values:
-                self.te_printer.append(item)
+                ret += item
+                ret += '\n'
+
+            
+
+            # 开始执行修饰器
+            for xsq_name in self.init_xsq_list():
+                if xsq_name == '':
+                    continue
+                xsq_path = os.path.join(GEN_PATH, XSQ_PATH, xsq_name)
+                print(f'修饰器地址:{xsq_path}')
+                with open(xsq_path, 'r', encoding='utf-8') as f:
+                    xsq_content = f.read()
+                    func_obj = self.str_to_func(xsq_content)
+                    ret = func_obj(ret)
+            # 读取修饰器，并执行
+            self.te_printer.setText(ret)    
+            
             History(project_name=project_name
                     , genner_str=input_text
                     , ret=values

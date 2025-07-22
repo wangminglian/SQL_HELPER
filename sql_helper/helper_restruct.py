@@ -47,7 +47,9 @@ class Reader_Factory(object):
         arg_models = data.arg_model.where(ARG_model.rn!=0).order_by(ARG_model.rn).execute()
             # order_by(ARG_model.rn)
             # .execute()
+        
         data = Normal_Reader(data,sp=sp).bulid()
+        
         for item in arg_models:
             if item.arg_model == '字符串切割':
                 data= Splits_Reader(data,item.arg_contorl).bulid()

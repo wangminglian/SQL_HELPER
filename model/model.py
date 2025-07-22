@@ -90,6 +90,9 @@ class XQ_INFO(Base_Model):
     xuqiu_type = CharField(verbose_name='需求类型') # 任务/取数
     status = CharField(verbose_name='需求状态') # 开发中、完成、作废
     tcr = CharField(verbose_name='需求提出人')
+    start_date = DateTimeField(verbose_name='开始时间',null=True)
+    end_date = DateTimeField(verbose_name='结束时间',null=True)
+    rentian = IntegerField(verbose_name='人天',null=True)
     class Meta:
         database = dp
 

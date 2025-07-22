@@ -12,6 +12,7 @@ conf_path:
   ZIP_PATH: D:\\Program Files (x86)\\360\\360zip\\360zip.exe
   DB_PATH: SQL_HELPER目录\\ # 数据库存储路径
   MOBAN_PATH: SQL_HELPER目录\\模板目录\\ #代码模版路径
+  XSQ_PATH: SQL_HELPER目录\\修饰器\\ #修饰器路径
   DB_NAME: SQL_Helper.db
   SJTC_MOBAN_PATH: SQL_HELPER目录\\模板目录\\数据探查模版\\ #数据探查脚本模版目录
   LSJS_PATH: E:\\临时接收\\ # 临时接收路径，导入文档打开的初始目录
@@ -22,6 +23,6 @@ conf_path:
   TXYD: 6 # 运动提醒（每几个周期提醒一次）
   ZDXQ: 图书馆|周报|二礼历史口径|物联网相关口径|欠费口径资料|常用模版 #需要置顶的需求
   # MD_PATH: D:\\Program Files\\Typora\\Typora.exe # markdown 打开工具
-  MD_PATH: D:\\Program Files\\Obsidian\\Obsidian.exe  # markdown 打开工具
+  MD_PATH: D:\\Program Files\\Typora\\Typora.exe  # markdown 打开工具
 
 

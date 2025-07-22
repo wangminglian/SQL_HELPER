@@ -1202,14 +1202,14 @@ class BGL_UI(QWidget):
         if idx.isValid():
             datas = self.get_row_content(idx)
             id = datas[BGL_BM]
-            items = XQ_TABLE_INFO.select().where(XQ_TABLE_INFO.table_id==id)
+            items = XQ_TABLE_INFO.select().where(XQ_TABLE_INFO.table_id==id).order_by(XQ_TABLE_INFO.ctime.desc())
             shuru = []
             shuchu=[]
             for i in items:
                 if i.table_type=='输入':
-                    shuru.append(f"需求名称:{i.xq_id.name}\n脚本名称:{i.jb_id.name}\n脚本地址:{i.jb_id.path}\n")
+                    shuru.append(f"需求名称:{i.xq_id.name}\n脚本名称:{i.jb_id.name}\n脚本地址:{i.jb_id.path}\n使用时间:{i.jb_id.ctime}\n")
                 elif i.table_type=='输出':
-                    shuchu.append(f"需求名称:{i.xq_id.name}\n脚本名称:{i.jb_id.name}\n脚本地址:{i.jb_id.path}\n")
+                    shuchu.append(f"需求名称:{i.xq_id.name}\n脚本名称:{i.jb_id.name}\n脚本地址:{i.jb_id.path}\n提交时间:{i.jb_id.ctime}\n")
 
             text_str = '-------------------------------使用-------------------------------\n'
             if len(shuru)>0:

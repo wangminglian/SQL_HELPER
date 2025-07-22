@@ -9,6 +9,9 @@ from asyncio import sleep
 from concurrent.futures import ThreadPoolExecutor
 from clinet.xuqiu_ui import Ui_Form
 from clinet.create_xq_ui import Ui_create_xq
+from PySide6.QtWidgets import QDateEdit
+from PySide6.QtCore import QDate
+from PySide6.QtGui import QIntValidator
 import pyperclip
 from PySide6 import QtWidgets, QtCore
 from PySide6.QtCore import QTime, QDateTime, QDir, QAbstractTableModel, QModelIndex
@@ -106,8 +109,47 @@ class Create_XUQIU_UI(QWidget):
         self.bt_qd.clicked.connect(self.bcxq)
         self.wb = wb
 
+        self.da_start_date:QDateEdit = self.ui.da_start_date
+        self.da_end_date:QDateEdit = self.ui.da_end_date
+        self.li_rentian:QLineEdit = self.ui.li_rentian
+        # 开始时间设置当前日期
+        self.da_start_date.setDate(QDate.currentDate())
+        # 启用日历弹出
+        self.da_start_date.setCalendarPopup(True)
+        self.da_start_date.setDisplayFormat('yyyy-MM-dd')
+        self.da_start_date.setDateRange(QDate(2020, 1, 1), QDate(2050, 12, 31))
+        # 限制 li_rentian 只能输入数字
+        self.li_rentian.setValidator(QIntValidator())
+        self.li_rentian.setText('0')
+        # 根据人天，计算结束时间
+        self.li_rentian.textChanged.connect(self.f_li_rentian)
+        # 设置结束时间
+        self.da_end_date.setDate(QDate.currentDate())
+        # 启用结束日期的日历弹出
+        self.da_end_date.setCalendarPopup(True)
+        self.da_end_date.setDisplayFormat('yyyy-MM-dd')
+        self.da_end_date.setDateRange(QDate(2020, 1, 1), QDate(2050, 12, 31))
+
+
         self.inint_xqlx()
         self.init_com_srmm()
+
+    def f_li_rentian(self):
+        # 根据人天，计算结束时间
+        rentian = self.li_rentian.text()
+        if rentian == '':
+            return
+        try:
+            rentian = int(rentian)
+        except ValueError:
+            QMessageBox.warning(self, '错误', '请输入有效的数字')
+            return
+        
+        start_date = self.da_start_date.date()
+        # 使用 QDate 的 addDays 方法进行日期计算
+        end_date = start_date.addDays(rentian)
+        self.da_end_date.setDate(end_date)
+
 
     def init_com_srmm(self):
         #输入模版 输出模版初始化
@@ -127,7 +169,17 @@ class Create_XUQIU_UI(QWidget):
         for i in XUQIU_TTYPE:
             self.com_xqlx.addItem(i)
 
+    # 创建md文档
+    def create_md(self,name):
+        # 创建md文档
+        md_path = os.path.join(DATA_PATH,name,f'{name}.md')
+        print(f'创建md文档: {md_path}')
+        if os.path.exists(md_path):
+            return
+        with open(md_path,'w',encoding='utf-8') as f:
+            f.write(f'# {name}')
 
+    
 
     def init_xuqiu(self,name,srmb,scmb):
         #创建数据目录，如果目录已存在，则报错
@@ -138,17 +190,19 @@ class Create_XUQIU_UI(QWidget):
         schz = scmb.split('.')[-1]
         if os.path.exists(pt):
             raise ValueError('目录已存在，请勿重复创建')
-        inint_path_str =['数据','文档']
-        inint_path =[]
-        for i in inint_path_str:
-            inint_path.append(os.path.join(pt,i))
         else:
+            inint_path_str =['数据','文档']
+            inint_path =[]
+            for i in inint_path_str:
+                inint_path.append(os.path.join(pt,i))
             os.mkdir(pt)
             for i in inint_path:
                 os.mkdir(i)
             os.mkdir(os.path.join(pt,'代码'))
             shutil.copy(srpt,os.path.join(pt,f'输入-{name}.{srhz}'))
             shutil.copy(scpt,os.path.join(pt, f'输出-{name}.{schz}'))
+            # 创建需求定义md文档
+            self.create_md(name)
         return pt
 
 
@@ -160,9 +214,17 @@ class Create_XUQIU_UI(QWidget):
             scmb = self.com_scmm.currentText()
             path = self.init_xuqiu(name,srmb,scmb)
             xuqiu_type = self.com_xqlx.currentText()
+            start_date = self.da_start_date.date().toString('yyyy-MM-dd')
+            end_date = self.da_end_date.date().toString('yyyy-MM-dd')
+            rentian = self.li_rentian.text()
+            if rentian == '':
+                rentian = 0
+            else:
+                rentian = int(rentian)
             status='开发中'
             tcr = self.tl_tcr.text()
-            ret_dic = {'name':name,'path':path,'xuqiu_type':xuqiu_type,'status':status,'tcr':tcr}
+            ret_dic = {'name':name,'path':path,'xuqiu_type':xuqiu_type,'status':status,'tcr':tcr
+                       ,'start_date':start_date,'end_date':end_date,'rentian':rentian}
             xq_info = XQ_INFO(**ret_dic)
             xq_info.save()
             self.wb.init_tb_xuqiu()
@@ -172,7 +234,7 @@ class Create_XUQIU_UI(QWidget):
 
 
 
-xuqiu_header = ['id','需求名称','需求类型','需求状态','需求提出人','需求存储位置','创建日期']
+xuqiu_header = ['id','需求名称','需求类型','需求状态','需求提出人','需求存储位置','创建日期','开始时间','结束时间','总天数','剩余天数']
 xuqiu_header_id =0
 xuqiu_header_xqmc =1
 xuqiu_header_xqlx =2
@@ -180,7 +242,10 @@ xuqiu_header_xqzt =3
 xuqiu_header_xqtcr =4
 xuqiu_header_xqccwz =5
 xuqiu_header_cjrq =6
-
+xuqiu_header_kssj =7
+xuqiu_header_jzsj =8
+xuqiu_header_rtr =9
+xuqiu_header_srtr =10
 
 xuqiu_dtl_header = ['id','类型','文件名','版本','备注','创建日期','更新日期','路径']
 xuqiu_dtl_header_id=0
@@ -520,7 +585,7 @@ class XUQIU_UI(QWidget):
         self.bt_cjjs.clicked.connect(self.f_cjjs)
 
         self.read_sql_eng = Reader_SQL()
-        self.com_sear_type.addItems(['开发中','','完成'])
+        self.com_sear_type.addItems(['','开发中','完成'])
 
         self.is_zd: QRadioButton = self.ui.is_zd
         self.is_zd.toggled.connect(self.f_is_zd)
@@ -926,12 +991,12 @@ class XUQIU_UI(QWidget):
         self.show()
 
 
-    def show_rename_dialog(self,xqlx,tcr,xqmc):
+    def show_rename_dialog(self,xqlx,tcr,xqmc,kssj=None,rtr=None):
         # 创建一个修改需求的对话框
         dialog = QDialog()
         dialog.setWindowFlag(QtCore.Qt.WindowStaysOnTopHint)
         dialog.setWindowTitle('修改需求')
-        dialog.setFixedSize(600,200)
+        dialog.setFixedSize(600,350)
         layout = QVBoxLayout()
 
         #需求名称
@@ -952,12 +1017,50 @@ class XUQIU_UI(QWidget):
         in_tcr = QLineEdit()
         in_tcr.setText(tcr)
 
+        # 如果kssj 为空，则设置为当前日期
+        if kssj is None:
+            kssj = QDate.currentDate()
+        else:
+            # 时间格式为 2025-06-20 00:00:00 需要转换为 QDate
+            kssj_str = kssj.strftime('%Y-%m-%d')
+            # 使用转换后的字符串来创建QDate对象
+            kssj = QDate.fromString(kssj_str, 'yyyy-MM-dd')
+        if rtr is None:
+            rtr = '0'
+        else:
+            rtr = str(rtr)
+
+        # 开始时间
+        lb5 = QLabel()
+        lb5.setText('开始时间')
+        in_kssj = QDateEdit()
+        in_kssj.setDate(kssj)
+        in_kssj.setCalendarPopup(True)
+        in_kssj.setDisplayFormat('yyyy-MM-dd')
+
+        # 人天
+        lb4 = QLabel()
+        lb4.setText('人天')
+        in_rtr = QLineEdit()
+        in_rtr.setText(rtr)
+        in_rtr.setValidator(QIntValidator())
+
+        
+
+
+
         layout.addWidget(lb2)
         layout.addWidget(in_xqmc)
         layout.addWidget(lb0)
         layout.addWidget(in_xqlx)
         layout.addWidget(lb1)
         layout.addWidget(in_tcr)
+        layout.addWidget(lb5)
+        layout.addWidget(in_kssj)
+
+        layout.addWidget(lb4)
+        layout.addWidget(in_rtr)
+
 
         # 创建一个按钮框
         button_box = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
@@ -971,7 +1074,7 @@ class XUQIU_UI(QWidget):
         result = dialog.exec_()
         # 获取用户输入的文本
         if result == QDialog.Accepted:
-            return {'xqlx':in_xqlx.currentText(),'tcr':in_tcr.text(),'xqmc':in_xqmc.text()}
+            return {'xqlx':in_xqlx.currentText(),'tcr':in_tcr.text(),'xqmc':in_xqmc.text(),'ksrq':in_kssj.date().toString('yyyy-MM-dd'),'rtr':in_rtr.text()}
         else:
             return {}
     def f_bt_rename(self):
@@ -980,7 +1083,17 @@ class XUQIU_UI(QWidget):
             datas = self.get_row_content(idx)
             id = datas[0]
             itme = XQ_INFO.get_by_id(id)
-            ret = self.show_rename_dialog(itme.xuqiu_type,itme.tcr,itme.name)
+            ret = self.show_rename_dialog(itme.xuqiu_type,itme.tcr,itme.name,itme.start_date,itme.rentian)
+            # 根据人天，开始时间计算结束时间
+            ksrq = ret.get('ksrq')
+            print(f"ksrq:{ksrq}")
+            rtr = ret.get('rtr')
+            # 字符串转日期
+            ksrq = QDate.fromString(ksrq, 'yyyy-MM-dd')
+            jzrq = ksrq.addDays(int(rtr))
+            itme.start_date = ksrq.toString('yyyy-MM-dd')
+            itme.end_date = jzrq.toString('yyyy-MM-dd')
+            itme.rentian = rtr
             itme.xuqiu_type = ret.get('xqlx')
             itme.tcr = ret.get('tcr')
             print(f"*******************{ ret.get('xqmc')}")
@@ -1073,6 +1186,8 @@ class XUQIU_UI(QWidget):
                 pass
             elif file_path.endswith('.md'):
                 subprocess.Popen(F'{MD_PATH}  "{file_path}"')
+            elif file_path.endswith('.py'):
+                subprocess.Popen(F'{VS_PATH} "{file_path}"')
             else:
                 subprocess.Popen(F'{WPS_PATH} "{file_path}"')
         elif datas[1]=='文件夹':
@@ -1375,7 +1490,7 @@ class XUQIU_UI(QWidget):
                     if 'http' in file_path:
                         ctime = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
                         mtime = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
-                        datas.append([id,type, f'@@@{file_path}', version, desc,ctime,mtime, file_path])
+                        datas.append([id,type, f'@@@{file_path[:50]}', version, desc,ctime,mtime, file_path])
         files.reverse()
         if ct == '' or ct == '文档':
             ## md 文档
@@ -1501,7 +1616,7 @@ class XUQIU_UI(QWidget):
     def init_tb_xuqiu(self,search=None):
         # 显示需求表格
         rwlx =''
-        print('init_tb_xuqiu@@@search',search)
+        
         com_status = self.com_sear_type.currentText()
         if search:
             gjz_str_ss = search
@@ -1509,12 +1624,14 @@ class XUQIU_UI(QWidget):
             gjz_str_ss = self.li_search.text()
         model = QStandardItemModel()
         gjz_str_l =[]
-        # print(ZDXQ)
         zd_list = ZDXQ.split('|')
         gjz_str_l += zd_list
         if gjz_str_ss!='':
             gjz_str_l += gjz_str_ss.split('|')
         xs_ids = []
+
+        all_items = []
+
         for gjz_str in gjz_str_l:
             gjz_list = gjz_str.split('&')
             items = XQ_INFO.select().order_by(XQ_INFO.mtime.desc())
@@ -1522,22 +1639,51 @@ class XUQIU_UI(QWidget):
                 items = items.where(XQ_INFO.status==com_status)
             for gjz in gjz_list:
                 items = items.where((XQ_INFO.name ** f'%{gjz}%')|(XQ_INFO.xuqiu_type == gjz)|(XQ_INFO.tcr  ** f'%{gjz}%'))
-            for column, name in enumerate(xuqiu_header):
+            all_items += list(items)
+        # 开发周期内的需求
+        cur_date = QDate.currentDate().toString('yyyy-MM-dd')
+
+        # cur_date -7 
+        cur_date_7 = QDate.currentDate().addDays(-7).toString('yyyy-MM-dd')
+        cur_items = XQ_INFO.select().where(XQ_INFO.start_date<=cur_date,XQ_INFO.end_date>=cur_date_7,XQ_INFO.status=='开发中')
+        all_items += list(cur_items)
+        
+        for column, name in enumerate(xuqiu_header):
                 header_item = QStandardItem(name)
-                model.setHorizontalHeaderItem(column, header_item)
-            for item in items[:500]:
-                id = str(item.id)
-                if id in xs_ids:
-                    continue
-                xs_ids.append(id)
-                name = item.name
-                path = item.path
-                xuqiu_type = item.xuqiu_type
-                status = item.status
-                tcr = item.tcr
-                ctime = item.ctime.strftime("%Y-%m-%d %H:%M:%S")
-                row_items = [QStandardItem(i) for i in [id,name,xuqiu_type,status,tcr,path,ctime]]
-                model.appendRow(row_items)
+                model.setHorizontalHeaderItem(column, header_item) 
+           
+        for item in all_items[:500]:
+            id = str(item.id)
+            if id in xs_ids:
+                continue
+            xs_ids.append(id)
+            name = item.name
+            path = item.path
+            xuqiu_type = item.xuqiu_type
+            status = item.status
+            tcr = item.tcr
+            ctime = item.ctime.strftime("%Y-%m-%d %H:%M:%S")
+            start_date = item.start_date.strftime("%Y-%m-%d") if item.start_date else ''
+            end_date = item.end_date.strftime("%Y-%m-%d") if item.end_date else ''
+            rentian = str(item.rentian) if item.rentian else ''
+            # 剩余人天, 结束时间减去当前时间
+            # 获取当前时间
+            if end_date != '' and status == '开发中':
+                # 获取当前日期字符串
+                cur_date_str = QDate.currentDate().toString('yyyy-MM-dd')
+                # 将字符串转为QDate对象
+                end_qdate = QDate.fromString(end_date, 'yyyy-MM-dd')
+                cur_qdate = QDate.fromString(cur_date_str, 'yyyy-MM-dd')
+                # 计算当前日期到结束日期的天数
+                srtr = cur_qdate.daysTo(end_qdate)
+                srtr = str(srtr)
+                # info日志输出
+                print(f"[info] 计算剩余人天: 当前日期={cur_date_str}, 结束日期={end_date}, 剩余人天={srtr}")
+            else:
+                srtr = ''
+
+            row_items = [QStandardItem(i) for i in [id,name,xuqiu_type,status,tcr,path,ctime,start_date,end_date,rentian,srtr]]
+            model.appendRow(row_items)
         self.tb_xuqiu.setModel(model)
 
         #列宽行高

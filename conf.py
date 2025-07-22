@@ -31,6 +31,7 @@ TXSJ = my_conf.get_path('TXSJ')
 ZDXQ = my_conf.get_path('ZDXQ')
 ZIP_PATH =my_conf.get_path('ZIP_PATH')
 MD_PATH = my_conf.get_path('MD_PATH')
+XSQ_PATH = my_conf.get_path('XSQ_PATH')
 INIT_FILE = './初始化文件'
 import logging
 logging.basicConfig(level=logging.WARNING, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')

@@ -276,6 +276,31 @@ class Ui_Form(object):
         # 应用委托到整个表格
         self.tb_xuqiudtl.setItemDelegate(CustomDelegate(self.tb_xuqiudtl))
 
+        # 修改自定义委托以应用于所有列(需求列表)
+        class CustomDelegate(QStyledItemDelegate):
+            def paint(self, painter, option, index):
+                # 获取第二列的值
+                zrt = index.sibling(index.row(), 9).data()
+                syrtr = index.sibling(index.row(), 10).data()
+                xqzt = index.sibling(index.row(), 3).data()
+                if xqzt == '完成':
+                    option.palette.setColor(QPalette.Text, QColor("#00008B"))  # 深蓝色
+                if syrtr !='' and zrt !='':
+                    syrtr = float(syrtr)
+                    zrt = float(zrt)
+                    # 时间占用比，如果小于0.5，则显示绿色，如果小于0.8，则显示黄色，如果大于0.8，则显示红色
+                    wb = 1-(syrtr / zrt)
+                    if wb < 0.5:
+                        option.palette.setColor(QPalette.Text, QColor("#4CAF50"))  # 绿色
+                    elif wb < 0.8:
+                        option.palette.setColor(QPalette.Text, QColor("#FFA726"))  # 黄色
+                    else:
+                        option.palette.setColor(QPalette.Text, QColor("#FF5722"))  # 红色
+                super().paint(painter, option, index)
+
+        # 应用委托到整个表格
+        self.tb_xuqiu.setItemDelegate(CustomDelegate(self.tb_xuqiu))
+
         self.retranslateUi(Form)
 
         QMetaObject.connectSlotsByName(Form)
