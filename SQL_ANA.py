@@ -44,8 +44,19 @@ class SQL_ANA:
         
         return out
     
-    def sql_parse(self, sql_code: str):
-        pass
+    def sql_parse(self, sql: str):
+            """
+            用sqlglot对SQL语句标准化。
+            """
+            logging.info(f"原始SQL: {sql}")
+            try:
+                # 直接格式化SQL
+                result = sqlglot.transpile(sql, pretty=True)[0]
+                logging.info(f"标准化后SQL: {result}")
+                return result
+            except Exception as e:
+                logging.error(f"标准化失败: {e}")
+                return ""
 
 
 

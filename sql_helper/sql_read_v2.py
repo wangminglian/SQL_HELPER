@@ -172,15 +172,15 @@ if __name__ == '__main__':
     a = SQL_DE_UTIL()
     start_time = time.time()
 
-    a.set_sql_by_file('E:\\思特奇\\学习笔记\\数仓任务\\关于对政企经营沙盘系统中酒店清单摸排营销进行统计分析报表开发的需求.sql')
+    a.set_sql_by_file('E:\\思特奇\\SQL_HELPER目录\\数据\\关于打造我的欠费大宽表的需求\TB_RPT_GRP_OWE_WIDE_DTL_MON.sql')
     end_time = time.time()
 
 
 
-    u = a.get_creat_tables()
+    # u = a.get_creat_tables()
 
-    for i in u:
-        print(i)
+    # for i in u:
+    #     print(i)
 
     #
     # for i in u:

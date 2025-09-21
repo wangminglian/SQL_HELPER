@@ -4,6 +4,7 @@ import ast
 from clinet.main_ui import Ui_MainWindow
 from clinet.gy_ui import Ui_SQL_HELPER
 import pyperclip
+import pandas as pd
 
 from PySide6.QtCore import QTime, QDateTime, QRect, QTimer, QCoreApplication
 from PySide6.QtGui import Qt, QIcon, QKeySequence, QShortcut, QAction
