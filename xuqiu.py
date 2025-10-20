@@ -543,8 +543,7 @@ class XUQIU_UI(QWidget):
 
 
         self.tb_xuqiudtl.setSelectionBehavior(QAbstractItemView.SelectItems)
-        self.tb_xuqiudtl.setWordWrap(True)
-
+        self.tb_xuqiudtl.setWordWrap(True) 
 
         self.bt_new_jiaoben:QPushButton =self.ui.new_jiaoben
         self.bt_new_jiaoben.clicked.connect(self.new_jiaoben)
